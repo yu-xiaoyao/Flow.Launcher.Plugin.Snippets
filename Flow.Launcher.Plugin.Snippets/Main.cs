@@ -144,6 +144,19 @@ namespace Flow.Launcher.Plugin.Snippets
             var contextData = selectedResult.ContextData;
             if (contextData is SnippetModel sm)
             {
+                //TODO TEST
+                menus.Add(new Result
+                {
+                    Title = "TEST",
+                    IcoPath = IconPath,
+                    Action = _ =>
+                    {
+                        var sw = new SnippetsWindows();
+                        sw.Show();
+                        return true;
+                    }
+                });
+
                 menus.Add(new Result
                 {
                     Title = _context.API.GetTranslation("snippets_plugin_edit_snippet"),

@@ -34,6 +34,7 @@
     <system:String x:Key="snippets_plugin_snippets_key">Key</system:String>
     <system:String x:Key="snippets_plugin_snippets_value">Value</system:String>
     <system:String x:Key="snippets_plugin_snippets_score">Score</system:String>
+    <system:String x:Key="snippets_plugin_snippets_folder">Folder</system:String>
     <system:String x:Key="snippets_plugin_filter">Filter</system:String>
     <system:String x:Key="snippets_plugin_reset">Reset</system:String>
     <system:String x:Key="snippets_plugin_export">Export</system:String>
