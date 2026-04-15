@@ -92,7 +92,7 @@ namespace Flow.Launcher.Plugin.Snippets
                         if (_settings.AutoPasteEnabled)
                         {
                             Task.Run(() =>
-                                AutoPasteHelper.PasteWhenFocusRestoredAsync(_context, _settings.PasteDelayMs));
+                                AutoPasteHelper.PasteWhenFocusRestoredAsyncNew(_context, _settings.PasteDelayMs));
                         }
                     }
                     catch (Exception ex)
