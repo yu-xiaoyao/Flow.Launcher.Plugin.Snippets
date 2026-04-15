@@ -80,8 +80,11 @@ namespace Flow.Launcher.Plugin.Snippets
                 {
                     try
                     {
+                        // Expand variables before copying to clipboard
+                        var expandedValue = VariableExpander.Expand(value);
+                        
                         // copy to clipboard first
-                        _context.API.CopyToClipboard(value, showDefaultNotification: false);
+                        _context.API.CopyToClipboard(expandedValue, showDefaultNotification: false);
 
                         // after Flow Launcher hides, wait until Flow Launcher no longer has focus and paste into previous active window
                         if (_settings.AutoPasteEnabled)
