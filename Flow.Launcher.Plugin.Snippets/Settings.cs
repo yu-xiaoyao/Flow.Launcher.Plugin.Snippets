@@ -21,6 +21,11 @@ public class Settings : BaseModel
     /// Delay in milliseconds before pasting
     /// </summary>
     public int PasteDelayMs { get; set; } = 50;
+    
+    /// <summary>
+    /// Enable Dynamic Variables when value is {{VAR}}
+    /// </summary>
+    public bool DynamicVariables { get; set; }
 
     /// <summary>
     /// 1.x.x version snippets

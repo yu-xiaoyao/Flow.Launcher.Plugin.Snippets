@@ -22,6 +22,7 @@ public partial class SettingPanel : UserControl
 
         ComboBoxStorageMode.SelectedIndex = _settings.StorageType == StorageType.Sqlite ? 1 : 0;
         CheckBoxAutoPaste.IsChecked = _settings.AutoPasteEnabled;
+        CheckBoxDynamicVariables.IsChecked = _settings.DynamicVariables;
     }
 
     private void ButtonOpenManage_OnClick(object sender, RoutedEventArgs e)
@@ -116,6 +117,19 @@ public partial class SettingPanel : UserControl
     private void CheckBoxAutoPaste_Unchecked(object sender, RoutedEventArgs e)
     {
         _settings.AutoPasteEnabled = false;
+        _publicApi.SavePluginSettings();
+    }
+    
+    
+    private void CheckBoxDynamicVariables_Checked(object sender, RoutedEventArgs e)
+    {
+        _settings.DynamicVariables = true;
+        _publicApi.SavePluginSettings();
+    }
+
+    private void CheckBoxDynamicVariables_Unchecked(object sender, RoutedEventArgs e)
+    {
+        _settings.DynamicVariables = false;
         _publicApi.SavePluginSettings();
     }
 }

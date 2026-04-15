@@ -49,5 +49,7 @@
     <system:String x:Key="snippets_plugin_file_not_found">文件不存在</system:String>
     <system:String x:Key="snippets_plugin_auto_paste_enabled">启用自动粘贴</system:String>
     <system:String x:Key="snippets_plugin_auto_paste_description">复制到剪贴板后自动粘贴片段</system:String>
+    <system:String x:Key="snippets_plugin_enable_dynamic_variables">启用动态变量</system:String>
+    <system:String x:Key="snippets_plugin_enable_dynamic_variables_desc">解析格式像这样的变量: {{date}}</system:String>
 
 </ResourceDictionary>

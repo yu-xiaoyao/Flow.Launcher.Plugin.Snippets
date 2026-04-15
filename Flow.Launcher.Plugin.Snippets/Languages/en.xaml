@@ -49,5 +49,7 @@
     <system:String x:Key="snippets_plugin_file_not_found">File Not Found</system:String>
     <system:String x:Key="snippets_plugin_auto_paste_enabled">Enable Auto Paste</system:String>
     <system:String x:Key="snippets_plugin_auto_paste_description">Automatically paste snippets after copying to clipboard</system:String>
+    <system:String x:Key="snippets_plugin_enable_dynamic_variables">Enable Dynamic Variables</system:String>
+    <system:String x:Key="snippets_plugin_enable_dynamic_variables_desc">Parse variables in this format: {{date}}</system:String>
 
 </ResourceDictionary>

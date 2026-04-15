@@ -80,9 +80,13 @@ namespace Flow.Launcher.Plugin.Snippets
                 {
                     try
                     {
-                        // Expand variables before copying to clipboard
-                        var expandedValue = VariableExpander.Expand(value);
-                        
+                        var expandedValue = value;
+                        if (_settings.DynamicVariables)
+                        {
+                            // Expand variables before copying to clipboard
+                            expandedValue = VariableExpander.Expand(value);
+                        }
+
                         // copy to clipboard first
                         _context.API.CopyToClipboard(expandedValue, showDefaultNotification: false);
 
@@ -94,7 +98,7 @@ namespace Flow.Launcher.Plugin.Snippets
                     }
                     catch (Exception ex)
                     {
-                         InnerLogger.Logger.Error("Snippets Action", ex);
+                        InnerLogger.Logger.Error("Snippets Action", ex);
                     }
 
                     return true;
@@ -252,7 +256,7 @@ namespace Flow.Launcher.Plugin.Snippets
             _snippetManage.Close();
         }
 
-        
+
         // P/Invoke helpers to simulate Ctrl+V keypress and check foreground window
         [DllImport("user32.dll", SetLastError = true)]
         private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
@@ -288,33 +292,32 @@ namespace Flow.Launcher.Plugin.Snippets
         }
 
         private static async Task PasteWhenFocusRestoredAsync(PluginInitContext context, int extraDelayMs = 50)
-         {
+        {
             try
             {
-              // Wait until Flow Launcher main window is no longer visible
-              const int timeoutMs = 2000; // max wait time for focus to switch
-              const int intervalMs = 100;
-              var waited = 0;
-                
-              while (waited < timeoutMs && context.API.IsMainWindowVisible())
-               {
-                 await Task.Delay(intervalMs).ConfigureAwait(false);
-                 waited += intervalMs;
+                // Wait until Flow Launcher main window is no longer visible
+                const int timeoutMs = 2000; // max wait time for focus to switch
+                const int intervalMs = 100;
+                var waited = 0;
+
+                while (waited < timeoutMs && context.API.IsMainWindowVisible())
+                {
+                    await Task.Delay(intervalMs).ConfigureAwait(false);
+                    waited += intervalMs;
                 }
 
-            // small extra delay to ensure target window is ready to accept input
-            await Task.Delay(extraDelayMs).ConfigureAwait(false);
-            SendCtrlV();
-            
+                // small extra delay to ensure target window is ready to accept input
+                await Task.Delay(extraDelayMs).ConfigureAwait(false);
+                SendCtrlV();
             }
-             catch (Exception ex)
-              {
-                 InnerLogger.Logger.Error("Snippets Paste", ex);
-               
-                 // At minimum, the snippet is already in clipboard
-                 // Optionally show a notification that auto-paste failed
-             }
-         }
+            catch (Exception ex)
+            {
+                InnerLogger.Logger.Error("Snippets Paste", ex);
+
+                // At minimum, the snippet is already in clipboard
+                // Optionally show a notification that auto-paste failed
+            }
+        }
 
         private List<Result> _buildEmpty(Query query)
         {
