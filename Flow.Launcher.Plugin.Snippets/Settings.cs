@@ -13,6 +13,21 @@ public class Settings : BaseModel
     public bool EnableFolder { get; set; } = false;
 
     /// <summary>
+    /// Enable Auto Paste Feature
+    /// </summary>
+    public bool AutoPasteEnabled { get; set; } = true;
+
+    /// <summary>
+    /// Delay in milliseconds before pasting
+    /// </summary>
+    public int PasteDelayMs { get; set; } = 50;
+    
+    /// <summary>
+    /// Enable Dynamic Variables when value is {{VAR}}
+    /// </summary>
+    public bool DynamicVariables { get; set; }
+
+    /// <summary>
     /// 1.x.x version snippets
     /// </summary>
     [Obsolete]

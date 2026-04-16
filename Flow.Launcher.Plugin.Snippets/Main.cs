@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using Flow.Launcher.Plugin.Snippets.Json;
 using Flow.Launcher.Plugin.Snippets.Sqlite;
@@ -26,7 +27,7 @@ namespace Flow.Launcher.Plugin.Snippets
             if (_settings.StorageType == StorageType.Sqlite)
             {
                 _snippetManage =
-                    new SqliteSnippetManage(FileUtil.GetDataDirectory(true, () => GetType().Assembly.GetName().Name));
+                    new SqliteSnippetManage(context.CurrentPluginMetadata.PluginSettingsDirectoryPath);
             }
             else
             {
@@ -58,22 +59,47 @@ namespace Flow.Launcher.Plugin.Snippets
 
         private Result _modelToResult(Query query, SnippetModel sm)
         {
+            var key = sm.Key ?? string.Empty;
+            var value = sm.Value ?? string.Empty;
             return new Result
             {
-                Title = sm.Key,
-                SubTitle = sm.Value.Replace("\r\n", "  ").Replace("\n", "  "),
+                Title = key,
+                SubTitle = value.Replace("\r\n", "  ").Replace("\n", "  "),
                 IcoPath = IconPath,
                 Score = sm.Score,
-                AutoCompleteText = $"{query.ActionKeyword} {sm.Key}",
+                AutoCompleteText = $"{query.ActionKeyword} {key}",
                 ContextData = sm,
                 Preview = new Result.PreviewInfo
                 {
-                    Description = sm.Value,
+                    Description = value,
                     PreviewImagePath = IconPath
                 },
                 Action = _ =>
                 {
-                    _context.API.CopyToClipboard(sm.Value, showDefaultNotification: false);
+                    try
+                    {
+                        var expandedValue = value;
+                        if (_settings.DynamicVariables)
+                        {
+                            // Expand variables before copying to clipboard
+                            expandedValue = VariableExpander.Expand(value);
+                        }
+
+                        // copy to clipboard first
+                        _context.API.CopyToClipboard(expandedValue, showDefaultNotification: false);
+
+                        // after Flow Launcher hides, wait until Flow Launcher no longer has focus and paste into previous active window
+                        if (_settings.AutoPasteEnabled)
+                        {
+                            Task.Run(() =>
+                                AutoPasteHelper.PasteWhenFocusRestoredAsyncNew(_context, _settings.PasteDelayMs));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        InnerLogger.Logger.Error("Snippets Action", ex);
+                    }
+
                     return true;
                 }
             };
@@ -241,7 +267,7 @@ namespace Flow.Launcher.Plugin.Snippets
         {
             _snippetManage.Close();
         }
-
+        
         private List<Result> _buildEmpty(Query query)
         {
             return new List<Result>

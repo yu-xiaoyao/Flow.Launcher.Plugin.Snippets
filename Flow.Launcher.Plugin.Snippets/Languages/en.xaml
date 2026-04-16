@@ -5,7 +5,7 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String x:Key="snippets_plugin_title">Snippets</system:String>
-    <system:String x:Key="snippets_plugin_description">Manage name/value snippets and copy to clipboard</system:String>
+    <system:String x:Key="snippets_plugin_description">Manage name/value snippets with auto-paste and clipboard support</system:String>
 
     <system:String x:Key="snippets_plugin_snippets_empty">Snippets list is empty</system:String>
     <system:String x:Key="snippets_plugin_snippets_empty_add">Snippet is empty, Please add Snippet first</system:String>
@@ -48,5 +48,9 @@
     <system:String x:Key="snippets_plugin_save_json_file">Save Json File</system:String>
     <system:String x:Key="snippets_plugin_error">Error</system:String>
     <system:String x:Key="snippets_plugin_file_not_found">File Not Found</system:String>
+    <system:String x:Key="snippets_plugin_auto_paste_enabled">Enable Auto Paste</system:String>
+    <system:String x:Key="snippets_plugin_auto_paste_description">Automatically paste snippets after copying to clipboard</system:String>
+    <system:String x:Key="snippets_plugin_enable_dynamic_variables">Enable Dynamic Variables</system:String>
+    <system:String x:Key="snippets_plugin_enable_dynamic_variables_desc">Parse variables in this format: {{date}}</system:String>
 
 </ResourceDictionary>

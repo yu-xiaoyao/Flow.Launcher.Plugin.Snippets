@@ -5,7 +5,7 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String x:Key="snippets_plugin_title">Snippets</system:String>
-    <system:String x:Key="snippets_plugin_description">管理 key/value Snippets 和复制到剪贴板</system:String>
+    <system:String x:Key="snippets_plugin_description">管理 key/value Snippets，支持自动粘贴和剪贴板功能</system:String>
 
     <system:String x:Key="snippets_plugin_snippets_empty">Snippets 列表为空</system:String>
     <system:String x:Key="snippets_plugin_snippets_empty_add">Snippets 为空, 请先添加 Snippet</system:String>
@@ -48,5 +48,9 @@
     <system:String x:Key="snippets_plugin_save_json_file">保存 Json 文件</system:String>
     <system:String x:Key="snippets_plugin_error">错误</system:String>
     <system:String x:Key="snippets_plugin_file_not_found">文件不存在</system:String>
+    <system:String x:Key="snippets_plugin_auto_paste_enabled">启用自动粘贴</system:String>
+    <system:String x:Key="snippets_plugin_auto_paste_description">复制到剪贴板后自动粘贴片段</system:String>
+    <system:String x:Key="snippets_plugin_enable_dynamic_variables">启用动态变量</system:String>
+    <system:String x:Key="snippets_plugin_enable_dynamic_variables_desc">解析格式像这样的变量: {{date}}</system:String>
 
 </ResourceDictionary>
