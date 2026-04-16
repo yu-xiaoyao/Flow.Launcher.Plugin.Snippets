@@ -1,38 +1,39 @@
-﻿<Window x:Class="Flow.Launcher.Plugin.Snippets.SnippetsWindows"
+﻿<Window x:Class="Flow.Launcher.Plugin.Snippets.SettingWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:Flow.Launcher.Plugin.Snippets"
-        mc:Ignorable="d"
-        Title="SnippetsWindows"
+        Title="{DynamicResource snippets_plugin_manage_snippets}"
+        Width="1200"
+        Height="640"
+        MinWidth="940"
+        MinHeight="600"
+        Closed="OnClosed"
         Loaded="OnLoaded"
         StateChanged="Window_StateChanged"
         ResizeMode="CanResize"
-        WindowStartupLocation="CenterScreen"
-        Width="1200"
-        Height="640"
-        MinWidth="{Binding WindowMinWidth,RelativeSource={RelativeSource Self}}"
-        MinHeight="{Binding WindowMinHeight,RelativeSource={RelativeSource Self}}"
+        UseLayoutRounding="True"
+        WindowStartupLocation="Manual"
+        mc:Ignorable="d"
+
         Background="{DynamicResource PopuBGColor}"
         Foreground="{DynamicResource PopupTextColor}">
 
-    <!-- Remove Windows Default Title Bar -->
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="32"
                       ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}" />
     </WindowChrome.WindowChrome>
+    <Window.InputBindings>
+        <KeyBinding Key="Escape" Command="Close" />
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="Close" Executed="OnCloseExecuted" />
+    </Window.CommandBindings>
 
-
+    <!--  New  -->
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <!-- Custom Title Bar -->
-        <StackPanel>
-            <Grid>
+        <Border Style="{StaticResource WindowMainPanelStyle}">
+            <Grid Background="{DynamicResource Color01B}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
@@ -40,16 +41,27 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="32" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <!--  TitleBar and Control  -->
+                <Image
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Width="16"
+                    Height="16"
+                    Margin="10 4 4 4"
+                    RenderOptions.BitmapScalingMode="HighQuality"
+                    Source="/Images/Snippets.png" />
                 <TextBlock
                     Grid.Row="0"
                     Grid.Column="1"
-                    Margin="10 4 4 4"
+                    Margin="4 0 0 0"
                     VerticalAlignment="Center"
                     FontSize="12"
                     Foreground="{DynamicResource Color05B}"
-                    Text="{DynamicResource snippets_plugin_title}" />
-
+                    Text="{DynamicResource flowlauncher_settings}" />
 
                 <Button
                     Grid.Row="0"
@@ -76,7 +88,6 @@
                         </Path.Style>
                     </Path>
                 </Button>
-
                 <Button
                     Name="MaximizeButton"
                     Grid.Row="0"
@@ -127,10 +138,10 @@
                         </Path.Style>
                     </Path>
                 </Button>
-
                 <Button
+                    Grid.Row="0"
                     Grid.Column="4"
-                    Click="OnCancelButtonClick"
+                    Click="OnCloseButtonClick"
                     Style="{StaticResource TitleBarCloseButtonStyle}">
                     <Path
                         Width="46"
@@ -152,74 +163,64 @@
                     </Path>
                 </Button>
 
-            </Grid>
-        </StackPanel>
 
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="4*" />
-            </Grid.ColumnDefinitions>
-
-            <!-- Left Tree -->
-            <StackPanel Grid.Column="0" Background="Aqua">
-
-            </StackPanel>
-
-            <!-- Right Content -->
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-
-                <Grid>
+                <!-- Data Container -->
+                <Grid
+                    x:Name="NavView"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="5"
+                    Margin="0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Background="{DynamicResource Color01B}">
 
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="250" MinWidth="160" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" MinWidth="300" />
                     </Grid.ColumnDefinitions>
 
-                    <ComboBox Grid.Column="0" Margin="5 0 0 0" Width="120"
-                              VerticalAlignment="Center" HorizontalAlignment="Center" Name="ComboBoxFilterType">
-                        <ComboBoxItem Content="{DynamicResource snippets_plugin_snippets_key}" />
-                        <ComboBoxItem Content="{DynamicResource snippets_plugin_snippets_value}" />
-                        <ComboBoxItem Content="{DynamicResource snippets_plugin_snippets_folder}" />
-                    </ComboBox>
+                    <!-- Left Panel -->
+                    <Border
+                        Grid.Column="0"
+                        Margin="0"
+                        Background="{DynamicResource Color02B}"
+                        CornerRadius="4">
+                        <TextBlock
+                            Margin="12"
+                            VerticalAlignment="Top"
+                            Foreground="{DynamicResource Color05B}"
+                            Text="Left Panel" />
+                    </Border>
 
-                    <TextBox Grid.Column="1" Margin="5 0 0 0" Width="240"></TextBox>
+                    <!-- Splitter -->
+                    <GridSplitter
+                        Grid.Column="1"
+                        Width="4"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Stretch"
+                        Background="{DynamicResource Color03B}"
+                        ResizeBehavior="PreviousAndNext" />
 
-                    <Button Grid.Column="2" Margin="5 0 0 0"
-                            Content="{DynamicResource snippets_plugin_filter}">
-                    </Button>
-
-                    <Button Grid.Column="3" Margin="5 0 0 0"
-                            Content="{DynamicResource snippets_plugin_reset}">
-                    </Button>
-
-                    <Button Grid.Column="4" Margin="5 0 0 0"
-                            Content="{DynamicResource snippets_plugin_add}">
-                    </Button>
+                    <!-- Right Panel -->
+                    <Border
+                        Grid.Column="2"
+                        Margin="0"
+                        Background="{DynamicResource Color04B}"
+                        CornerRadius="4">
+                        <TextBlock
+                            Margin="12"
+                            VerticalAlignment="Top"
+                            Foreground="{DynamicResource Color05B}"
+                            Text="Right Panel" />
+                    </Border>
 
                 </Grid>
 
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Button Background="Wheat">TTTT</Button>
-                    <Button Grid.Column="1">TEST2</Button>
-
-                </Grid>
 
             </Grid>
-        </Grid>
+        </Border>
     </Grid>
 
 

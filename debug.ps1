@@ -1,31 +1,21 @@
-dotnet publish Flow.Launcher.Plugin.Snippets -c Release -r win-x64 --no-self-contained
-# Compress-Archive -LiteralPath Flow.Launcher.Plugin.Snippets/bin/Release/win-x64/publish -DestinationPath Flow.Launcher.Plugin.Snippets/bin/Snippets.zip -Force
+dotnet publish Flow.Launcher.Plugin.Snippets -c Debug -r win-x64 --no-self-contained
 
-echo "Build Complete"
+$AppDataFolder = [Environment]::GetFolderPath("ApplicationData")
+$flowLauncherExe = "$env:LOCALAPPDATA\FlowLauncher\Flow.Launcher.exe"
 
-try {
-    taskkill /F /IM Flow.Launcher.exe
+if (Test-Path $flowLauncherExe) {
+    Stop-Process -Name "Flow.Launcher" -Force -ErrorAction SilentlyContinue
+    Start-Sleep -Seconds 2
+
+    if (Test-Path "$AppDataFolder\FlowLauncher\Plugins\Snippets") {
+        Remove-Item -Recurse -Force "$AppDataFolder\FlowLauncher\Plugins\Snippets"
+    }
+
+    Copy-Item "Flow.Launcher.Plugin.Snippets\bin\Debug\win-x64\publish" "$AppDataFolder\FlowLauncher\Plugins\" -Recurse -Force
+    Rename-Item -Path "$AppDataFolder\FlowLauncher\Plugins\publish" -NewName "Snippets"
+
+    Start-Sleep -Seconds 2
+    Start-Process $flowLauncherExe
+} else {
+    Write-Host "Flow.Launcher.exe not found. Please install Flow Launcher first"
 }
-catch {
-
-}
-Start-Sleep -Seconds 1
-try {
-    taskkill /F /IM Flow.Launcher.exe
-}
-catch {
-
-}
-
-echo "Kill Flow Launcher"
-
-try {
-    Remove-Item $env:APPDATA\FlowLauncher\Plugins\Snippets-1.0.0\* -recurse
-}
-catch {
-
-}
-echo "Start Copy"
-Copy-Item -Path Flow.Launcher.Plugin.Snippets\bin\Release\win-x64\publish\* -Destination $env:APPDATA\FlowLauncher\Plugins\Snippets-1.0.0\ -recurse
-echo "Restart FlowLauncher"
-.$env:LOCALAPPDATA\FlowLauncher\Flow.Launcher.exe

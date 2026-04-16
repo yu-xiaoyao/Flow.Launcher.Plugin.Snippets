@@ -173,11 +173,11 @@ namespace Flow.Launcher.Plugin.Snippets
                 //TODO TEST
                 menus.Add(new Result
                 {
-                    Title = "TEST",
+                    Title = "New SettingWindow",
                     IcoPath = IconPath,
                     Action = _ =>
                     {
-                        var sw = new SnippetsWindows();
+                        var sw = new SettingWindow(_context, _snippetManage);
                         sw.Show();
                         return true;
                     }
