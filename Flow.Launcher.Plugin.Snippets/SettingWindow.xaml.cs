@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using Flow.Launcher.Plugin.Snippets.Model;
 using JetBrains.Annotations;
 
@@ -12,10 +14,17 @@ public partial class SettingWindow : Window
     public double WindowMinWidth { get; set; } = 1200;
     public double WindowMinHeight { get; set; } = 640;
 
+    public const int AllSnippets = -1;
+    public const int Favorites = -2;
+    public const int Recent = -3;
+
     private readonly PluginInitContext _context;
     private readonly SnippetManage _snippetManage;
 
     private List<FolderModel> _folders;
+
+    private int _selectFolder = AllSnippets;
+
 
     public SettingWindow(PluginInitContext context, SnippetManage snippetManage)
     {
@@ -24,7 +33,54 @@ public partial class SettingWindow : Window
         InitializeComponent();
         // ComboBoxFilterType.SelectedIndex = 0;
         _folders = _getFolders();
+        _renderItemSelectStyle();
     }
+
+
+    private void _renderItemSelectStyle()
+    {
+        if (_selectFolder < 0)
+        {
+            switch (_selectFolder)
+            {
+                case AllSnippets:
+                    AllSnippetsFolder.Background = Brushes.LightBlue;
+                    break;
+                case Favorites:
+                    FavoritesFolder.Background = Brushes.LightBlue;
+                    break;
+                case Recent:
+                    RecentFolder.Background = Brushes.LightBlue;
+                    break;
+            }
+        }
+        else if (_selectFolder > 0)
+        {
+        }
+    }
+
+
+    private void BorderFolder_MouseEnter(object sender, MouseEventArgs e)
+    {
+        // 鼠标移入时的逻辑
+        var bd = sender as Border;
+        if (bd != null)
+        {
+            bd.Background = Brushes.DarkGray;
+            // 你还可以在这里启动动画、记录日志或弹出提示
+        }
+    }
+
+    private void BorderFolder_MouseLeave(object sender, MouseEventArgs e)
+    {
+        // 鼠标移出时恢复原状
+        var bd = sender as Border;
+        if (bd != null)
+        {
+            bd.Background = Brushes.White;
+        }
+    }
+
 
     #region 数据加载
 
