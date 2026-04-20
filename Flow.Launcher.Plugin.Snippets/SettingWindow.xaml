@@ -176,22 +176,59 @@
                     Background="{DynamicResource Color01B}">
 
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="250" MinWidth="160" />
+                        <ColumnDefinition Width="250" MinWidth="160" MaxWidth="560" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" MinWidth="300" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Left Panel -->
+                    <!-- Left Panel: Folder List-->
                     <Border
                         Grid.Column="0"
                         Margin="0"
                         Background="{DynamicResource Color02B}"
                         CornerRadius="4">
-                        <TextBlock
-                            Margin="12"
-                            VerticalAlignment="Top"
-                            Foreground="{DynamicResource Color05B}"
-                            Text="Left Panel" />
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="0" Background="LightBlue" Height="60" CornerRadius="4">
+                                <TextBlock Text="这是顶部 (Fixed/Auto)" VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Border>
+
+                            <Border Grid.Row="1" Background="White" BorderBrush="Gray" BorderThickness="0,1">
+                                <!--<ScrollViewer>
+                                    <StackPanel>
+                                        <TextBlock Text="这是中间主体内容 (Fill)" Margin="20" />
+                                    </StackPanel>
+                                </ScrollViewer>-->
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.Row="0" Background="LightBlue" Height="60" CornerRadius="4">
+                                        <TextBlock Text="这是---------顶部 (Fixed/Auto)" VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                    <Border Grid.Row="1" Background="PaleVioletRed" CornerRadius="4">
+                                        <TextBlock Text="这是+++++++++顶部 (Fixed/Auto)" VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                </Grid>
+
+
+                            </Border>
+
+                            <Border Grid.Row="2" Background="LightGray" Height="40">
+                                <TextBlock Text="这是底部 (Fixed/Auto)" VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Border>
+                        </Grid>
                     </Border>
 
                     <!-- Splitter -->
@@ -203,7 +240,7 @@
                         Background="{DynamicResource Color03B}"
                         ResizeBehavior="PreviousAndNext" />
 
-                    <!-- Right Panel -->
+                    <!-- Right Panel: Select Folder Snippets -->
                     <Border
                         Grid.Column="2"
                         Margin="0"
