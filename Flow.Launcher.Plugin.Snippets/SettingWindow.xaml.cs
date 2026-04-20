@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,48 +18,51 @@ public partial class SettingWindow : Window
     public const int AllSnippets = -1;
     public const int Favorites = -2;
     public const int Recent = -3;
+    public const int No = -4;
 
     private readonly PluginInitContext _context;
     private readonly SnippetManage _snippetManage;
 
-    private List<FolderModel> _folders;
 
     private int _selectFolder = AllSnippets;
+
+    public ObservableCollection<FolderModel> Folders { get; set; } = new();
 
 
     public SettingWindow(PluginInitContext context, SnippetManage snippetManage)
     {
         _context = context;
         _snippetManage = snippetManage;
+
+        DataContext = this;
+
         InitializeComponent();
         // ComboBoxFilterType.SelectedIndex = 0;
-        _folders = _getFolders();
-        _renderItemSelectStyle();
-    }
+        _renderItemSelectStyle(false);
 
-
-    private void _renderItemSelectStyle()
-    {
-        if (_selectFolder < 0)
+        foreach (var folderModel in _getFolders())
         {
-            switch (_selectFolder)
-            {
-                case AllSnippets:
-                    AllSnippetsFolder.Background = Brushes.LightBlue;
-                    break;
-                case Favorites:
-                    FavoritesFolder.Background = Brushes.LightBlue;
-                    break;
-                case Recent:
-                    RecentFolder.Background = Brushes.LightBlue;
-                    break;
-            }
+            Folders.Add(folderModel);
         }
-        else if (_selectFolder > 0)
+
+        foreach (var folderModel in _getFolders())
         {
+            Folders.Add(folderModel);
+        }
+
+        foreach (var folderModel in _getFolders())
+        {
+            Folders.Add(folderModel);
+        }
+
+        foreach (var folderModel in _getFolders())
+        {
+            Folders.Add(folderModel);
         }
     }
 
+
+    #region View Event
 
     private void BorderFolder_MouseEnter(object sender, MouseEventArgs e)
     {
@@ -66,7 +70,7 @@ public partial class SettingWindow : Window
         var bd = sender as Border;
         if (bd != null)
         {
-            bd.Background = Brushes.DarkGray;
+            // bd.Background = Brushes.DarkGray;
             // 你还可以在这里启动动画、记录日志或弹出提示
         }
     }
@@ -77,12 +81,115 @@ public partial class SettingWindow : Window
         var bd = sender as Border;
         if (bd != null)
         {
-            bd.Background = Brushes.White;
+            // bd.Background = Brushes.White;
+        }
+    }
+
+    private void _renderItemSelectStyle(bool reset)
+    {
+        var b = reset ? Brushes.White : Brushes.LightBlue;
+        if (_selectFolder < 0)
+        {
+            switch (_selectFolder)
+            {
+                case AllSnippets:
+                    AllSnippetsFolder.Background = b;
+                    break;
+                case Favorites:
+                    FavoritesFolder.Background = b;
+                    break;
+                case Recent:
+                    RecentFolder.Background = b;
+                    break;
+                case No:
+                    NoFolder.Background = b;
+                    break;
+            }
+        }
+        else if (_selectFolder > 0)
+        {
         }
     }
 
 
-    #region 数据加载
+    private void AllSnippetsFolder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        _renderItemSelectStyle(true);
+        _selectFolder = AllSnippets;
+        AllSnippetsFolder.Background = Brushes.LightBlue;
+    }
+
+    private void FavoritesFolder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        _renderItemSelectStyle(true);
+        _selectFolder = Favorites;
+        FavoritesFolder.Background = Brushes.LightBlue;
+    }
+
+    private void RecentFolder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        _renderItemSelectStyle(true);
+        _selectFolder = Recent;
+        RecentFolder.Background = Brushes.LightBlue;
+    }
+
+    private void NoFolder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        _renderItemSelectStyle(true);
+        _selectFolder = No;
+        NoFolder.Background = Brushes.LightBlue;
+    }
+
+
+    private void AllSnippetsFolder_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        _renderItemSelectStyle(true);
+        _selectFolder = AllSnippets;
+        AllSnippetsFolder.Background = Brushes.LightBlue;
+    }
+
+    private void FavoritesFolder_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        _renderItemSelectStyle(true);
+        _selectFolder = Favorites;
+        FavoritesFolder.Background = Brushes.LightBlue;
+    }
+
+    private void RecentFolder_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        _renderItemSelectStyle(true);
+        _selectFolder = Recent;
+        RecentFolder.Background = Brushes.LightBlue;
+    }
+
+    private void NoFolder_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        _renderItemSelectStyle(true);
+        _selectFolder = No;
+        NoFolder.Background = Brushes.LightBlue;
+    }
+
+
+    private void FolderList_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        var border = sender as Border;
+        if (border?.DataContext is FolderModel folder)
+        {
+        }
+    }
+
+    private void FolderList_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        var border = sender as Border;
+        if (border?.DataContext is FolderModel folder)
+        {
+        }
+    }
+
+    #endregion
+
+
+    #region Data Load
 
     private List<FolderModel> _getFolders([CanBeNull] string name = null)
     {

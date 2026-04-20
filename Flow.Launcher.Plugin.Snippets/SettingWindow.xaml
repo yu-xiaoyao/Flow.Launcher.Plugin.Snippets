@@ -199,51 +199,85 @@
                                            HorizontalAlignment="Center" />
                             </Border>
 
-                            <Border Grid.Row="1" Background="White" BorderBrush="Gray" BorderThickness="0,1">
-                                <!--<ScrollViewer>
-                                    <StackPanel>
-                                        <TextBlock Text="这是中间主体内容 (Fill)" Margin="20" />
-                                    </StackPanel>
-                                </ScrollViewer>-->
+                            <Border Grid.Row="1" CornerRadius="4">
 
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
+
                                     <StackPanel Grid.Row="0">
 
                                         <Border x:Name="AllSnippetsFolder" CornerRadius="4" Height="32"
-                                                Background="White"
                                                 Margin="8 4 8 2"
-                                                MouseEnter="BorderFolder_MouseEnter"
-                                                MouseLeave="BorderFolder_MouseLeave">
-                                            <TextBlock Text="所有 Snippets" Margin="4 0" VerticalAlignment="Center"
-                                                       Height="32"
-                                                       Background="CadetBlue" />
-                                        </Border>
-                                        <Border x:Name="FavoritesFolder" CornerRadius="4" Height="32" Margin="8 2"
                                                 Background="White"
                                                 MouseEnter="BorderFolder_MouseEnter"
-                                                MouseLeave="BorderFolder_MouseLeave">
+                                                MouseLeave="BorderFolder_MouseLeave"
+                                                MouseLeftButtonUp="AllSnippetsFolder_MouseLeftButtonUp"
+                                                MouseRightButtonUp="AllSnippetsFolder_MouseRightButtonUp">
+                                            <TextBlock Text="所有 Snippets" Margin="4 0" VerticalAlignment="Center" />
+                                        </Border>
+
+                                        <Border x:Name="FavoritesFolder" CornerRadius="4" Height="32"
+                                                Margin="8 2"
+                                                Background="White"
+                                                MouseEnter="BorderFolder_MouseEnter"
+                                                MouseLeave="BorderFolder_MouseLeave"
+                                                MouseLeftButtonUp="FavoritesFolder_MouseLeftButtonUp"
+                                                MouseRightButtonUp="FavoritesFolder_MouseRightButtonUp">
                                             <TextBlock Text="收藏 Snippets" Margin="4 0" VerticalAlignment="Center" />
                                         </Border>
-                                        <Border x:Name="RecentFolder" CornerRadius="4" Height="32" Margin="8 2 8 4"
+                                        <Border x:Name="RecentFolder" CornerRadius="4" Height="32"
+                                                Margin="8 2 8 4"
                                                 Background="White"
                                                 MouseEnter="BorderFolder_MouseEnter"
-                                                MouseLeave="BorderFolder_MouseLeave">
+                                                MouseLeave="BorderFolder_MouseLeave"
+                                                MouseLeftButtonUp="RecentFolder_MouseLeftButtonUp"
+                                                MouseRightButtonUp="RecentFolder_MouseRightButtonUp">
+                                            <TextBlock Text="最近更新" Margin="4 0" VerticalAlignment="Center" />
+                                        </Border>
+                                        <Border x:Name="NoFolder" CornerRadius="4" Height="32"
+                                                Margin="8 2 8 4"
+                                                Background="White"
+                                                MouseEnter="BorderFolder_MouseEnter"
+                                                MouseLeave="BorderFolder_MouseLeave"
+                                                MouseLeftButtonUp="NoFolder_MouseLeftButtonUp"
+                                                MouseRightButtonUp="NoFolder_MouseRightButtonUp">
                                             <TextBlock Text="最近更新" Margin="4 0" VerticalAlignment="Center" />
                                         </Border>
                                     </StackPanel>
-                                    <Border Grid.Row="1" Background="PaleVioletRed" CornerRadius="4">
-                                        <TextBlock Text="这是+++++++++顶部 (Fixed/Auto)" VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center" />
+
+                                    <Border Grid.Row="1" Margin="8" Height="24" Background="Aqua">
+                                        <TextBlock Text="Folder" VerticalAlignment="Center" />
+                                    </Border>
+
+                                    <Border Grid.Row="2">
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+
+                                            <ItemsControl ItemsSource="{Binding Folders}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <ItemContainerTemplate>
+                                                        <Border CornerRadius="4" Height="32"
+                                                                Margin="8 2 8 2"
+                                                                Background="White"
+                                                                MouseLeftButtonUp="FolderList_MouseLeftButtonUp"
+                                                                MouseRightButtonUp="FolderList_MouseRightButtonUp">
+                                                            <TextBlock Text="{Binding Name}" Margin="4 0"
+                                                                       VerticalAlignment="Center" />
+                                                        </Border>
+                                                    </ItemContainerTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+
+                                        </ScrollViewer>
                                     </Border>
                                 </Grid>
 
                             </Border>
 
-                            <Border Grid.Row="2" Background="LightGray" Height="40">
+                            <Border Grid.Row="2" Background="Plum" Height="40">
                                 <TextBlock Text="这是底部 (Fixed/Auto)" VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Border>
