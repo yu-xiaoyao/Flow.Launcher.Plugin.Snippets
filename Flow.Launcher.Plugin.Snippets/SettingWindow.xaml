@@ -30,6 +30,17 @@
         <CommandBinding Command="Close" Executed="OnCloseExecuted" />
     </Window.CommandBindings>
 
+    <Window.Resources>
+        <Style x:Key="BorderSelectableBorderStyle" TargetType="Border">
+            <Setter Property="Background" Value="White" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter Property="Background" Value="LightBlue" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <!--  New  -->
     <Grid>
         <Border Style="{StaticResource WindowMainPanelStyle}">
@@ -249,8 +260,10 @@
                                         </Border>
                                     </StackPanel>
 
-                                    <Border Grid.Row="1" Margin="8" Height="24" Background="Aqua">
-                                        <TextBlock Text="Folder" VerticalAlignment="Center" />
+                                    <Border Grid.Row="1" Background="WhiteSmoke"
+                                            CornerRadius="4">
+                                        <TextBlock Text="FOLDER" VerticalAlignment="Center" FontSize="14"
+                                                   HorizontalAlignment="Center" Margin="8 4" />
                                     </Border>
 
                                     <Border Grid.Row="2">
@@ -261,9 +274,24 @@
                                                     <ItemContainerTemplate>
                                                         <Border CornerRadius="4" Height="32"
                                                                 Margin="8 2 8 2"
-                                                                Background="White"
                                                                 MouseLeftButtonUp="FolderList_MouseLeftButtonUp"
                                                                 MouseRightButtonUp="FolderList_MouseRightButtonUp">
+
+
+                                                            <Border.Style>
+                                                                <Style TargetType="Border">
+                                                                    <Setter Property="Background" Value="White" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                                                Value="True">
+                                                                            <Setter Property="Background"
+                                                                                    Value="LightBlue" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Border.Style>
+
+
                                                             <TextBlock Text="{Binding Name}" Margin="4 0"
                                                                        VerticalAlignment="Center" />
                                                         </Border>

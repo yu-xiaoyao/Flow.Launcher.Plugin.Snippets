@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Flow.Launcher.Plugin.Snippets.Model;
+using Flow.Launcher.Plugin.Snippets.Util;
 using JetBrains.Annotations;
 
 namespace Flow.Launcher.Plugin.Snippets;
@@ -15,16 +16,24 @@ public partial class SettingWindow : Window
     public double WindowMinWidth { get; set; } = 1200;
     public double WindowMinHeight { get; set; } = 640;
 
-    public const int AllSnippets = -1;
-    public const int Favorites = -2;
-    public const int Recent = -3;
-    public const int No = -4;
+    public const int AllSnippetsIndex = -1;
+    public const int FavoritesIndex = -2;
+    public const int RecentIndex = -3;
+    public const int NoIndex = -4;
 
     private readonly PluginInitContext _context;
     private readonly SnippetManage _snippetManage;
 
 
-    private int _selectFolder = AllSnippets;
+    private int _selectFolder = AllSnippetsIndex;
+
+
+    public FolderModel AllSnippets { get; set; } = new FolderModel()
+    {
+        Name = "All Snippets",
+        IsSelected = true
+    };
+
 
     public ObservableCollection<FolderModel> Folders { get; set; } = new();
 
@@ -92,16 +101,16 @@ public partial class SettingWindow : Window
         {
             switch (_selectFolder)
             {
-                case AllSnippets:
+                case AllSnippetsIndex:
                     AllSnippetsFolder.Background = b;
                     break;
-                case Favorites:
+                case FavoritesIndex:
                     FavoritesFolder.Background = b;
                     break;
-                case Recent:
+                case RecentIndex:
                     RecentFolder.Background = b;
                     break;
-                case No:
+                case NoIndex:
                     NoFolder.Background = b;
                     break;
             }
@@ -114,76 +123,107 @@ public partial class SettingWindow : Window
 
     private void AllSnippetsFolder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
+        ClearFolderListSelected();
         _renderItemSelectStyle(true);
-        _selectFolder = AllSnippets;
+        _selectFolder = AllSnippetsIndex;
         AllSnippetsFolder.Background = Brushes.LightBlue;
     }
 
     private void FavoritesFolder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
+        ClearFolderListSelected();
         _renderItemSelectStyle(true);
-        _selectFolder = Favorites;
+        _selectFolder = FavoritesIndex;
         FavoritesFolder.Background = Brushes.LightBlue;
     }
 
     private void RecentFolder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
+        ClearFolderListSelected();
         _renderItemSelectStyle(true);
-        _selectFolder = Recent;
+        _selectFolder = RecentIndex;
         RecentFolder.Background = Brushes.LightBlue;
     }
 
     private void NoFolder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
+        ClearFolderListSelected();
         _renderItemSelectStyle(true);
-        _selectFolder = No;
+        _selectFolder = NoIndex;
         NoFolder.Background = Brushes.LightBlue;
     }
 
 
     private void AllSnippetsFolder_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
+        ClearFolderListSelected();
         _renderItemSelectStyle(true);
-        _selectFolder = AllSnippets;
+        _selectFolder = AllSnippetsIndex;
         AllSnippetsFolder.Background = Brushes.LightBlue;
     }
 
     private void FavoritesFolder_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
+        ClearFolderListSelected();
         _renderItemSelectStyle(true);
-        _selectFolder = Favorites;
+        _selectFolder = FavoritesIndex;
         FavoritesFolder.Background = Brushes.LightBlue;
     }
 
     private void RecentFolder_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
+        ClearFolderListSelected();
         _renderItemSelectStyle(true);
-        _selectFolder = Recent;
+        _selectFolder = RecentIndex;
         RecentFolder.Background = Brushes.LightBlue;
     }
 
     private void NoFolder_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
+        ClearFolderListSelected();
         _renderItemSelectStyle(true);
-        _selectFolder = No;
+        _selectFolder = NoIndex;
         NoFolder.Background = Brushes.LightBlue;
     }
 
 
     private void FolderList_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        var border = sender as Border;
-        if (border?.DataContext is FolderModel folder)
+        InnerLogger.Logger.Info($"FolderList_MouseLeftButtonUp. {sender}");
+        if ((sender as Border)?.DataContext is FolderModel clicked)
         {
+            InnerLogger.Logger.Info($"FolderList_MouseLeftButtonUp. {clicked}");
+            foreach (var f in Folders)
+                f.IsSelected = false;
+            clicked.IsSelected = true;
+            ClearInnerSelected();
         }
     }
 
     private void FolderList_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
-        var border = sender as Border;
-        if (border?.DataContext is FolderModel folder)
+        InnerLogger.Logger.Info("FolderList_MouseRightButtonUp");
+        if ((sender as Border)?.DataContext is FolderModel clicked)
         {
+            foreach (var f in Folders)
+                f.IsSelected = false;
+            clicked.IsSelected = true;
+            ClearInnerSelected();
         }
+    }
+
+    private void ClearFolderListSelected()
+    {
+        foreach (var f in Folders)
+            f.IsSelected = false;
+    }
+
+    private void ClearInnerSelected()
+    {
+        AllSnippetsFolder.Background = Brushes.White;
+        FavoritesFolder.Background = Brushes.White;
+        RecentFolder.Background = Brushes.White;
+        NoFolder.Background = Brushes.White;
     }
 
     #endregion
