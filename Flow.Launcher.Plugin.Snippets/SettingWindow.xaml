@@ -34,6 +34,11 @@
         <Style x:Key="BorderSelectableBorderStyle" TargetType="Border">
             <Setter Property="Background" Value="White" />
             <Style.Triggers>
+
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="DarkGray" />
+                </Trigger>
+
                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
                     <Setter Property="Background" Value="LightBlue" />
                 </DataTrigger>
@@ -221,39 +226,35 @@
 
                                     <StackPanel Grid.Row="0">
 
-                                        <Border x:Name="AllSnippetsFolder" CornerRadius="4" Height="32"
+                                        <Border CornerRadius="4" Height="32"
                                                 Margin="8 4 8 2"
-                                                Background="White"
-                                                MouseEnter="BorderFolder_MouseEnter"
-                                                MouseLeave="BorderFolder_MouseLeave"
+                                                Style="{StaticResource BorderSelectableBorderStyle}"
+                                                DataContext="{Binding FolderAllSnippets}"
                                                 MouseLeftButtonUp="AllSnippetsFolder_MouseLeftButtonUp"
                                                 MouseRightButtonUp="AllSnippetsFolder_MouseRightButtonUp">
                                             <TextBlock Text="所有 Snippets" Margin="4 0" VerticalAlignment="Center" />
                                         </Border>
 
-                                        <Border x:Name="FavoritesFolder" CornerRadius="4" Height="32"
+                                        <Border CornerRadius="4" Height="32"
                                                 Margin="8 2"
-                                                Background="White"
-                                                MouseEnter="BorderFolder_MouseEnter"
-                                                MouseLeave="BorderFolder_MouseLeave"
+                                                Style="{StaticResource BorderSelectableBorderStyle}"
+                                                DataContext="{Binding FolderFavorites}"
                                                 MouseLeftButtonUp="FavoritesFolder_MouseLeftButtonUp"
                                                 MouseRightButtonUp="FavoritesFolder_MouseRightButtonUp">
                                             <TextBlock Text="收藏 Snippets" Margin="4 0" VerticalAlignment="Center" />
                                         </Border>
-                                        <Border x:Name="RecentFolder" CornerRadius="4" Height="32"
+                                        <Border CornerRadius="4" Height="32"
                                                 Margin="8 2 8 4"
-                                                Background="White"
-                                                MouseEnter="BorderFolder_MouseEnter"
-                                                MouseLeave="BorderFolder_MouseLeave"
+                                                Style="{StaticResource BorderSelectableBorderStyle}"
+                                                DataContext="{Binding FolderRecent}"
                                                 MouseLeftButtonUp="RecentFolder_MouseLeftButtonUp"
                                                 MouseRightButtonUp="RecentFolder_MouseRightButtonUp">
                                             <TextBlock Text="最近更新" Margin="4 0" VerticalAlignment="Center" />
                                         </Border>
-                                        <Border x:Name="NoFolder" CornerRadius="4" Height="32"
+                                        <Border CornerRadius="4" Height="32"
                                                 Margin="8 2 8 4"
-                                                Background="White"
-                                                MouseEnter="BorderFolder_MouseEnter"
-                                                MouseLeave="BorderFolder_MouseLeave"
+                                                Style="{StaticResource BorderSelectableBorderStyle}"
+                                                DataContext="{Binding FolderNo}"
                                                 MouseLeftButtonUp="NoFolder_MouseLeftButtonUp"
                                                 MouseRightButtonUp="NoFolder_MouseRightButtonUp">
                                             <TextBlock Text="最近更新" Margin="4 0" VerticalAlignment="Center" />
@@ -274,23 +275,9 @@
                                                     <ItemContainerTemplate>
                                                         <Border CornerRadius="4" Height="32"
                                                                 Margin="8 2 8 2"
+                                                                Style="{StaticResource BorderSelectableBorderStyle}"
                                                                 MouseLeftButtonUp="FolderList_MouseLeftButtonUp"
                                                                 MouseRightButtonUp="FolderList_MouseRightButtonUp">
-
-
-                                                            <Border.Style>
-                                                                <Style TargetType="Border">
-                                                                    <Setter Property="Background" Value="White" />
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding IsSelected}"
-                                                                                Value="True">
-                                                                            <Setter Property="Background"
-                                                                                    Value="LightBlue" />
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </Border.Style>
-
 
                                                             <TextBlock Text="{Binding Name}" Margin="4 0"
                                                                        VerticalAlignment="Center" />
