@@ -316,11 +316,86 @@
                         Margin="0"
                         Background="{DynamicResource Color04B}"
                         CornerRadius="4">
-                        <TextBlock
-                            Margin="12"
-                            VerticalAlignment="Top"
-                            Foreground="{DynamicResource Color05B}"
-                            Text="Right Panel" />
+
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="60" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+
+                            <Border Grid.Row="0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="110" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            CornerRadius="4">
+                                        <ComboBox Width="100" FontSize="12" HorizontalAlignment="Center">
+                                            <ComboBoxItem Content="正常" FontSize="12" />
+                                            <ComboBoxItem Content="语法" FontSize="12" />
+                                        </ComboBox>
+                                    </Border>
+
+                                    <Border Grid.Column="1" VerticalAlignment="Center">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" VerticalAlignment="Center" Margin="4 0 0 0">
+                                                <Label Content="Key" FontSize="14" />
+                                            </Border>
+                                            <Border Grid.Column="1" Margin="4 0 0 0">
+                                                <TextBox FontSize="14" />
+                                            </Border>
+
+                                            <Border Grid.Column="2" VerticalAlignment="Center" Margin="4 0 0 0">
+                                                <Label Content="Value" FontSize="14" />
+                                            </Border>
+                                            <Border Grid.Column="3" Margin="4 0 0 0">
+                                                <TextBox FontSize="14" />
+                                            </Border>
+
+                                            <Border Grid.Column="4" VerticalAlignment="Center" Margin="4 0 0 0">
+                                                <Label Content="Folder" FontSize="14" />
+                                            </Border>
+                                            <Border Grid.Column="5" Margin="4 0 0 0">
+                                                <TextBox FontSize="14" />
+                                            </Border>
+
+                                            <Border Grid.Column="6" VerticalAlignment="Center" Margin="4 0 0 0">
+                                                <Button FontSize="14" Content="Search" Width="84" />
+                                            </Border>
+                                            <Border Grid.Column="7" Margin="4 0 0 0">
+                                                <Button FontSize="14" Content="Reset" Width="84" />
+                                            </Border>
+
+                                        </Grid>
+                                    </Border>
+                                    <Border Grid.Column="2" CornerRadius="4" Margin="2 0"
+                                            VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <Button FontSize="14" Content="Add" Width="84" />
+                                    </Border>
+
+                                </Grid>
+                            </Border>
+
+                            <Border Grid.Row="1" />
+
+                        </Grid>
+
+
                     </Border>
 
                 </Grid>
