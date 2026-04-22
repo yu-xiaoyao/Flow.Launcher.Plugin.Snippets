@@ -13,7 +13,7 @@
         StateChanged="Window_StateChanged"
         ResizeMode="CanResize"
         UseLayoutRounding="True"
-        WindowStartupLocation="Manual"
+        WindowStartupLocation="CenterScreen"
         mc:Ignorable="d"
 
         Background="{DynamicResource PopuBGColor}"
@@ -292,9 +292,11 @@
 
                             </Border>
 
-                            <Border Grid.Row="2" Background="Plum" Height="40">
-                                <TextBlock Text="这是底部 (Fixed/Auto)" VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
+                            <Border Grid.Row="2" CornerRadius="4" Height="44" Background="Gray">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                                            HorizontalAlignment="Center">
+                                    <Button Content="{DynamicResource snippets_plugin_add}" />
+                                </StackPanel>
                             </Border>
                         </Grid>
                     </Border>

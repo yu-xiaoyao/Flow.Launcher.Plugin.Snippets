@@ -76,7 +76,7 @@ public partial class SettingPanel : UserControl
             var sms = FileUtil.ReadSnippets(file);
             foreach (var sm in sms)
             {
-                _snippetManage.Add(sm);
+                _snippetManage.Add(sm.Key, sm.Value, sm.FolderId, sm.Score);
             }
         });
     }
@@ -119,8 +119,8 @@ public partial class SettingPanel : UserControl
         _settings.AutoPasteEnabled = false;
         _publicApi.SavePluginSettings();
     }
-    
-    
+
+
     private void CheckBoxDynamicVariables_Checked(object sender, RoutedEventArgs e)
     {
         _settings.DynamicVariables = true;

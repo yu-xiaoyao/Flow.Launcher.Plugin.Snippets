@@ -2,7 +2,6 @@
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
-using Flow.Launcher.Plugin.Snippets.Util;
 using JetBrains.Annotations;
 
 namespace Flow.Launcher.Plugin.Snippets;
@@ -127,23 +126,12 @@ public partial class SnippetDialog : Window, INotifyPropertyChanged
                 return false;
             }
 
-            _snippetManage.Add(new SnippetModel
-            {
-                Key = key,
-                Value = value,
-                Score = score
-            });
+            _snippetManage.Add(key, value, score: score);
         }
         else
         {
             // update
-            var sm = new SnippetModel
-            {
-                Key = _selectSm.Key,
-                Value = value,
-                Score = score
-            };
-            var result = _snippetManage.UpdateByKey(sm);
+            var result = _snippetManage.UpdateByKey(_selectSm.Key, value: value, score: score);
 
             return result;
         }

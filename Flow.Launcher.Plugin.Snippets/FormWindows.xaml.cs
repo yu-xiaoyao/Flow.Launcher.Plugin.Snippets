@@ -290,12 +290,7 @@ public partial class FormWindows : Window
                 return;
             }
 
-            _snippetManage.Add(new SnippetModel
-            {
-                Key = key,
-                Value = value,
-                Score = score
-            });
+            _snippetManage.Add(key, value, score: score);
 
             TbKey.Text = "";
             TbValue.Text = "";
@@ -311,7 +306,7 @@ public partial class FormWindows : Window
                 Value = value,
                 Score = score
             };
-            _snippetManage.UpdateByKey(sm);
+            _snippetManage.UpdateByKey(_selectSm.Key, value: value, score: score);
             _loadData();
 
             var findIdx = _findBySelectData(_selectSm?.Key);

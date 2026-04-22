@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Flow.Launcher.Plugin.Snippets.Model;
 
 namespace Flow.Launcher.Plugin.Snippets.Json;
 
@@ -51,7 +52,7 @@ public class JsonSettingSnippetManage : SnippetManage
         return _snippets.FirstOrDefault(x => x.Key == key);
     }
 
-    public List<SnippetModel> List(string key = null, string value = null)
+    public List<SnippetModel> List(string key = null, string value = null, long? folderId = null)
     {
         if (key != null && value != null)
         {
@@ -70,6 +71,11 @@ public class JsonSettingSnippetManage : SnippetManage
 
         return _snippets
             .OrderByDescending(x => x.Score).ToList();
+    }
+
+    public bool Add(string key, string value, long? folderId = null, int score = 0)
+    {
+        throw new NotImplementedException();
     }
 
     public bool Add(SnippetModel sm)
@@ -94,6 +100,11 @@ public class JsonSettingSnippetManage : SnippetManage
         if (sm == null)
             return true;
         return _snippets.Remove(sm);
+    }
+
+    public bool UpdateByKey(string key, string value = null, long? folderId = null, int? score = null)
+    {
+        throw new NotImplementedException();
     }
 
     public bool UpdateByKey(SnippetModel sm)
@@ -126,5 +137,35 @@ public class JsonSettingSnippetManage : SnippetManage
         }
 
         _context.API.SavePluginSettings();
+    }
+
+    public FolderModel GetFolder(string name)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool AddFolder(string name)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool RemoveFolder(string name)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool UpdateFolderById(long id, string newName)
+    {
+        throw new NotImplementedException();
+    }
+
+    public List<FolderModel> ListFolders(string name = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void CleanFolders()
+    {
+        throw new NotImplementedException();
     }
 }

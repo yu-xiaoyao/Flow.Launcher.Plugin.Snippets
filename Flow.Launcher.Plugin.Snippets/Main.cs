@@ -22,12 +22,13 @@ namespace Flow.Launcher.Plugin.Snippets
             _context = context;
             _settings = _context.API.LoadSettingJsonStorage<Settings>();
 
-            InnerLogger.SetAsFlowLauncherLogger(_context.API, LoggerLevel.TRACE);
+            InnerLogger.SetAsFlowLauncherLogger(_context, LoggerLevel.TRACE);
 
             if (_settings.StorageType == StorageType.Sqlite)
             {
                 _snippetManage =
-                    new SqliteSnippetManage(context.CurrentPluginMetadata.PluginSettingsDirectoryPath);
+                    new SqliteSnippetManage(context.CurrentPluginMetadata.PluginSettingsDirectoryPath,
+                        context.CurrentPluginMetadata.Version);
             }
             else
             {
@@ -148,20 +149,12 @@ namespace Flow.Launcher.Plugin.Snippets
 
         private void _add(string key, string value)
         {
-            _snippetManage.Add(new SnippetModel
-            {
-                Key = key,
-                Value = value
-            });
+            _snippetManage.Add(key, value);
         }
 
         private void _update(string key, string value)
         {
-            _snippetManage.UpdateByKey(new SnippetModel
-            {
-                Key = key,
-                Value = value
-            });
+            _snippetManage.UpdateByKey(key, value: value);
         }
 
         public List<Result> LoadContextMenus(Result selectedResult)
@@ -267,7 +260,7 @@ namespace Flow.Launcher.Plugin.Snippets
         {
             _snippetManage.Close();
         }
-        
+
         private List<Result> _buildEmpty(Query query)
         {
             return new List<Result>
@@ -295,11 +288,7 @@ namespace Flow.Launcher.Plugin.Snippets
 
             foreach (var snippet in snippets)
             {
-                _snippetManage.Add(new SnippetModel
-                {
-                    Key = snippet.Key,
-                    Value = snippet.Value
-                });
+                _snippetManage.Add(snippet.Key, snippet.Value);
             }
 
             // clear old snippets after merge
