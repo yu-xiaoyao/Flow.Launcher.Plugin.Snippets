@@ -18,10 +18,11 @@ public class SqliteSnippetManage : SnippetManage
                                       (
                                           key         varchar(200) not null primary key,
                                           value       text         not null,
-                                          score       int          not null default 0,
+                                          score       BIGINT       not null default 0,
                                           update_time datetime     not null DEFAULT CURRENT_TIMESTAMP,
                                           create_time datetime     not null DEFAULT CURRENT_TIMESTAMP,
-                                          folder_id   BIGINT
+                                          favorites   INTEGER      not  null default 0
+                                          folder_id   BIGINT,
                                       )
                                       """;
 
@@ -104,8 +105,17 @@ public class SqliteSnippetManage : SnippetManage
             if (!existFolder)
             {
                 //language=SQL
-                const string addFolderIdSql = $"alter table {TABLE_NAME} add column folder_id BIGINT";
-                _alertTable(connection, addFolderIdSql);
+                const string alterSql = $"alter table {TABLE_NAME} add column folder_id BIGINT";
+                _alertTable(connection, alterSql);
+            }
+
+            var existFavorites = _checkTableColumnExists(connection, TABLE_NAME, "favorites");
+            InnerLogger.Logger.Debug($"UpdateTableQuery: {TABLE_NAME}. favorites: {existFavorites}");
+            if (!existFavorites)
+            {
+                //language=SQL
+                const string alterSql = $"alter table {TABLE_NAME} add column favorites INTEGER not null default 0";
+                _alertTable(connection, alterSql);
             }
         }
     }
@@ -201,6 +211,69 @@ public class SqliteSnippetManage : SnippetManage
             result.Add(_readSnippetModel(reader));
         }
 
+        return result;
+    }
+
+    public List<SnippetModel> ListRecent(string key = null, string value = null, int limit = 20)
+    {
+        var sql = $"{QueryAllSql} where 1=1";
+
+        if (key != null)
+            sql += " and s.key like @key";
+
+        if (value != null)
+            sql += " and s.value like @value";
+
+        sql += $" order by s.update_time desc limit {limit}";
+
+        InnerLogger.Logger.Info($"List: {sql}");
+
+        using var connection = new SQLiteConnection(_connectionString);
+        connection.Open();
+        using var command = new SQLiteCommand(sql, connection);
+
+        if (key != null)
+            command.Parameters.AddWithValue("@key", $"%{key}%");
+
+        if (value != null)
+            command.Parameters.AddWithValue("@value", $"%{value}%");
+
+        using var reader = command.ExecuteReader();
+        var result = new List<SnippetModel>();
+        while (reader.Read())
+        {
+            result.Add(_readSnippetModel(reader));
+        }
+
+        return result;
+    }
+
+    public List<SnippetModel> ListNoFolder(string key = null, string value = null)
+    {
+        var sql = $"{QueryAllSql} where 1=1";
+
+        if (key != null)
+            sql += " and s.key like @key";
+
+        if (value != null)
+            sql += " and s.value like @value";
+
+        sql += " and f.folder_id is null order by s.score desc";
+
+        using var connection = new SQLiteConnection(_connectionString);
+        connection.Open();
+        using var command = new SQLiteCommand(sql, connection);
+
+        if (key != null)
+            command.Parameters.AddWithValue("@key", $"%{key}%");
+
+        if (value != null)
+            command.Parameters.AddWithValue("@value", $"%{value}%");
+
+        using var reader = command.ExecuteReader();
+        var result = new List<SnippetModel>();
+        while (reader.Read())
+            result.Add(_readSnippetModel(reader));
         return result;
     }
 

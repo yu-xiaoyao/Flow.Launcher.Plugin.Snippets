@@ -11,6 +11,10 @@ public interface SnippetManage
 
     List<SnippetModel> List([CanBeNull] string key = null, [CanBeNull] string value = null, long? folderId = null);
 
+    List<SnippetModel> ListRecent([CanBeNull] string key = null, [CanBeNull] string value = null, int limit = 20);
+
+    List<SnippetModel> ListNoFolder([CanBeNull] string key = null, [CanBeNull] string value = null);
+
     bool Add(string key, string value, long? folderId = null, int score = 0);
 
     bool RemoveByKey(string key);

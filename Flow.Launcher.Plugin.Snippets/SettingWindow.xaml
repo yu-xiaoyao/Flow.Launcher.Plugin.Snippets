@@ -386,15 +386,36 @@
                                     </Border>
                                     <Border Grid.Column="2" CornerRadius="4" Margin="4 0"
                                             VerticalAlignment="Center" HorizontalAlignment="Center">
-                                        <Button FontSize="13" Content="Add" Width="84" />
+                                        <Button FontSize="13" Content="Add" Width="84" Click="BtnAddSnippets_Click" />
                                     </Border>
 
                                 </Grid>
                             </Border>
 
-                            <Border Grid.Row="1">
-                                <!-- Snippets List -->
-
+                            <Border Grid.Row="1" x:Name="SnippetsContainer" Margin="4"
+                                    BorderBrush="{DynamicResource Color03B}">
+                                <DataGrid ItemsSource="{Binding Snippets}"
+                                          AutoGenerateColumns="False"
+                                          IsReadOnly="True"
+                                          CanUserAddRows="False"
+                                          CanUserDeleteRows="True"
+                                          SelectionMode="Single"
+                                          HeadersVisibility="Column"
+                                          GridLinesVisibility="Horizontal"
+                                          FontSize="13">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Key" Binding="{Binding Key}" Width="120" />
+                                        <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*" />
+                                        <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="60" />
+                                        <DataGridTextColumn Header="Folder" Binding="{Binding FolderName}" Width="120" />
+                                        <DataGridTextColumn Header="CreateTime"
+                                                            Binding="{Binding CreateTime, StringFormat=yyyy-MM-dd HH:mm:SS}"
+                                                            Width="160" />
+                                        <DataGridTextColumn Header="UpdateTime"
+                                                            Binding="{Binding UpdateTime, StringFormat=yyyy-MM-dd HH:mm:SS}"
+                                                            Width="160" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
                             </Border>
 
                         </Grid>

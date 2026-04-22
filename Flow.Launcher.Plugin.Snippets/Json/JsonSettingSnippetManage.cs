@@ -73,6 +73,16 @@ public class JsonSettingSnippetManage : SnippetManage
             .OrderByDescending(x => x.Score).ToList();
     }
 
+    public List<SnippetModel> ListRecent(string key = null, string value = null, int limit = 20)
+    {
+        throw new NotImplementedException();
+    }
+
+    public List<SnippetModel> ListNoFolder(string key = null, string value = null)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool Add(string key, string value, long? folderId = null, int score = 0)
     {
         throw new NotImplementedException();

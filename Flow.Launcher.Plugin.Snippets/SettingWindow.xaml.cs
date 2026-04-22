@@ -18,7 +18,6 @@ public partial class SettingWindow : Window
     private readonly PluginInitContext _context;
     private readonly SnippetManage _snippetManage;
 
-    private long _selectFolderId = -1L;
 
     public FolderModel FolderAllSnippets { get; set; } = new FolderModel()
     {
@@ -43,6 +42,10 @@ public partial class SettingWindow : Window
 
 
     public ObservableCollection<FolderModel> Folders { get; set; } = new();
+
+    public ObservableCollection<SnippetModel> Snippets { get; set; } = new();
+
+    private long _selectFolderId = -1L;
 
 
     public SettingWindow(PluginInitContext context, SnippetManage snippetManage)
@@ -207,33 +210,48 @@ public partial class SettingWindow : Window
 
     private void _loadAllSnippets()
     {
-        var snippets = _snippetManage.List();
+        Snippets.Clear();
+        foreach (var s in _snippetManage.List())
+            Snippets.Add(s);
     }
 
     private void _loadFavorites()
     {
-        var snippets = _snippetManage.List();
+        Snippets.Clear();
+        foreach (var s in _snippetManage.List())
+            Snippets.Add(s);
     }
 
     private void _loadRecent()
     {
-        var snippets = _snippetManage.List();
+        Snippets.Clear();
+        foreach (var s in _snippetManage.ListRecent())
+            Snippets.Add(s);
     }
 
     private void _loadNoFolder()
     {
-        var snippets = _snippetManage.List();
+        Snippets.Clear();
+        foreach (var s in _snippetManage.ListNoFolder())
+            Snippets.Add(s);
     }
 
     private void _reloadSnippets(long folderId)
     {
         _selectFolderId = folderId;
-        var snippets = _snippetManage.List(folderId: folderId);
+        Snippets.Clear();
+        foreach (var s in _snippetManage.List(folderId: folderId))
+            Snippets.Add(s);
     }
 
     private List<FolderModel> _getFolders([CanBeNull] string name = null)
     {
         return _snippetManage.ListFolders(name);
+    }
+
+    private void BtnAddSnippets_Click(object sender, RoutedEventArgs e)
+    {
+        _snippetManage.Add($"SP-{new Random().Next(10000)}", $"Value-{new Random().Next(10000000)}");
     }
 
     #endregion
