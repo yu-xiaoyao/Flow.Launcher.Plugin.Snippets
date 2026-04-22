@@ -32,15 +32,15 @@
 
     <Window.Resources>
         <Style x:Key="BorderSelectableBorderStyle" TargetType="Border">
-            <Setter Property="Background" Value="White" />
+            <Setter Property="Background" Value="{DynamicResource Color06B}" />
             <Style.Triggers>
 
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="DarkGray" />
+                    <Setter Property="Background" Value="{DynamicResource Color14B}" />
                 </Trigger>
 
                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                    <Setter Property="Background" Value="LightBlue" />
+                    <Setter Property="Background" Value="{DynamicResource Color18B}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -201,7 +201,7 @@
                     <Border
                         Grid.Column="0"
                         Margin="0"
-                        Background="{DynamicResource Color02B}"
+                        Background="{DynamicResource Color01B}"
                         CornerRadius="4">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -210,7 +210,8 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <Border Grid.Row="0" Background="LightBlue" Height="60" CornerRadius="4">
+                            <Border Grid.Row="0" Height="60" Background="{DynamicResource Color14B}"
+                                    CornerRadius="4">
                                 <TextBlock Text="这是顶部 (Fixed/Auto)" VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Border>
@@ -292,10 +293,12 @@
 
                             </Border>
 
-                            <Border Grid.Row="2" CornerRadius="4" Height="44" Background="Gray">
+                            <Border Grid.Row="2" CornerRadius="4" Height="44"
+                                    Background="{DynamicResource Color14B}">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
                                             HorizontalAlignment="Center">
-                                    <Button Content="{DynamicResource snippets_plugin_add}" />
+                                    <Button Content="{DynamicResource snippets_plugin_add}" FontSize="13"
+                                            Click="BtnAddFolder_OnClick" />
                                 </StackPanel>
                             </Border>
                         </Grid>
@@ -304,7 +307,7 @@
                     <!-- Splitter -->
                     <GridSplitter
                         Grid.Column="1"
-                        Width="4"
+                        Width="2"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Stretch"
                         Background="{DynamicResource Color03B}"
@@ -314,9 +317,7 @@
                     <Border
                         Grid.Column="2"
                         Margin="0"
-                        Background="{DynamicResource Color04B}"
                         CornerRadius="4">
-
 
                         <Grid>
                             <Grid.RowDefinitions>
@@ -325,7 +326,7 @@
                             </Grid.RowDefinitions>
 
 
-                            <Border Grid.Row="0">
+                            <Border Grid.Row="0" Background="{DynamicResource Color14B}" CornerRadius="4">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="110" />
@@ -335,9 +336,9 @@
 
                                     <Border Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"
                                             CornerRadius="4">
-                                        <ComboBox Width="100" FontSize="12" HorizontalAlignment="Center">
-                                            <ComboBoxItem Content="正常" FontSize="12" />
-                                            <ComboBoxItem Content="语法" FontSize="12" />
+                                        <ComboBox Width="100" FontSize="13" HorizontalAlignment="Center">
+                                            <ComboBoxItem Content="正常" FontSize="13" />
+                                            <ComboBoxItem Content="语法" FontSize="13" />
                                         </ComboBox>
                                     </Border>
 
@@ -354,44 +355,47 @@
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <Border Grid.Column="0" VerticalAlignment="Center" Margin="4 0 0 0">
-                                                <Label Content="Key" FontSize="14" />
+                                                <Label Content="Key" FontSize="13" />
                                             </Border>
                                             <Border Grid.Column="1" Margin="4 0 0 0">
-                                                <TextBox FontSize="14" />
+                                                <TextBox FontSize="13" />
                                             </Border>
 
                                             <Border Grid.Column="2" VerticalAlignment="Center" Margin="4 0 0 0">
-                                                <Label Content="Value" FontSize="14" />
+                                                <Label Content="Value" FontSize="13" />
                                             </Border>
                                             <Border Grid.Column="3" Margin="4 0 0 0">
-                                                <TextBox FontSize="14" />
+                                                <TextBox FontSize="13" />
                                             </Border>
 
                                             <Border Grid.Column="4" VerticalAlignment="Center" Margin="4 0 0 0">
-                                                <Label Content="Folder" FontSize="14" />
+                                                <Label Content="Folder" FontSize="13" />
                                             </Border>
                                             <Border Grid.Column="5" Margin="4 0 0 0">
-                                                <TextBox FontSize="14" />
+                                                <TextBox FontSize="13" />
                                             </Border>
 
                                             <Border Grid.Column="6" VerticalAlignment="Center" Margin="4 0 0 0">
-                                                <Button FontSize="14" Content="Search" Width="84" />
+                                                <Button FontSize="13" Content="Search" Width="84" />
                                             </Border>
                                             <Border Grid.Column="7" Margin="4 0 0 0">
-                                                <Button FontSize="14" Content="Reset" Width="84" />
+                                                <Button FontSize="13" Content="Reset" Width="84" />
                                             </Border>
 
                                         </Grid>
                                     </Border>
-                                    <Border Grid.Column="2" CornerRadius="4" Margin="2 0"
+                                    <Border Grid.Column="2" CornerRadius="4" Margin="4 0"
                                             VerticalAlignment="Center" HorizontalAlignment="Center">
-                                        <Button FontSize="14" Content="Add" Width="84" />
+                                        <Button FontSize="13" Content="Add" Width="84" />
                                     </Border>
 
                                 </Grid>
                             </Border>
 
-                            <Border Grid.Row="1" />
+                            <Border Grid.Row="1">
+                                <!-- Snippets List -->
+
+                            </Border>
 
                         </Grid>
 

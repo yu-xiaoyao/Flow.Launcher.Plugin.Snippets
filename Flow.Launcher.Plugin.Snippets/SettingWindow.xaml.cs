@@ -55,10 +55,15 @@ public partial class SettingWindow : Window
         InitializeComponent();
         // ComboBoxFilterType.SelectedIndex = 0;
         // _renderItemSelectStyle(false);
+        _reloadFolders();
+        _loadAllSnippets();
+    }
 
+    private void _reloadFolders()
+    {
+        Folders.Clear();
         foreach (var folderModel in _getFolders())
             Folders.Add(folderModel);
-        _loadAllSnippets();
     }
 
 
@@ -183,6 +188,16 @@ public partial class SettingWindow : Window
         FolderFavorites.IsSelected = false;
         FolderRecent.IsSelected = false;
         FolderNo.IsSelected = false;
+    }
+
+    #endregion
+
+    #region Left
+
+    private void BtnAddFolder_OnClick(object sender, RoutedEventArgs e)
+    {
+        _snippetManage.AddFolder($"Folder - {new Random().Next()}");
+        _reloadFolders();
     }
 
     #endregion
