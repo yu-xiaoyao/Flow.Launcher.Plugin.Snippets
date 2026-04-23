@@ -173,6 +173,51 @@ public partial class SettingWindow : Window
         FolderListClick(sender as Border);
     }
 
+    private void FolderList_MoveUpOnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem menuItem &&
+            menuItem.Parent is ContextMenu menu &&
+            menu.PlacementTarget is Border border &&
+            border.DataContext is FolderModel folder)
+        {
+            //TODO
+        }
+    }
+
+    private void FolderList_MoveDownOnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem menuItem &&
+            menuItem.Parent is ContextMenu menu &&
+            menu.PlacementTarget is Border border &&
+            border.DataContext is FolderModel folder)
+        {
+            //TODO
+        }
+    }
+
+    private void FolderList_RenameFolderOnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem menuItem &&
+            menuItem.Parent is ContextMenu menu &&
+            menu.PlacementTarget is Border border &&
+            border.DataContext is FolderModel folder)
+        {
+            //TODO
+        }
+    }
+
+    private void FolderList_DeleteFolderOnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem menuItem &&
+            menuItem.Parent is ContextMenu menu &&
+            menu.PlacementTarget is Border border &&
+            border.DataContext is FolderModel folder)
+        {
+            _snippetManage.RemoveFolderById(folder.Id);
+            _reloadFolders();
+        }
+    }
+
     private void FolderListClick([CanBeNull] Border border)
     {
         if (border?.DataContext is FolderModel clicked)
@@ -319,4 +364,12 @@ public partial class SettingWindow : Window
     }
 
     #endregion
+
+
+    private void BtnReset_OnClick(object sender, RoutedEventArgs e)
+    {
+        TbFilterKey.Text = "";
+        TbFilterValue.Text = "";
+        TbFilterFolder.Text = "";
+    }
 }

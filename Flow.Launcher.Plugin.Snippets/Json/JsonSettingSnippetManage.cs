@@ -164,6 +164,11 @@ public class JsonSettingSnippetManage : SnippetManage
         throw new NotImplementedException();
     }
 
+    public bool RemoveFolderById(long folderId)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool UpdateFolderById(long id, string newName)
     {
         throw new NotImplementedException();

@@ -52,5 +52,12 @@
     <system:String x:Key="snippets_plugin_auto_paste_description">复制到剪贴板后自动粘贴片段</system:String>
     <system:String x:Key="snippets_plugin_enable_dynamic_variables">启用动态变量</system:String>
     <system:String x:Key="snippets_plugin_enable_dynamic_variables_desc">解析格式像这样的变量: {{date}}</system:String>
+    <system:String x:Key="snippets_plugin_add_folder">添加目录</system:String>
+    <system:String x:Key="snippets_plugin_delete_folder">删除目录</system:String>
+    <system:String x:Key="snippets_plugin_rename">重命名</system:String>
+    <system:String x:Key="snippets_plugin_all_snippets">所有 Snippets</system:String>
+    <system:String x:Key="snippets_plugin_favorites">收藏</system:String>
+    <system:String x:Key="snippets_plugin_recent">最近</system:String>
+    <system:String x:Key="snippets_plugin_no_folder">无目录</system:String>
 
 </ResourceDictionary>

@@ -233,7 +233,8 @@
                                                 DataContext="{Binding FolderAllSnippets}"
                                                 MouseLeftButtonUp="AllSnippetsFolder_MouseLeftButtonUp"
                                                 MouseRightButtonUp="AllSnippetsFolder_MouseRightButtonUp">
-                                            <TextBlock Text="所有 Snippets" Margin="4 0" VerticalAlignment="Center" />
+                                            <TextBlock Text="{DynamicResource snippets_plugin_all_snippets}"
+                                                       Margin="4 0" VerticalAlignment="Center" />
                                         </Border>
 
                                         <Border CornerRadius="4" Height="32"
@@ -242,7 +243,8 @@
                                                 DataContext="{Binding FolderFavorites}"
                                                 MouseLeftButtonUp="FavoritesFolder_MouseLeftButtonUp"
                                                 MouseRightButtonUp="FavoritesFolder_MouseRightButtonUp">
-                                            <TextBlock Text="收藏 Snippets" Margin="4 0" VerticalAlignment="Center" />
+                                            <TextBlock Text="{DynamicResource snippets_plugin_favorites}" Margin="4 0"
+                                                       VerticalAlignment="Center" />
                                         </Border>
                                         <Border CornerRadius="4" Height="32"
                                                 Margin="8 2 8 4"
@@ -250,7 +252,8 @@
                                                 DataContext="{Binding FolderRecent}"
                                                 MouseLeftButtonUp="RecentFolder_MouseLeftButtonUp"
                                                 MouseRightButtonUp="RecentFolder_MouseRightButtonUp">
-                                            <TextBlock Text="最近更新" Margin="4 0" VerticalAlignment="Center" />
+                                            <TextBlock Text="{DynamicResource snippets_plugin_recent}" Margin="4 0"
+                                                       VerticalAlignment="Center" />
                                         </Border>
                                         <Border CornerRadius="4" Height="32"
                                                 Margin="8 2 8 4"
@@ -258,7 +261,8 @@
                                                 DataContext="{Binding FolderNo}"
                                                 MouseLeftButtonUp="NoFolder_MouseLeftButtonUp"
                                                 MouseRightButtonUp="NoFolder_MouseRightButtonUp">
-                                            <TextBlock Text="最近更新" Margin="4 0" VerticalAlignment="Center" />
+                                            <TextBlock Text="{DynamicResource snippets_plugin_no_folder}" Margin="4 0"
+                                                       VerticalAlignment="Center" />
                                         </Border>
                                     </StackPanel>
 
@@ -279,7 +283,23 @@
                                                                 Style="{StaticResource BorderSelectableBorderStyle}"
                                                                 MouseLeftButtonUp="FolderList_MouseLeftButtonUp"
                                                                 MouseRightButtonUp="FolderList_MouseRightButtonUp">
-
+                                                            <Border.ContextMenu>
+                                                                <ContextMenu>
+                                                                    <MenuItem
+                                                                        Header="{DynamicResource snippets_plugin_move_up}"
+                                                                        Click="FolderList_MoveUpOnClick" />
+                                                                    <MenuItem
+                                                                        Header="{DynamicResource snippets_plugin_move_down}"
+                                                                        Click="FolderList_MoveDownOnClick" />
+                                                                    <Separator />
+                                                                    <MenuItem
+                                                                        Header="{DynamicResource snippets_plugin_rename}"
+                                                                        Click="FolderList_RenameFolderOnClick" />
+                                                                    <MenuItem
+                                                                        Header="{DynamicResource snippets_plugin_delete_folder}"
+                                                                        Click="FolderList_DeleteFolderOnClick" />
+                                                                </ContextMenu>
+                                                            </Border.ContextMenu>
                                                             <TextBlock Text="{Binding Name}" Margin="4 0"
                                                                        VerticalAlignment="Center" />
                                                         </Border>
@@ -297,7 +317,7 @@
                                     Background="{DynamicResource Color14B}">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
                                             HorizontalAlignment="Center">
-                                    <Button Content="{DynamicResource snippets_plugin_add}" FontSize="13"
+                                    <Button Content="{DynamicResource snippets_plugin_add_folder}" FontSize="13"
                                             Click="BtnAddFolder_OnClick" />
                                 </StackPanel>
                             </Border>
@@ -355,38 +375,46 @@
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <Border Grid.Column="0" VerticalAlignment="Center" Margin="4 0 0 0">
-                                                <Label Content="Key" FontSize="13" />
+                                                <Label Content="{DynamicResource snippets_plugin_snippets_key}"
+                                                       FontSize="13" />
                                             </Border>
                                             <Border Grid.Column="1" Margin="4 0 0 0">
-                                                <TextBox FontSize="13" />
+                                                <TextBox x:Name="TbFilterKey" FontSize="13" />
                                             </Border>
 
                                             <Border Grid.Column="2" VerticalAlignment="Center" Margin="4 0 0 0">
-                                                <Label Content="Value" FontSize="13" />
+                                                <Label Content="{DynamicResource snippets_plugin_snippets_value}"
+                                                       FontSize="13" />
                                             </Border>
                                             <Border Grid.Column="3" Margin="4 0 0 0">
-                                                <TextBox FontSize="13" />
+                                                <TextBox x:Name="TbFilterValue" FontSize="13" />
                                             </Border>
 
                                             <Border Grid.Column="4" VerticalAlignment="Center" Margin="4 0 0 0">
-                                                <Label Content="Folder" FontSize="13" />
+                                                <Label Content="{DynamicResource snippets_plugin_snippets_folder}"
+                                                       FontSize="13" />
                                             </Border>
                                             <Border Grid.Column="5" Margin="4 0 0 0">
-                                                <TextBox FontSize="13" />
+                                                <TextBox x:Name="TbFilterFolder" FontSize="13" />
                                             </Border>
 
                                             <Border Grid.Column="6" VerticalAlignment="Center" Margin="4 0 0 0">
-                                                <Button FontSize="13" Content="Search" Width="84" />
+                                                <Button FontSize="13"
+                                                        Content="{DynamicResource snippets_plugin_filter}"
+                                                        Width="84" />
                                             </Border>
                                             <Border Grid.Column="7" Margin="4 0 0 0">
-                                                <Button FontSize="13" Content="Reset" Width="84" />
+                                                <Button FontSize="13" Content="{DynamicResource snippets_plugin_reset}"
+                                                        Click="BtnReset_OnClick"
+                                                        Width="84" />
                                             </Border>
 
                                         </Grid>
                                     </Border>
                                     <Border Grid.Column="2" CornerRadius="4" Margin="4 0"
                                             VerticalAlignment="Center" HorizontalAlignment="Center">
-                                        <Button FontSize="13" Content="Add" Width="84" Click="BtnAddSnippets_Click" />
+                                        <Button FontSize="13" Content="Add"
+                                                Width="84" Click="BtnAddSnippets_Click" />
                                     </Border>
 
                                 </Grid>

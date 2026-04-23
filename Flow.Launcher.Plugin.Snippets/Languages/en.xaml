@@ -52,5 +52,12 @@
     <system:String x:Key="snippets_plugin_auto_paste_description">Automatically paste snippets after copying to clipboard</system:String>
     <system:String x:Key="snippets_plugin_enable_dynamic_variables">Enable Dynamic Variables</system:String>
     <system:String x:Key="snippets_plugin_enable_dynamic_variables_desc">Parse variables in this format: {{date}}</system:String>
+    <system:String x:Key="snippets_plugin_add_folder">Add Folder</system:String>
+    <system:String x:Key="snippets_plugin_delete_folder">Delete Folder</system:String>
+    <system:String x:Key="snippets_plugin_rename">Rename</system:String>
+    <system:String x:Key="snippets_plugin_all_snippets">All Snippets</system:String>
+    <system:String x:Key="snippets_plugin_favorites">Favorites</system:String>
+    <system:String x:Key="snippets_plugin_recent">Recent</system:String>
+    <system:String x:Key="snippets_plugin_no_folder">No Folder</system:String>
 
 </ResourceDictionary>

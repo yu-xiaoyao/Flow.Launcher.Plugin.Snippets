@@ -258,7 +258,9 @@ public class SqliteSnippetManage : SnippetManage
         if (value != null)
             sql += " and s.value like @value";
 
-        sql += " and f.folder_id is null order by s.score desc";
+        sql += " and f.id is null order by s.score desc";
+
+        InnerLogger.Logger.Debug($"ListNoFolder: {sql}");
 
         using var connection = new SQLiteConnection(_connectionString);
         connection.Open();
@@ -441,6 +443,16 @@ public class SqliteSnippetManage : SnippetManage
         connection.Open();
         using var command = new SQLiteCommand(sql, connection);
         command.Parameters.AddWithValue("@name", name);
+        return command.ExecuteNonQuery() > 0;
+    }
+
+    public bool RemoveFolderById(long folderId)
+    {
+        const string sql = $"delete from {TABLE_NAME_FOLDER} where id = @id";
+        using var connection = new SQLiteConnection(_connectionString);
+        connection.Open();
+        using var command = new SQLiteCommand(sql, connection);
+        command.Parameters.AddWithValue("@id", folderId);
         return command.ExecuteNonQuery() > 0;
     }
 

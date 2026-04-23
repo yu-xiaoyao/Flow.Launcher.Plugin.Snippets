@@ -34,6 +34,8 @@ public interface SnippetManage
 
     bool RemoveFolder(string name);
 
+    bool RemoveFolderById(long folderId);
+
     bool UpdateFolderById(long id, string newName);
 
     List<FolderModel> ListFolders([CanBeNull] string name = null);
