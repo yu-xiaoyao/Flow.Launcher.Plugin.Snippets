@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Flow.Launcher.Plugin.Snippets.Json;
 using Flow.Launcher.Plugin.Snippets.Sqlite;
+using Flow.Launcher.Plugin.Snippets.Update;
 using Flow.Launcher.Plugin.Snippets.Util;
 
 namespace Flow.Launcher.Plugin.Snippets
@@ -24,17 +25,22 @@ namespace Flow.Launcher.Plugin.Snippets
 
             InnerLogger.SetAsFlowLauncherLogger(_context, LoggerLevel.TRACE);
 
-            if (_settings.StorageType == StorageType.Sqlite)
-            {
-                _snippetManage =
-                    new SqliteSnippetManage(context.CurrentPluginMetadata.PluginSettingsDirectoryPath,
-                        context.CurrentPluginMetadata.Version);
-            }
-            else
-            {
-                _snippetManage = new JsonSettingSnippetManage(context);
-                _mergeOldSnippet(); // merge old snippets
-            }
+            var pluginSettingPath = context.CurrentPluginMetadata.PluginSettingsDirectoryPath;
+
+            _snippetManage = new SqliteSnippetManage(pluginSettingPath, context.CurrentPluginMetadata.Version);
+            _upgradeToSqlite(pluginSettingPath);
+
+            // if (_settings.StorageType == StorageType.Sqlite)
+            // {
+            //     _snippetManage =
+            //         new SqliteSnippetManage(context.CurrentPluginMetadata.PluginSettingsDirectoryPath,
+            //             context.CurrentPluginMetadata.Version);
+            // }
+            // else
+            // {
+            //     _snippetManage = new JsonSettingSnippetManage(context);
+            //     _mergeOldSnippet(); // merge old snippets
+            // }
         }
 
         public List<Result> Query(Query query)
@@ -275,13 +281,51 @@ namespace Flow.Launcher.Plugin.Snippets
             };
         }
 
+        private void _mergeJsonToSqlite(string pluginSettingPath)
+        {
+            // v1
+            var v1JsonPath = Path.Combine(pluginSettingPath, "Settings.json");
+            if (File.Exists(v1JsonPath))
+            {
+                var settings = _context.API.LoadSettingJsonStorage<Settings>();
+
+                // File.Delete(v1JsonPath);
+            }
+
+            // v2
+            var v2JsonPath = Path.Combine(pluginSettingPath, "JsonSetting.json");
+            if (File.Exists(v2JsonPath))
+            {
+                // File.Delete(v2JsonPath);
+            }
+        }
+
 
         /// <summary>
+        /// upgrade v2 -> v3
+        /// </summary>
+        /// <param name="pluginSettingPath"></param>
+        private void _upgradeToSqlite(string pluginSettingPath)
+        {
+            if (_settings.StorageType == StorageType.JsonSetting)
+            {
+                // merge to Sqlite
+                UpgradeHelper.UpgradeV2ToV3(_snippetManage, pluginSettingPath);
+                _settings.StorageType = StorageType.Sqlite;
+                _context.API.SavePluginSettings();
+            }
+        }
+
+
+        /// <summary>
+        /// v1 version is only save in Plugin Settings
+        /// data type: Dictionary <![CDATA[<]]>string, string <![CDATA[>]]> Snippets { get; set; }
         /// 1.x.x version snippets merge to 2.x.x version
         /// </summary>
         [Obsolete]
         private void _mergeOldSnippet()
         {
+            // Data Type: Dictionary<string, string> Snippets { get; set; }
             // old version snippets in Settings.json
             var snippets = _settings.Snippets;
             if (snippets == null || !snippets.Any()) return;

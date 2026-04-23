@@ -21,7 +21,7 @@ public class Settings : BaseModel
     /// Delay in milliseconds before pasting
     /// </summary>
     public int PasteDelayMs { get; set; } = 50;
-    
+
     /// <summary>
     /// Enable Dynamic Variables when value is {{VAR}}
     /// </summary>
@@ -36,6 +36,6 @@ public class Settings : BaseModel
 
 public enum StorageType
 {
-    JsonSetting,
+    [Obsolete] JsonSetting,
     Sqlite
 }

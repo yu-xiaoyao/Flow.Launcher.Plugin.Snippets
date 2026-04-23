@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.IO;
 using Flow.Launcher.Plugin.Snippets.Model;
 using Flow.Launcher.Plugin.Snippets.Util;
+using static Flow.Launcher.Plugin.Snippets.Util.DateTimeUtil;
 
 namespace Flow.Launcher.Plugin.Snippets.Sqlite;
 
@@ -294,6 +295,11 @@ public class SqliteSnippetManage : SnippetManage
         return _add(sm);
     }
 
+    public bool Add(SnippetModel sm)
+    {
+        return _add(sm);
+    }
+
 
     private bool _add(SnippetModel sm)
     {
@@ -512,10 +518,5 @@ public class SqliteSnippetManage : SnippetManage
             CreateTime = reader.GetDateTime(3),
             UpdateTime = reader.GetDateTime(4)
         };
-    }
-
-    private static DateTime TrimMilliseconds(DateTime dt)
-    {
-        return new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second, dt.Kind);
     }
 }

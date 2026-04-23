@@ -17,6 +17,8 @@ public interface SnippetManage
 
     bool Add(string key, string value, long? folderId = null, int score = 0);
 
+    bool Add(SnippetModel sm);
+
     bool RemoveByKey(string key);
 
     bool UpdateByKey(string key, [CanBeNull] string value = null, long? folderId = null, int? score = null);
