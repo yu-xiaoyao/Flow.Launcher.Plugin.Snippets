@@ -9,7 +9,8 @@ public interface SnippetManage
     [CanBeNull]
     SnippetModel GetByKey(string key);
 
-    List<SnippetModel> List([CanBeNull] string key = null, [CanBeNull] string value = null, long? folderId = null);
+    List<SnippetModel> List([CanBeNull] string key = null, [CanBeNull] string value = null, bool? favorites = null,
+        long? folderId = null);
 
     List<SnippetModel> ListRecent([CanBeNull] string key = null, [CanBeNull] string value = null, int limit = 20);
 

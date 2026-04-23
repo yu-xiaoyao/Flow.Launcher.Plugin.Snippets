@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:conv="clr-namespace:Flow.Launcher.Plugin.Snippets.UI.Converters"
         Title="{DynamicResource snippets_plugin_manage_snippets}"
         Width="1200"
         Height="640"
@@ -44,7 +45,12 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+
     </Window.Resources>
+
 
     <!--  New  -->
     <Grid>
@@ -327,7 +333,7 @@
                     <!-- Splitter -->
                     <GridSplitter
                         Grid.Column="1"
-                        Width="2"
+                        Width="3"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Stretch"
                         Background="{DynamicResource Color03B}"
@@ -337,7 +343,8 @@
                     <Border
                         Grid.Column="2"
                         Margin="0"
-                        CornerRadius="4">
+                        CornerRadius="4"
+                        Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}">
 
                         <Grid>
                             <Grid.RowDefinitions>
@@ -401,6 +408,7 @@
                                             <Border Grid.Column="6" VerticalAlignment="Center" Margin="4 0 0 0">
                                                 <Button FontSize="13"
                                                         Content="{DynamicResource snippets_plugin_filter}"
+                                                        Click="BtnFilter_OnClick"
                                                         Width="84" />
                                             </Border>
                                             <Border Grid.Column="7" Margin="4 0 0 0">
@@ -422,6 +430,7 @@
 
                             <Border Grid.Row="1" x:Name="SnippetsContainer" Margin="4"
                                     BorderBrush="{DynamicResource Color03B}">
+
                                 <DataGrid ItemsSource="{Binding Snippets}"
                                           AutoGenerateColumns="False"
                                           IsReadOnly="True"
@@ -430,17 +439,18 @@
                                           SelectionMode="Single"
                                           HeadersVisibility="Column"
                                           GridLinesVisibility="Horizontal"
-                                          FontSize="13">
+                                          MouseDoubleClick="DataGridSnippets_MouseDoubleClick">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Key" Binding="{Binding Key}" Width="120" />
                                         <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*" />
                                         <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="60" />
-                                        <DataGridTextColumn Header="Folder" Binding="{Binding FolderName}" Width="120" />
+                                        <DataGridTextColumn Header="Folder" Binding="{Binding FolderName}"
+                                                            Width="120" />
                                         <DataGridTextColumn Header="CreateTime"
-                                                            Binding="{Binding CreateTime, StringFormat=yyyy-MM-dd HH:mm:SS}"
+                                                            Binding="{Binding CreateTime, StringFormat=yyyy-MM-dd HH:mm:ss}"
                                                             Width="160" />
                                         <DataGridTextColumn Header="UpdateTime"
-                                                            Binding="{Binding UpdateTime, StringFormat=yyyy-MM-dd HH:mm:SS}"
+                                                            Binding="{Binding UpdateTime, StringFormat=yyyy-MM-dd HH:mm:ss}"
                                                             Width="160" />
                                     </DataGrid.Columns>
                                 </DataGrid>
@@ -448,7 +458,15 @@
 
                         </Grid>
 
+                    </Border>
 
+                    <Border
+                        Grid.Column="2"
+                        Margin="0"
+                        CornerRadius="4"
+                        Background="Red"
+                        Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <TextBlock Text="0-234234"></TextBlock>
                     </Border>
 
                 </Grid>

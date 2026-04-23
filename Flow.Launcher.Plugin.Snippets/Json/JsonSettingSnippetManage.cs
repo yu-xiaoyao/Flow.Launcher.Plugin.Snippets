@@ -52,7 +52,8 @@ public class JsonSettingSnippetManage : SnippetManage
         return _snippets.FirstOrDefault(x => x.Key == key);
     }
 
-    public List<SnippetModel> List(string key = null, string value = null, long? folderId = null)
+    public List<SnippetModel> List(string key = null, string value = null, bool? favorites = null,
+        long? folderId = null)
     {
         if (key != null && value != null)
         {

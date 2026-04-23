@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,8 +12,13 @@ using JetBrains.Annotations;
 
 namespace Flow.Launcher.Plugin.Snippets;
 
-public partial class SettingWindow : Window
+public partial class SettingWindow : Window, INotifyPropertyChanged
 {
+    public const int IndexAllSnippets = -1;
+    public const int IndexFavorites = -2;
+    public const int IndexRecent = -3;
+    public const int IndexNoFolder = -4;
+
     public double WindowMinWidth { get; set; } = 1200;
     public double WindowMinHeight { get; set; } = 640;
 
@@ -19,33 +26,45 @@ public partial class SettingWindow : Window
     private readonly SnippetManage _snippetManage;
 
 
-    public FolderModel FolderAllSnippets { get; set; } = new FolderModel()
-    {
-        Name = "All Snippets",
-        IsSelected = true, // default select
-    };
+    public FolderModel FolderAllSnippets { get; set; } = new();
 
-    public FolderModel FolderFavorites { get; set; } = new FolderModel()
-    {
-        Name = "Favorites",
-    };
+    public FolderModel FolderFavorites { get; set; } = new();
 
-    public FolderModel FolderRecent { get; set; } = new FolderModel()
-    {
-        Name = "Recent",
-    };
+    public FolderModel FolderRecent { get; set; } = new();
 
-    public FolderModel FolderNo { get; set; } = new FolderModel()
-    {
-        Name = "No Folder",
-    };
+    public FolderModel FolderNo { get; set; } = new();
 
 
     public ObservableCollection<FolderModel> Folders { get; set; } = new();
 
     public ObservableCollection<SnippetModel> Snippets { get; set; } = new();
 
-    private long _selectFolderId = -1L;
+    private long _selectFolderId = IndexAllSnippets;
+
+
+    #region UI Fields
+
+    private bool _isEditing;
+
+    public bool IsEditing
+    {
+        get => _isEditing;
+        set
+        {
+            _isEditing = value;
+            OnPropertyChanged();
+        }
+    }
+
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
+
+    #endregion
 
 
     public SettingWindow(PluginInitContext context, SnippetManage snippetManage)
@@ -59,7 +78,15 @@ public partial class SettingWindow : Window
         // ComboBoxFilterType.SelectedIndex = 0;
         // _renderItemSelectStyle(false);
         _reloadFolders();
-        _loadAllSnippets();
+        _loadSnippets();
+        // _loadAllSnippets();
+    }
+
+    #region Data Load
+
+    private List<FolderModel> _getFolders([CanBeNull] string name = null)
+    {
+        return _snippetManage.ListFolders(name);
     }
 
     private void _reloadFolders()
@@ -69,8 +96,69 @@ public partial class SettingWindow : Window
             Folders.Add(folderModel);
     }
 
+    private void _loadSnippets()
+    {
+        IsEditing = false;
 
-    #region View Event
+        Snippets.Clear();
+
+        List<SnippetModel> queryList;
+        switch (_selectFolderId)
+        {
+            case IndexAllSnippets:
+                FolderAllSnippets.IsSelected = true;
+                queryList = _snippetManage.List();
+                break;
+            case IndexFavorites:
+                FolderFavorites.IsSelected = true;
+                queryList = _snippetManage.List(favorites: true);
+                break;
+            case IndexRecent:
+                FolderRecent.IsSelected = true;
+                queryList = _snippetManage.ListRecent();
+                break;
+            case IndexNoFolder:
+                FolderNo.IsSelected = true;
+                queryList = _snippetManage.ListNoFolder();
+                break;
+            default:
+                queryList = _selectFolderId > 0
+                    ? _snippetManage.List(folderId: _selectFolderId)
+                    : new List<SnippetModel>();
+                break;
+        }
+
+        foreach (var sm in queryList)
+            Snippets.Add(sm);
+    }
+
+
+    private void _reloadSnippets(long folderId)
+    {
+        _selectFolderId = folderId;
+        Snippets.Clear();
+        foreach (var s in _snippetManage.List(folderId: folderId))
+            Snippets.Add(s);
+    }
+
+    #endregion
+
+    private void ClearFolderListSelected()
+    {
+        foreach (var f in Folders)
+            f.IsSelected = false;
+    }
+
+    private void ClearInnerSelected()
+    {
+        FolderAllSnippets.IsSelected = false;
+        FolderFavorites.IsSelected = false;
+        FolderRecent.IsSelected = false;
+        FolderNo.IsSelected = false;
+    }
+
+
+    #region All Snippets Events
 
     private void AllSnippetsFolder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
@@ -89,8 +177,13 @@ public partial class SettingWindow : Window
         FolderRecent.IsSelected = false;
         FolderNo.IsSelected = false;
         ClearFolderListSelected();
-        _loadAllSnippets();
+        _selectFolderId = IndexAllSnippets;
+        _loadSnippets();
     }
+
+    #endregion
+
+    #region Favorites Events
 
     private void FavoritesFolder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
@@ -109,9 +202,13 @@ public partial class SettingWindow : Window
         FolderRecent.IsSelected = false;
         FolderNo.IsSelected = false;
         ClearFolderListSelected();
-        _loadFavorites();
+        _selectFolderId = IndexFavorites;
+        _loadSnippets();
     }
 
+    #endregion
+
+    #region Recent Events
 
     private void RecentFolder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
@@ -130,8 +227,13 @@ public partial class SettingWindow : Window
         FolderRecent.IsSelected = true;
         FolderNo.IsSelected = false;
         ClearFolderListSelected();
-        _loadRecent();
+        _selectFolderId = IndexRecent;
+        _loadSnippets();
     }
+
+    #endregion
+
+    #region No Folder Events
 
     private void NoFolder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
@@ -151,15 +253,14 @@ public partial class SettingWindow : Window
         FolderRecent.IsSelected = false;
         FolderNo.IsSelected = true;
         ClearFolderListSelected();
-        _loadNoFolder();
+        _selectFolderId = IndexNoFolder;
+        _loadSnippets();
     }
 
-    private void ClearFolderListSelected()
-    {
-        _selectFolderId = -1L;
-        foreach (var f in Folders)
-            f.IsSelected = false;
-    }
+    #endregion
+
+
+    #region Folder List
 
     private void FolderList_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
@@ -172,6 +273,21 @@ public partial class SettingWindow : Window
         InnerLogger.Logger.Info("FolderList_MouseRightButtonUp");
         FolderListClick(sender as Border);
     }
+
+    private void FolderListClick([CanBeNull] Border border)
+    {
+        if (border?.DataContext is FolderModel clicked)
+        {
+            foreach (var f in Folders)
+                f.IsSelected = false;
+            clicked.IsSelected = true;
+            ClearInnerSelected();
+            _reloadSnippets(clicked.Id);
+            _selectFolderId = clicked.Id;
+            _loadSnippets();
+        }
+    }
+
 
     private void FolderList_MoveUpOnClick(object sender, RoutedEventArgs e)
     {
@@ -218,27 +334,8 @@ public partial class SettingWindow : Window
         }
     }
 
-    private void FolderListClick([CanBeNull] Border border)
-    {
-        if (border?.DataContext is FolderModel clicked)
-        {
-            foreach (var f in Folders)
-                f.IsSelected = false;
-            clicked.IsSelected = true;
-            _reloadSnippets(clicked.Id);
-            ClearInnerSelected();
-        }
-    }
-
-    private void ClearInnerSelected()
-    {
-        FolderAllSnippets.IsSelected = false;
-        FolderFavorites.IsSelected = false;
-        FolderRecent.IsSelected = false;
-        FolderNo.IsSelected = false;
-    }
-
     #endregion
+
 
     #region Left
 
@@ -251,55 +348,13 @@ public partial class SettingWindow : Window
     #endregion
 
 
-    #region Data Load
-
-    private void _loadAllSnippets()
-    {
-        Snippets.Clear();
-        foreach (var s in _snippetManage.List())
-            Snippets.Add(s);
-    }
-
-    private void _loadFavorites()
-    {
-        Snippets.Clear();
-        foreach (var s in _snippetManage.List())
-            Snippets.Add(s);
-    }
-
-    private void _loadRecent()
-    {
-        Snippets.Clear();
-        foreach (var s in _snippetManage.ListRecent())
-            Snippets.Add(s);
-    }
-
-    private void _loadNoFolder()
-    {
-        Snippets.Clear();
-        foreach (var s in _snippetManage.ListNoFolder())
-            Snippets.Add(s);
-    }
-
-    private void _reloadSnippets(long folderId)
-    {
-        _selectFolderId = folderId;
-        Snippets.Clear();
-        foreach (var s in _snippetManage.List(folderId: folderId))
-            Snippets.Add(s);
-    }
-
-    private List<FolderModel> _getFolders([CanBeNull] string name = null)
-    {
-        return _snippetManage.ListFolders(name);
-    }
-
     private void BtnAddSnippets_Click(object sender, RoutedEventArgs e)
     {
-        _snippetManage.Add($"SP-{new Random().Next(10000)}", $"Value-{new Random().Next(10000000)}");
+        // IsEditing = true;
+        var ew = new SnippetEditWindows(_snippetManage);
+        ew.ShowDialog();
     }
 
-    #endregion
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
@@ -371,5 +426,32 @@ public partial class SettingWindow : Window
         TbFilterKey.Text = "";
         TbFilterValue.Text = "";
         TbFilterFolder.Text = "";
+    }
+
+    private void BtnFilter_OnClick(object sender, RoutedEventArgs e)
+    {
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+
+    private void DataGridSnippets_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        // 确保点击的是行，而不是空白处
+        var row = ItemsControl.ContainerFromElement(
+            (DataGrid)sender,
+            e.OriginalSource as DependencyObject) as DataGridRow;
+
+        if (row?.Item is SnippetModel item)
+        {
+            IsEditing = true;
+            // 调用 ViewModel 命令，传入选中项
+            // (DataContext as SnippetModel)?.BeginEditCommand.Execute(item);
+        }
     }
 }

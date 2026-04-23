@@ -11,6 +11,9 @@ public class SnippetModel
     public DateTime CreateTime { get; set; }
     public DateTime UpdateTime { get; set; }
 
+    public int Faviorites { get; set; }
+    [CanBeNull] public string Syntax { get; set; }
+
     public long? FolderId { get; set; }
 
 
@@ -19,6 +22,19 @@ public class SnippetModel
     /// </summary>
     [CanBeNull]
     public string FolderName { get; set; }
+
+    public SnippetModel Clone() => new()
+    {
+        Key = Key,
+        Value = Value,
+        Score = Score,
+        Faviorites = Faviorites,
+        Syntax = Syntax,
+        FolderId = FolderId,
+        CreateTime = CreateTime,
+        UpdateTime = UpdateTime,
+    };
+
 
     public override string ToString()
     {
