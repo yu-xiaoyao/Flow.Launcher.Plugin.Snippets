@@ -318,7 +318,12 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
             menu.PlacementTarget is Border border &&
             border.DataContext is FolderModel folder)
         {
-            //TODO
+            var fed = new FolderEditDialog(_context, _snippetManage, folder);
+            var result = fed.ShowDialog();
+            if (result == true)
+            {
+                _reloadFolders();
+            }
         }
     }
 
@@ -337,12 +342,17 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
     #endregion
 
 
-    #region Left
+    #region Left Events
 
     private void BtnAddFolder_OnClick(object sender, RoutedEventArgs e)
     {
         _snippetManage.AddFolder($"Folder - {new Random().Next()}");
-        _reloadFolders();
+        var fed = new FolderEditDialog(_context, _snippetManage);
+        var result = fed.ShowDialog();
+        if (result == true)
+        {
+            _reloadFolders();
+        }
     }
 
     #endregion

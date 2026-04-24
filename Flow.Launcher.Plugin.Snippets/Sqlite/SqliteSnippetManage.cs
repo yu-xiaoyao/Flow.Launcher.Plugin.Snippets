@@ -556,23 +556,24 @@ public class SqliteSnippetManage : SnippetManage
         return reader.Read() ? _readFolderModel(reader) : null;
     }
 
-    private FolderModel _createFolderModel(string name)
+    private FolderModel _createFolderModel(string name, long? orderNum = null)
     {
         var id = IdHelper.NewId();
+        var num = orderNum ?? id;
         var now = DateTimeUtil.TrimMilliseconds(DateTime.Now);
         return new FolderModel
         {
             Id = id,
             Name = name,
-            OrderNum = id,
+            OrderNum = num,
             CreateTime = now,
             UpdateTime = now,
         };
     }
 
-    public bool AddFolder(string name)
+    public bool AddFolder(string name, long? orderNum = null)
     {
-        var fm = _createFolderModel(name);
+        var fm = _createFolderModel(name, orderNum);
         return _addFolder(fm);
     }
 
@@ -619,7 +620,7 @@ public class SqliteSnippetManage : SnippetManage
         return command.ExecuteNonQuery() > 0;
     }
 
-    public bool UpdateFolderById(long id, string newName)
+    public bool UpdateFolderById(long id, string newName, long? orderNum = null)
     {
         const string sql =
             $"update {TABLE_NAME_FOLDER} set name = @new_name, update_time = @update_time where id = @id";

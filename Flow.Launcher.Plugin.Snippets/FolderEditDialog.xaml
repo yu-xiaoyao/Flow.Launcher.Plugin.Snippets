@@ -1,0 +1,175 @@
+<Window x:Class="Flow.Launcher.Plugin.Snippets.FolderEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:Flow.Launcher.Plugin.Snippets"
+        mc:Ignorable="d"
+        Height="450"
+        Width="500"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource PopuBGColor}"
+        Foreground="{DynamicResource PopupTextColor}">
+
+    <!-- Remove Windows Default Title Bar. Height: 32 -->
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32"
+                      ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}" />
+    </WindowChrome.WindowChrome>
+
+    <StackPanel Orientation="Vertical">
+        <!-- Custom Windows Bar. Height: 32 -->
+        <StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button
+                    Grid.Column="4"
+                    Click="OnCancelButtonClick"
+                    Style="{StaticResource TitleBarCloseButtonStyle}">
+                    <Path
+                        Width="46"
+                        Height="32"
+                        Data="M 18,11 27,20 M 18,20 27,11"
+                        Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
+                        StrokeThickness="1">
+                        <Path.Style>
+                            <Style TargetType="Path">
+                                <Style.Triggers>
+                                    <DataTrigger
+                                        Binding="{Binding Path=IsActive, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+                                        Value="False">
+                                        <Setter Property="Opacity" Value="0.5" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Path.Style>
+                    </Path>
+                </Button>
+            </Grid>
+        </StackPanel>
+
+        <!-- Title Bar. Height: 32 -->
+        <DockPanel Margin="26,0,26,0">
+            <StackPanel Margin="0,0,0,12" DockPanel.Dock="Top">
+                <TextBlock
+                    Margin="0,0,0,0"
+                    FontSize="20"
+                    FontWeight="SemiBold"
+                    Text="{Binding TitleName}"
+                    TextAlignment="Left" />
+            </StackPanel>
+        </DockPanel>
+        <!-- Windows Title Bar And Title Bar Height: 64 -->
+
+        <StackPanel Height="386">
+            <!-- Content Area -->
+            <StackPanel Height="306" Orientation="Vertical">
+                <Grid Margin="30,0,30,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- ID (read-only) -->
+                    <Label
+                        Grid.Row="0" Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Margin="0,8,10,0"
+                        Content="{DynamicResource snippets_plugin_folder_id}" />
+                    <TextBlock
+                        x:Name="TbId"
+                        Grid.Row="0" Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Margin="0,8,0,0"
+                        Text="" />
+
+                    <!-- Name (editable) -->
+                    <Label
+                        Grid.Row="1" Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Margin="0,8,10,0"
+                        Content="{DynamicResource snippets_plugin_folder_name}" />
+                    <TextBox
+                        x:Name="TbName"
+                        Grid.Row="1" Grid.Column="1"
+                        Margin="0,8,0,0" />
+
+                    <!-- OrderNum (editable) -->
+                    <Label
+                        Grid.Row="2" Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Margin="0,8,10,0"
+                        Content="{DynamicResource snippets_plugin_folder_order}" />
+                    <TextBox
+                        x:Name="TbOrderNum"
+                        Grid.Row="2" Grid.Column="1"
+                        Width="120"
+                        HorizontalAlignment="Left"
+                        Margin="0,8,0,0"
+                        PreviewTextInput="TextBox_PreviewTextInput"
+                        DataObject.Pasting="TextBox_Pasting" />
+
+                    <!-- CreateTime (read-only) -->
+                    <Label
+                        Grid.Row="3" Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Margin="0,8,10,0"
+                        Content="{DynamicResource snippets_plugin_folder_create_time}" />
+                    <TextBlock
+                        x:Name="TbCreateTime"
+                        Grid.Row="3" Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Margin="0,8,0,0"
+                        Text="" />
+
+                    <!-- UpdateTime (read-only) -->
+                    <Label
+                        Grid.Row="4" Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Margin="0,8,10,0"
+                        Content="{DynamicResource snippets_plugin_folder_update_time}" />
+                    <TextBlock
+                        x:Name="TbUpdateTime"
+                        Grid.Row="4" Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Margin="0,8,0,0"
+                        Text="" />
+                </Grid>
+            </StackPanel>
+
+            <!-- Bottom Button Bar -->
+            <Border Height="80"
+                    Background="{DynamicResource PopupButtonAreaBGColor}"
+                    BorderBrush="{DynamicResource PopupButtonAreaBorderColor}"
+                    BorderThickness="0,1,0,0">
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button
+                        MinWidth="120"
+                        Margin="5,0,5,0"
+                        Click="OnCancelButtonClick"
+                        Content="{DynamicResource cancel}" />
+                    <Button
+                        MinWidth="120"
+                        Margin="5,0,5,0"
+                        Click="SaveAndCloseButtonClick"
+                        Content="{DynamicResource snippets_plugin_save_and_close}"
+                        Style="{DynamicResource AccentButtonStyle}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </StackPanel>
+</Window>

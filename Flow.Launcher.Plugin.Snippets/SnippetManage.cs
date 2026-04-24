@@ -44,13 +44,13 @@ public interface SnippetManage
     [CanBeNull]
     FolderModel GetFolder(string name);
 
-    bool AddFolder(string name);
+    bool AddFolder(string name, long? orderNum = null);
 
     bool RemoveFolder(string name);
 
     bool RemoveFolderById(long folderId);
 
-    bool UpdateFolderById(long id, string newName);
+    bool UpdateFolderById(long id, string newName, long? orderNum = null);
 
     List<FolderModel> ListFolders([CanBeNull] string name = null);
 
