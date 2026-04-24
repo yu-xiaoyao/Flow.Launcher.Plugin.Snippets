@@ -30,8 +30,8 @@ public class Settings : BaseModel
     /// <summary>
     /// 1.x.x version snippets
     /// </summary>
-    [Obsolete]
-    public Dictionary<string, string> Snippets { get; set; }
+    // [Obsolete]
+    // public Dictionary<string, string> Snippets { get; set; }
 }
 
 public enum StorageType

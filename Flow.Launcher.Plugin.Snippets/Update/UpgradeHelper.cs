@@ -21,7 +21,7 @@ public class UpgradeHelper
         public List<JsonSnippetModel> SnippetList { get; set; }
     }
 
-    public static void UpgradeV2ToV3(SnippetManage sm, string settingPath)
+    public static void UpgradeJsonToSqlite(SnippetManage sm, string settingPath)
     {
         // v2 -> v3
         var v2JsonPath = Path.Combine(settingPath, "JsonSetting.json");
@@ -40,9 +40,10 @@ public class UpgradeHelper
                         var score = jsm.Score ?? 0;
                         var model = new SnippetModel
                         {
-                            Key = jsm.Key,
+                            Id = IdHelper.NewId(),
+                            Name = jsm.Key,
                             Value = jsm.Value,
-                            Score = score,
+                            OrderNum = score,
                             CreateTime = dateTime,
                             UpdateTime = dateTime
                         };

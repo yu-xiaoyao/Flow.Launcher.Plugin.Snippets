@@ -9,20 +9,31 @@ public interface SnippetManage
     [CanBeNull]
     SnippetModel GetByKey(string key);
 
-    List<SnippetModel> List([CanBeNull] string key = null, [CanBeNull] string value = null, bool? favorites = null,
+    [CanBeNull]
+    SnippetModel GetSnippetById(long id);
+
+    List<SnippetModel> List([CanBeNull] string name = null, [CanBeNull] string value = null, bool? favorites = null,
         long? folderId = null);
 
-    List<SnippetModel> ListRecent([CanBeNull] string key = null, [CanBeNull] string value = null, int limit = 20);
+    List<SnippetModel> ListRecent([CanBeNull] string name = null, [CanBeNull] string value = null, int limit = 20);
 
-    List<SnippetModel> ListNoFolder([CanBeNull] string key = null, [CanBeNull] string value = null);
+    List<SnippetModel> ListNoFolder([CanBeNull] string name = null, [CanBeNull] string value = null);
 
-    bool Add(string key, string value, long? folderId = null, int score = 0);
+    bool Add(string name, string value, [CanBeNull] string syntax = null, bool? favorites = null,
+        long? folderId = null);
 
     bool Add(SnippetModel sm);
 
-    bool RemoveByKey(string key);
+    bool RemoveSnippetById(long id);
 
-    bool UpdateByKey(string key, [CanBeNull] string value = null, long? folderId = null, int? score = null);
+    // bool RemoveByKey(string key);
+
+    // bool UpdateByKey(string key, [CanBeNull] string value = null, long? folderId = null, int? score = null);
+    bool UpdateSnippetById(long id, [CanBeNull] string name = null, [CanBeNull] string value = null,
+        [CanBeNull] string syntax = null,
+        long? orderNum = null,
+        long? folderId = null,
+        bool? favorites = null);
 
     void Clear();
 

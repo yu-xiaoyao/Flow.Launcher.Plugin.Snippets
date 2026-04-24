@@ -76,7 +76,7 @@ public partial class SettingPanel : UserControl
             var sms = FileUtil.ReadSnippets(file);
             foreach (var sm in sms)
             {
-                _snippetManage.Add(sm.Key, sm.Value, sm.FolderId, sm.Score);
+                _snippetManage.Add(sm.Name, sm.Value, folderId: sm.FolderId);
             }
         });
     }

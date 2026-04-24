@@ -441,11 +441,10 @@
                                           GridLinesVisibility="Horizontal"
                                           MouseDoubleClick="DataGridSnippets_MouseDoubleClick">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Key" Binding="{Binding Key}" Width="120" />
+                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="120" />
                                         <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*" />
-                                        <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="60" />
                                         <DataGridTextColumn Header="Folder" Binding="{Binding FolderName}"
-                                                            Width="120" />
+                                                            Width="160" />
                                         <DataGridTextColumn Header="CreateTime"
                                                             Binding="{Binding CreateTime, StringFormat=yyyy-MM-dd HH:mm:ss}"
                                                             Width="160" />

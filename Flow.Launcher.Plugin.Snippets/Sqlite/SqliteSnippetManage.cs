@@ -4,49 +4,71 @@ using System.Data.SQLite;
 using System.IO;
 using Flow.Launcher.Plugin.Snippets.Model;
 using Flow.Launcher.Plugin.Snippets.Util;
-using static Flow.Launcher.Plugin.Snippets.Util.DateTimeUtil;
 
 namespace Flow.Launcher.Plugin.Snippets.Sqlite;
 
 public class SqliteSnippetManage : SnippetManage
 {
-    private const string TABLE_NAME = "snippets";
-    private const string TABLE_NAME_FOLDER = "folder";
+    /**
+    * version match plugin version
+    */
+    private const string TABLE_NAME_V2 = "snippets";
+
+    private const string TABLE_NAME_V3 = "snippets_3";
+
+    private const string TABLE_NAME_FOLDER_V3 = "folder_3";
+
+    /// <summary>
+    /// current table name
+    /// </summary>
+    private const string TABLE_NAME = TABLE_NAME_V3;
+
+    private const string TABLE_NAME_FOLDER = TABLE_NAME_FOLDER_V3;
+
+    // v2 Table DDL
+    [Obsolete] private const string TableDDL2 =
+        $"create table {TABLE_NAME_V2} (key varchar(200) not null primary key, value text not null, score int not null default 0, update_time datetime not null DEFAULT CURRENT_TIMESTAMP, create_time datetime not null DEFAULT CURRENT_TIMESTAMP)";
+
+    private const string QueryAllSql2 = $"SELECT key, value, score, update_time from {TABLE_NAME_V2}";
+
 
     //language=SQL
-    private const string _tableDDL = $"""
+    private const string TableDDL3 = $"""
                                       create table {TABLE_NAME}
                                       (
-                                          key         varchar(200) not null primary key,
-                                          value       text         not null,
-                                          score       BIGINT       not null default 0,
-                                          update_time datetime     not null DEFAULT CURRENT_TIMESTAMP,
-                                          create_time datetime     not null DEFAULT CURRENT_TIMESTAMP,
-                                          favorites   INTEGER      not  null default 0,
+                                          id          BIGINT       NOT NULL PRIMARY KEY,
+                                          name        varchar(200) NOT NULL,
+                                          value       text         NOT NULL,
+                                          order_num   BIGINT       NOT NULL,
+                                          create_time datetime     NOT NULL,
+                                          update_time datetime     NOT NULL,
+                                          favorites   INTEGER      NOT NULL default 0,
                                           syntax      varchar(100),
                                           folder_id   BIGINT
                                       )
                                       """;
 
-    // private const string QueryAllSql = $"select key, value, score, create_time, update_time from {TABLE_NAME}";
-    // private const string QueryAllSql = $"select key, value, score, create_time, update_time from {TABLE_NAME}";
-    private const string QueryAllSql =
-        $"SELECT s.key, s.value, s.score, s.create_time, s.update_time, s.favorites, s.syntax, f.id as folder_id, f.name as folder_name FROM {TABLE_NAME} s left join {TABLE_NAME_FOLDER} f on s.folder_id = f.id";
+    private const string QueryAllSql3 =
+        $"SELECT s.id, s.name, s.value, s.order_num, s.create_time, s.update_time, s.favorites, s.syntax, f.id as folder_id, f.name as folder_name FROM {TABLE_NAME} s left join {TABLE_NAME_FOLDER} f on s.folder_id = f.id";
+
+    private const string QueryAllSql = QueryAllSql3;
 
     //language=SQL
-    private const string FolderTableDDL = $"""
-                                           create table {TABLE_NAME_FOLDER}
-                                           (
-                                               id          BIGINT             NOT NULL PRIMARY KEY,
-                                               name        varchar(200)       NOT NULL UNIQUE,
-                                               order_num   BIGINT             NOT NULL,
-                                               create_time DATETIME           NOT NULL,
-                                               update_time DATETIME           NOT NULL
-                                           )
-                                           """;
+    private const string FolderTableDDL3 = $"""
+                                            create table {TABLE_NAME_FOLDER}
+                                            (
+                                                id          BIGINT             NOT NULL PRIMARY KEY,
+                                                name        varchar(200)       NOT NULL UNIQUE,
+                                                order_num   BIGINT             NOT NULL,
+                                                create_time DATETIME           NOT NULL,
+                                                update_time DATETIME           NOT NULL
+                                            )
+                                            """;
 
-    private const string FolderQueryAllSql =
+    private const string FolderQueryAllSql3 =
         $"select id, name, order_num, create_time, update_time from {TABLE_NAME_FOLDER}";
+
+    private const string FolderQueryAllSql = FolderQueryAllSql3;
 
     private readonly string _connectionString;
 
@@ -63,21 +85,6 @@ public class SqliteSnippetManage : SnippetManage
         using var connection = new SQLiteConnection(_connectionString);
         connection.Open();
 
-        var createSnippetsTable = false;
-
-        const string query = $"SELECT name FROM sqlite_master WHERE type='table' AND name='{TABLE_NAME}';";
-        using var command = new SQLiteCommand(query, connection);
-        var result = command.ExecuteScalar();
-        if (result == null)
-        {
-            // create table
-            using var createTableCommand = new SQLiteCommand(_tableDDL, connection);
-            createTableCommand.ExecuteNonQuery();
-
-            createSnippetsTable = true;
-        }
-
-
         // Folder 
         const string queryFolder = $"SELECT name FROM sqlite_master WHERE type='table' AND name='{TABLE_NAME_FOLDER}';";
         using var folderCommand = new SQLiteCommand(queryFolder, connection);
@@ -85,17 +92,66 @@ public class SqliteSnippetManage : SnippetManage
         if (folderResult == null)
         {
             // create Folder table
-            using var createTableCommand = new SQLiteCommand(FolderTableDDL, connection);
+            using var createTableCommand = new SQLiteCommand(FolderTableDDL3, connection);
+            createTableCommand.ExecuteNonQuery();
+        }
+
+        const string query = $"SELECT name FROM sqlite_master WHERE type='table' AND name='{TABLE_NAME}';";
+        using var command = new SQLiteCommand(query, connection);
+        var result = command.ExecuteScalar();
+        if (result == null)
+        {
+            // create table
+            using var createTableCommand = new SQLiteCommand(TableDDL3, connection);
             createTableCommand.ExecuteNonQuery();
 
-            if (!createSnippetsTable)
-            {
-                _updateSnippetsTableByVersion(connection);
-            }
+            // merge v2 data to current, after Table is Created
+            _mergeV2DataListToV3(connection);
         }
     }
 
-    #region 版本更新-表修改
+    #region 版本更新-表数据迁移
+
+    private void _mergeV2DataListToV3(SQLiteConnection connection)
+    {
+        const string query = $"SELECT name FROM sqlite_master WHERE type='table' AND name='{TABLE_NAME_V2}';";
+        using var command = new SQLiteCommand(query, connection);
+        var result = command.ExecuteScalar();
+
+        var list = new List<SnippetModel>();
+
+        if (result != null)
+        {
+            // read all data
+            using var queryCommand = new SQLiteCommand(QueryAllSql2, connection);
+            using var reader = queryCommand.ExecuteReader();
+            while (reader.Read())
+            {
+                var key = reader.GetString(0);
+                var value = reader.GetString(1);
+                var score = reader.GetInt32(2);
+                var updateTime = reader.IsDBNull(3) ? DateTime.Now : reader.GetDateTime(3);
+                list.Add(new SnippetModel
+                {
+                    Id = IdHelper.NewId(),
+                    Name = key,
+                    Value = value,
+                    OrderNum = score,
+                    CreateTime = updateTime,
+                    UpdateTime = updateTime
+                });
+            }
+        }
+
+        if (list.Count <= 0) return;
+
+        InnerLogger.Logger.Info($"Upgrade v2 data to v3. merge.size = {list.Count}");
+
+        var transaction = connection.BeginTransaction();
+        foreach (var sm in list)
+            _addSnippet(connection, sm);
+        transaction.Commit();
+    }
 
     private void _updateSnippetsTableByVersion(SQLiteConnection connection)
     {
@@ -157,15 +213,16 @@ public class SqliteSnippetManage : SnippetManage
     {
         return new SnippetModel
         {
-            Key = reader.GetString(0),
-            Value = reader.GetString(1),
-            Score = reader.GetInt32(2),
-            CreateTime = reader.GetDateTime(3),
-            UpdateTime = reader.GetDateTime(4),
-            Faviorites = reader.GetInt32(5),
-            Syntax = reader.IsDBNull(6) ? null : reader.GetString(6),
-            FolderId = reader.IsDBNull(7) ? null : reader.GetInt64(7),
-            FolderName = reader.IsDBNull(8) ? null : reader.GetString(8),
+            Id = reader.GetInt64(0),
+            Name = reader.GetString(1),
+            Value = reader.GetString(2),
+            OrderNum = reader.GetInt64(3),
+            CreateTime = reader.GetDateTime(4),
+            UpdateTime = reader.GetDateTime(5),
+            Faviorites = reader.GetInt32(6),
+            Syntax = reader.IsDBNull(7) ? null : reader.GetString(7),
+            FolderId = reader.IsDBNull(8) ? null : reader.GetInt64(8),
+            FolderName = reader.IsDBNull(9) ? null : reader.GetString(9),
         };
     }
 
@@ -181,13 +238,24 @@ public class SqliteSnippetManage : SnippetManage
         return reader.Read() ? _readSnippetModel(reader) : null;
     }
 
-    public List<SnippetModel> List(string key = null, string value = null, bool? favorites = null,
+    public SnippetModel GetSnippetById(long id)
+    {
+        const string sql = $"{QueryAllSql} where s.id = @id";
+        using var connection = new SQLiteConnection(_connectionString);
+        connection.Open();
+        using var command = new SQLiteCommand(sql, connection);
+        command.Parameters.AddWithValue("@id", id);
+        using var reader = command.ExecuteReader();
+        return reader.Read() ? _readSnippetModel(reader) : null;
+    }
+
+    public List<SnippetModel> List(string name = null, string value = null, bool? favorites = null,
         long? folderId = null)
     {
         var sql = $"{QueryAllSql} where 1=1";
 
-        if (!string.IsNullOrEmpty(key))
-            sql += " and s.key like @key";
+        if (!string.IsNullOrEmpty(name))
+            sql += " and s.name like @name";
 
         if (!string.IsNullOrEmpty(value))
             sql += " and s.value like @value";
@@ -198,7 +266,7 @@ public class SqliteSnippetManage : SnippetManage
         if (folderId != null)
             sql += " and f.id = @folder_id";
 
-        sql += " order by s.score desc";
+        sql += " order by s.order_num desc";
 
         InnerLogger.Logger.Info($"List: {sql}");
 
@@ -206,14 +274,14 @@ public class SqliteSnippetManage : SnippetManage
         connection.Open();
         using var command = new SQLiteCommand(sql, connection);
 
-        if (!string.IsNullOrEmpty(key))
-            command.Parameters.AddWithValue("@key", $"%{key}%");
+        if (!string.IsNullOrEmpty(name))
+            command.Parameters.AddWithValue("@name", $"%{name}%");
 
         if (!string.IsNullOrEmpty(value))
             command.Parameters.AddWithValue("@value", $"%{value}%");
 
         if (favorites != null)
-            command.Parameters.AddWithValue("@favorites", boolToInt((bool)favorites));
+            command.Parameters.AddWithValue("@favorites", Utils.BoolToInt(favorites));
 
         if (folderId != null)
             command.Parameters.AddWithValue("@folder_id", folderId);
@@ -228,12 +296,12 @@ public class SqliteSnippetManage : SnippetManage
         return result;
     }
 
-    public List<SnippetModel> ListRecent(string key = null, string value = null, int limit = 20)
+    public List<SnippetModel> ListRecent(string name = null, string value = null, int limit = 20)
     {
         var sql = $"{QueryAllSql} where 1=1";
 
-        if (!string.IsNullOrEmpty(key))
-            sql += " and s.key like @key";
+        if (!string.IsNullOrEmpty(name))
+            sql += " and s.name like @name";
 
         if (!string.IsNullOrEmpty(value))
             sql += " and s.value like @value";
@@ -246,8 +314,8 @@ public class SqliteSnippetManage : SnippetManage
         connection.Open();
         using var command = new SQLiteCommand(sql, connection);
 
-        if (!string.IsNullOrEmpty(key))
-            command.Parameters.AddWithValue("@key", $"%{key}%");
+        if (!string.IsNullOrEmpty(name))
+            command.Parameters.AddWithValue("@name", $"%{name}%");
 
         if (!string.IsNullOrEmpty(value))
             command.Parameters.AddWithValue("@value", $"%{value}%");
@@ -262,17 +330,17 @@ public class SqliteSnippetManage : SnippetManage
         return result;
     }
 
-    public List<SnippetModel> ListNoFolder(string key = null, string value = null)
+    public List<SnippetModel> ListNoFolder(string name = null, string value = null)
     {
         var sql = $"{QueryAllSql} where 1=1";
 
-        if (!string.IsNullOrEmpty(key))
-            sql += " and s.key like @key";
+        if (!string.IsNullOrEmpty(name))
+            sql += " and s.name like @name";
 
         if (!string.IsNullOrEmpty(value))
             sql += " and s.value like @value";
 
-        sql += " and f.id is null order by s.score desc";
+        sql += " and f.id is null order by s.order_num desc";
 
         InnerLogger.Logger.Debug($"ListNoFolder: {sql}");
 
@@ -280,8 +348,8 @@ public class SqliteSnippetManage : SnippetManage
         connection.Open();
         using var command = new SQLiteCommand(sql, connection);
 
-        if (!string.IsNullOrEmpty(key))
-            command.Parameters.AddWithValue("@key", $"%{key}%");
+        if (!string.IsNullOrEmpty(name))
+            command.Parameters.AddWithValue("@name", $"%{name}%");
 
         if (!string.IsNullOrEmpty(value))
             command.Parameters.AddWithValue("@value", $"%{value}%");
@@ -293,52 +361,126 @@ public class SqliteSnippetManage : SnippetManage
         return result;
     }
 
-    public bool Add(string key, string value, long? folderId = null, int score = 0)
+    public bool Add(string name, string value, string syntax = null, bool? favorites = null,
+        long? folderId = null)
     {
-        var now = TrimMilliseconds(DateTime.Now);
+        var now = DateTimeUtil.TrimMilliseconds(DateTime.Now);
+        var id = IdHelper.NewId();
         var sm = new SnippetModel
         {
-            Key = key,
+            Id = id,
+            Name = name,
             Value = value,
-            Score = score,
+            OrderNum = id,
             CreateTime = now,
             UpdateTime = now,
+            Faviorites = Utils.BoolToInt(favorites),
+            Syntax = syntax,
             FolderId = folderId
         };
-        return _add(sm);
+        return Add(sm);
     }
 
     public bool Add(SnippetModel sm)
     {
-        return _add(sm);
-    }
-
-
-    private bool _add(SnippetModel sm)
-    {
-        const string sql =
-            $"replace into {TABLE_NAME} (key, value, score, update_time, create_time, favorites, syntax, folder_id) values (@key, @value, @score, @update_time, @create_time, @favorites, @syntax, @folder_id)";
         using var connection = new SQLiteConnection(_connectionString);
         connection.Open();
+        return _addSnippet(connection, sm) > 0;
+    }
+
+    private int _addSnippet(SQLiteConnection connection, SnippetModel sm)
+    {
+        const string sql =
+            $"insert into {TABLE_NAME} (id, name, value, order_num, create_time, update_time, favorites, syntax, folder_id) values (@id, @name, @value, @order_num, @create_time, @update_time, @favorites, @syntax, @folder_id)";
+
         using var command = new SQLiteCommand(sql, connection);
-        command.Parameters.AddWithValue("@key", sm.Key);
+        command.Parameters.AddWithValue("@id", sm.Id);
+        command.Parameters.AddWithValue("@name", sm.Name);
         command.Parameters.AddWithValue("@value", sm.Value);
-        command.Parameters.AddWithValue("@score", sm.Score);
-        command.Parameters.AddWithValue("@update_time", sm.UpdateTime);
+        command.Parameters.AddWithValue("@order_num", sm.OrderNum);
         command.Parameters.AddWithValue("@create_time", sm.CreateTime);
+        command.Parameters.AddWithValue("@update_time", sm.UpdateTime);
         command.Parameters.AddWithValue("@favorites", sm.Faviorites);
         command.Parameters.AddWithValue("@syntax", sm.Syntax);
         command.Parameters.AddWithValue("@folder_id", sm.FolderId);
-        return command.ExecuteNonQuery() > 0;
+        return command.ExecuteNonQuery();
     }
 
-    public bool RemoveByKey(string key)
+    public bool RemoveSnippetById(long id)
     {
-        const string sql = $"delete from {TABLE_NAME} where key = @key";
+        const string sql = $"delete from {TABLE_NAME} where id = @id";
         using var connection = new SQLiteConnection(_connectionString);
         connection.Open();
         using var command = new SQLiteCommand(sql, connection);
-        command.Parameters.AddWithValue("@key", key);
+        command.Parameters.AddWithValue("@id", id);
+        return command.ExecuteNonQuery() > 0;
+    }
+
+    // public bool RemoveByKey(string key)
+    // {
+    //     const string sql = $"delete from {TABLE_NAME} where key = @key";
+    //     using var connection = new SQLiteConnection(_connectionString);
+    //     connection.Open();
+    //     using var command = new SQLiteCommand(sql, connection);
+    //     command.Parameters.AddWithValue("@key", key);
+    //     return command.ExecuteNonQuery() > 0;
+    // }
+
+    public bool UpdateSnippetById(long id, string name = null, string value = null, string syntax = null,
+        long? orderNum = null,
+        long? folderId = null,
+        bool? favorites = null)
+    {
+        if (string.IsNullOrEmpty(name) &&
+            string.IsNullOrEmpty(value) &&
+            string.IsNullOrEmpty(syntax) &&
+            orderNum == null &&
+            folderId == null &&
+            favorites == null)
+        {
+            return false;
+        }
+
+        var updateSqls = new List<string>();
+        if (!string.IsNullOrEmpty(name))
+            updateSqls.Add("name = @name");
+        if (!string.IsNullOrEmpty(value))
+            updateSqls.Add("value = @value");
+        if (!string.IsNullOrEmpty(syntax))
+            updateSqls.Add("syntax = @syntax");
+        if (orderNum != null)
+            updateSqls.Add("order_num = @order_num");
+        if (folderId != null)
+            updateSqls.Add("folder_id = @folder_id");
+        if (favorites != null)
+            updateSqls.Add("favorites = @favorites");
+        updateSqls.Add("update_time = @update_time");
+
+        var updateSql = string.Join(", ", updateSqls);
+        var sql = $"update {TABLE_NAME} set {updateSql} where id = @id";
+
+        InnerLogger.Logger.Info($"UpdateByKey: {sql}");
+
+        using var connection = new SQLiteConnection(_connectionString);
+        connection.Open();
+        using var command = new SQLiteCommand(sql, connection);
+
+        if (!string.IsNullOrEmpty(name))
+            command.Parameters.AddWithValue("@name", name);
+        if (!string.IsNullOrEmpty(value))
+            command.Parameters.AddWithValue("@value", value);
+        if (!string.IsNullOrEmpty(syntax))
+            command.Parameters.AddWithValue("@syntax", syntax);
+        if (orderNum != null)
+            command.Parameters.AddWithValue("@order_num", orderNum);
+        if (folderId != null)
+            command.Parameters.AddWithValue("@folder_id", folderId);
+        if (favorites != null)
+            command.Parameters.AddWithValue("@favorites", Utils.BoolToInt(favorites));
+
+        command.Parameters.AddWithValue("@update_time", DateTimeUtil.TrimMilliseconds(DateTime.Now));
+        command.Parameters.AddWithValue("@id", id);
+
         return command.ExecuteNonQuery() > 0;
     }
 
@@ -372,7 +514,7 @@ public class SqliteSnippetManage : SnippetManage
         if (score != null)
             command.Parameters.AddWithValue("@score", score);
 
-        command.Parameters.AddWithValue("@update_time", TrimMilliseconds(DateTime.Now));
+        command.Parameters.AddWithValue("@update_time", DateTimeUtil.TrimMilliseconds(DateTime.Now));
 
         command.Parameters.AddWithValue("@key", key);
 
@@ -417,7 +559,7 @@ public class SqliteSnippetManage : SnippetManage
     private FolderModel _createFolderModel(string name)
     {
         var id = IdHelper.NewId();
-        var now = TrimMilliseconds(DateTime.Now);
+        var now = DateTimeUtil.TrimMilliseconds(DateTime.Now);
         return new FolderModel
         {
             Id = id,
@@ -485,7 +627,7 @@ public class SqliteSnippetManage : SnippetManage
         connection.Open();
         using var command = new SQLiteCommand(sql, connection);
         command.Parameters.AddWithValue("@new_name", newName);
-        command.Parameters.AddWithValue("@update_time", TrimMilliseconds(DateTime.Now));
+        command.Parameters.AddWithValue("@update_time", DateTimeUtil.TrimMilliseconds(DateTime.Now));
         command.Parameters.AddWithValue("@id", id);
         return command.ExecuteNonQuery() > 0;
     }
@@ -533,15 +675,5 @@ public class SqliteSnippetManage : SnippetManage
             CreateTime = reader.GetDateTime(3),
             UpdateTime = reader.GetDateTime(4)
         };
-    }
-
-    private int boolToInt(bool value)
-    {
-        return value ? 1 : 0;
-    }
-
-    private bool intToBool(int value)
-    {
-        return value != 0;
     }
 }

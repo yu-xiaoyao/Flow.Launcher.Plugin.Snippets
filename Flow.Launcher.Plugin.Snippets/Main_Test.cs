@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using Flow.Launcher.Plugin.Snippets.Json;
 using Flow.Launcher.Plugin.Snippets.Model;
 using Flow.Launcher.Plugin.Snippets.Sqlite;
 using Flow.Launcher.Plugin.Snippets.Util;
@@ -27,7 +26,7 @@ public class Main_Test
     {
         var sm = new SqliteSnippetManage(dbPath, "2.0.0");
 
-        var snippetModels = sm.List(key: "key1");
+        var snippetModels = sm.List(name: "key1");
         foreach (var snippetModel in snippetModels)
         {
             Console.WriteLine(snippetModel + " - " + snippetModel.UpdateTime);
@@ -48,26 +47,21 @@ public class Main_Test
 
         snippets.Add(new SnippetModel
         {
-            Key = "key1",
+            Name = "key1",
             Value = "value1"
         });
 
         snippets.Add(new SnippetModel
         {
-            Key = "key2",
+            Name = "key2",
             Value = "value2"
         });
 
         snippets.Add(new SnippetModel
         {
-            Key = "key3",
+            Name = "key3",
             Value = "value3"
         });
-
-        var sm = new JsonSettingSnippetManage(null);
-        var v1 = sm.GetByKey("key1");
-        Console.WriteLine(v1 == null);
-        Console.WriteLine(v1);
     }
 
     private static void test_variable_expander()

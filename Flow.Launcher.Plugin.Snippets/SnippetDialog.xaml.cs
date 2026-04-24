@@ -89,9 +89,9 @@ public partial class SnippetDialog : Window, INotifyPropertyChanged
         if (_selectSm != null)
         {
             TbKey.IsEnabled = false;
-            TbKey.Text = _selectSm.Key;
+            TbKey.Text = _selectSm.Name;
             TbValue.Text = _selectSm.Value;
-            TbScore.Text = $"{_selectSm.Score}";
+            TbScore.Text = $"{_selectSm.OrderNum}";
         }
         else
         {
@@ -126,12 +126,12 @@ public partial class SnippetDialog : Window, INotifyPropertyChanged
                 return false;
             }
 
-            _snippetManage.Add(key, value, score: score);
+            _snippetManage.Add(key, value);
         }
         else
         {
             // update
-            var result = _snippetManage.UpdateByKey(_selectSm.Key, value: value, score: score);
+            var result = _snippetManage.UpdateSnippetById(_selectSm.Id, value: value, orderNum: score);
 
             return result;
         }

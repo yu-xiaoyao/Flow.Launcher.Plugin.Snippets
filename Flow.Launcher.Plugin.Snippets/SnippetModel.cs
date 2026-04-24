@@ -5,9 +5,10 @@ namespace Flow.Launcher.Plugin.Snippets;
 
 public class SnippetModel
 {
-    public string Key { get; set; }
+    public long Id { get; set; }
+    public string Name { get; set; }
     public string Value { get; set; }
-    public int Score { get; set; } = 0;
+    public long OrderNum { get; set; } = 0;
     public DateTime CreateTime { get; set; }
     public DateTime UpdateTime { get; set; }
 
@@ -25,12 +26,14 @@ public class SnippetModel
 
     public SnippetModel Clone() => new()
     {
-        Key = Key,
+        Id = Id,
+        Name = Name,
         Value = Value,
-        Score = Score,
+        OrderNum = OrderNum,
         Faviorites = Faviorites,
         Syntax = Syntax,
         FolderId = FolderId,
+        FolderName = FolderName,
         CreateTime = CreateTime,
         UpdateTime = UpdateTime,
     };
@@ -38,6 +41,6 @@ public class SnippetModel
 
     public override string ToString()
     {
-        return $"Key: {Key}, Value: {Value}, Score: {Score}";
+        return $"Name: {Name}, Value: {Value}";
     }
 }

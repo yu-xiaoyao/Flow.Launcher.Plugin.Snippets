@@ -28,7 +28,7 @@ namespace Flow.Launcher.Plugin.Snippets
             var pluginSettingPath = context.CurrentPluginMetadata.PluginSettingsDirectoryPath;
 
             _snippetManage = new SqliteSnippetManage(pluginSettingPath, context.CurrentPluginMetadata.Version);
-            _upgradeToSqlite(pluginSettingPath);
+            _upgradeJsonToSqlite(pluginSettingPath);
 
             // if (_settings.StorageType == StorageType.Sqlite)
             // {
@@ -54,7 +54,7 @@ namespace Flow.Launcher.Plugin.Snippets
             }
 
             // fuzzy search
-            var results = _snippetManage.List(key: search).Select(sm => _modelToResult(query, sm)).ToList();
+            var results = _snippetManage.List(name: search).Select(sm => _modelToResult(query, sm)).ToList();
 
             if (!results.Any() && query.SearchTerms.Length >= 2)
             {
@@ -66,14 +66,13 @@ namespace Flow.Launcher.Plugin.Snippets
 
         private Result _modelToResult(Query query, SnippetModel sm)
         {
-            var key = sm.Key ?? string.Empty;
+            var key = sm.Name ?? string.Empty;
             var value = sm.Value ?? string.Empty;
             return new Result
             {
                 Title = key,
                 SubTitle = value.Replace("\r\n", "  ").Replace("\n", "  "),
                 IcoPath = IconPath,
-                Score = sm.Score,
                 AutoCompleteText = $"{query.ActionKeyword} {key}",
                 ContextData = sm,
                 Preview = new Result.PreviewInfo
@@ -160,7 +159,7 @@ namespace Flow.Launcher.Plugin.Snippets
 
         private void _update(string key, string value)
         {
-            _snippetManage.UpdateByKey(key, value: value);
+            // _snippetManage.UpdateSnippetById(key, value: value);
         }
 
         public List<Result> LoadContextMenus(Result selectedResult)
@@ -176,12 +175,12 @@ namespace Flow.Launcher.Plugin.Snippets
                     IcoPath = IconPath,
                     Action = _ =>
                     {
-                        // var sw = new SettingWindow(_context, _snippetManage);
-                        // sw.Show();
+                        var sw = new SettingWindow(_context, _snippetManage);
+                        sw.Show();
 
-                        var ew = new SnippetEditWindows(_snippetManage);
-                        ew.ShowDialog();
-                        
+                        // var ew = new SnippetEditWindows(_snippetManage);
+                        // ew.ShowDialog();
+
                         return true;
                     }
                 });
@@ -190,7 +189,7 @@ namespace Flow.Launcher.Plugin.Snippets
                 {
                     Title = _context.API.GetTranslation("snippets_plugin_edit_snippet"),
                     SubTitle = string.Format(_context.API.GetTranslation("snippets_plugin_edit_snippet_info"),
-                        sm.Key, sm.Value.Replace("\r\n", "  ").Replace("\n", "  ")),
+                        sm.Name, sm.Value.Replace("\r\n", "  ").Replace("\n", "  ")),
                     IcoPath = IconPath,
                     Action = _ =>
                     {
@@ -202,11 +201,11 @@ namespace Flow.Launcher.Plugin.Snippets
                 {
                     Title = _context.API.GetTranslation("snippets_plugin_delete_snippet"),
                     SubTitle = string.Format(_context.API.GetTranslation("snippets_plugin_delete_snippet_info"),
-                        sm.Key, sm.Value.Replace("\r\n", "  ").Replace("\n", "  ")),
+                        sm.Name, sm.Value.Replace("\r\n", "  ").Replace("\n", "  ")),
                     IcoPath = IconPath,
                     Action = _ =>
                     {
-                        _snippetManage.RemoveByKey(sm.Key);
+                        _snippetManage.RemoveSnippetById(sm.Id);
                         return true;
                     },
                 });
@@ -216,7 +215,7 @@ namespace Flow.Launcher.Plugin.Snippets
                 {
                     Title = _context.API.GetTranslation("snippets_plugin_edit_snippet"),
                     SubTitle = string.Format(_context.API.GetTranslation("snippets_plugin_edit_snippet_info"),
-                        sm.Key, sm.Value.Replace("\r\n", "  ").Replace("\n", "  ")),
+                        sm.Name, sm.Value.Replace("\r\n", "  ").Replace("\n", "  ")),
                     IcoPath = IconPath,
                     Action = _ =>
                     {
@@ -309,12 +308,12 @@ namespace Flow.Launcher.Plugin.Snippets
         /// upgrade v2 -> v3
         /// </summary>
         /// <param name="pluginSettingPath"></param>
-        private void _upgradeToSqlite(string pluginSettingPath)
+        private void _upgradeJsonToSqlite(string pluginSettingPath)
         {
             if (_settings.StorageType == StorageType.JsonSetting)
             {
                 // merge to Sqlite
-                UpgradeHelper.UpgradeV2ToV3(_snippetManage, pluginSettingPath);
+                UpgradeHelper.UpgradeJsonToSqlite(_snippetManage, pluginSettingPath);
                 _settings.StorageType = StorageType.Sqlite;
                 _context.API.SavePluginSettings();
             }
@@ -326,22 +325,22 @@ namespace Flow.Launcher.Plugin.Snippets
         /// data type: Dictionary <![CDATA[<]]>string, string <![CDATA[>]]> Snippets { get; set; }
         /// 1.x.x version snippets merge to 2.x.x version
         /// </summary>
-        [Obsolete]
-        private void _mergeOldSnippet()
-        {
-            // Data Type: Dictionary<string, string> Snippets { get; set; }
-            // old version snippets in Settings.json
-            var snippets = _settings.Snippets;
-            if (snippets == null || !snippets.Any()) return;
-
-            foreach (var snippet in snippets)
-            {
-                _snippetManage.Add(snippet.Key, snippet.Value);
-            }
-
-            // clear old snippets after merge
-            _settings.Snippets = null;
-            _context.API.SavePluginSettings();
-        }
+        // [Obsolete]
+        // private void _mergeOldSnippet()
+        // {
+        //     // Data Type: Dictionary<string, string> Snippets { get; set; }
+        //     // old version snippets in Settings.json
+        //     var snippets = _settings.Snippets;
+        //     if (snippets == null || !snippets.Any()) return;
+        //
+        //     foreach (var snippet in snippets)
+        //     {
+        //         _snippetManage.Add(snippet.Key, snippet.Value);
+        //     }
+        //
+        //     // clear old snippets after merge
+        //     _settings.Snippets = null;
+        //     _context.API.SavePluginSettings();
+        // }
     }
 }

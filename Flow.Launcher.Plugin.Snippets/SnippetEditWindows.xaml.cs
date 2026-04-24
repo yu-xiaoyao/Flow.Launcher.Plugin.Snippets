@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using ICSharpCode.AvalonEdit.Highlighting;
 using Flow.Launcher.Plugin.Snippets.Model;
+using ICSharpCode.AvalonEdit.Highlighting;
 using JetBrains.Annotations;
 
 namespace Flow.Launcher.Plugin.Snippets;
@@ -48,7 +48,7 @@ public partial class SnippetEditWindows : Window
         // Load edit model
         if (_editModel != null)
         {
-            TbKey.Text = _editModel.Key;
+            TbKey.Text = _editModel.Name;
             TbKey.IsEnabled = false;
             Editor.Text = _editModel.Value;
             BtnFavorite.IsChecked = _editModel.Faviorites == 1;
@@ -74,7 +74,8 @@ public partial class SnippetEditWindows : Window
 
     private static List<string> _getSyntaxList() => new()
     {
-        "Text", "C#", "Java", "JavaScript", "Python", "HTML", "XML", "JSON", "SQL", "CSS", "Go", "Rust", "TypeScript", "Markdown"
+        "Text", "C#", "Java", "JavaScript", "Python", "HTML", "XML", "JSON", "SQL", "CSS", "Go", "Rust", "TypeScript",
+        "Markdown"
     };
 
     private static readonly Dictionary<string, string> SyntaxHighlightingMap = new()
@@ -111,16 +112,16 @@ public partial class SnippetEditWindows : Window
 
     private void OnSaveButtonClick(object sender, RoutedEventArgs e)
     {
-        var key = TbKey.Text.Trim();
+        var name = TbKey.Text.Trim();
         var value = Editor.Text;
 
-        if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
+        if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(value))
         {
-            MessageBox.Show("Key and Value are required.");
+            MessageBox.Show("Name and Value are required.");
             return;
         }
 
-        var favorite = BtnFavorite.IsChecked == true ? 1 : 0;
+        var favorites = BtnFavorite.IsChecked;
         var syntax = CbSyntax.SelectedIndex > 0 ? CbSyntax.SelectedItem?.ToString() : null;
         long? folderId = null;
         if (CbFolder.SelectedIndex > 0)
@@ -131,17 +132,12 @@ public partial class SnippetEditWindows : Window
 
         if (_edit && _editModel != null)
         {
-            _snippetManage.UpdateByKey(_editModel.Key, value: value, folderId: folderId);
+            _snippetManage.UpdateSnippetById(_editModel.Id, name: name, value: value, syntax: syntax,
+                folderId: folderId, favorites: favorites);
         }
         else
         {
-            var existing = _snippetManage.GetByKey(key);
-            if (existing != null)
-            {
-                MessageBox.Show("Key already exists.");
-                return;
-            }
-            _snippetManage.Add(key, value, folderId: folderId);
+            _snippetManage.Add(name, value, syntax, favorites, folderId);
         }
 
         DialogResult = true;
