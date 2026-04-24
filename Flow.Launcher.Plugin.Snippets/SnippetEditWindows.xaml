@@ -6,7 +6,7 @@
         xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
         mc:Ignorable="d"
         Title="{DynamicResource snippets_plugin_edit_snippet}"
-        Width="940"
+        Width="1180"
         Height="600"
         MinWidth="940"
         MinHeight="600"
@@ -67,11 +67,14 @@
                 Padding="5 0">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
+                    <!-- Favorite -->
                     <ColumnDefinition Width="Auto" />
 
+                    <!-- SnippetName -->
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" MinWidth="200" />
 
+                    <!-- Folder -->
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
 
@@ -93,17 +96,21 @@
                 </ToggleButton>
 
 
-                <!-- Key -->
+                <!-- SnippetName -->
                 <TextBlock Grid.Column="1" Text="{DynamicResource snippets_plugin_snippets_key}"
                            VerticalAlignment="Center" Margin="5 0" />
                 <Border Grid.Column="2" VerticalAlignment="Center" Margin="5 0">
-                    <TextBox x:Name="TbKey" FontSize="13" />
+                    <TextBox x:Name="TbSnippetName" FontSize="13" />
                 </Border>
 
                 <!-- Folder -->
                 <TextBlock Grid.Column="3" Text="{DynamicResource snippets_plugin_snippets_folder}"
                            VerticalAlignment="Center" Margin="5 0" />
-                <ComboBox Grid.Column="4" x:Name="CbFolder" FontSize="13" Width="160" Margin="5 0" />
+                <ComboBox Grid.Column="4" x:Name="CbFolder" FontSize="13" MinWidth="160" MaxWidth="250" Width="200"
+                          Margin="5 0"
+                          ItemsSource="{Binding Folders}"
+                          DisplayMemberPath="Name"
+                          SelectedValuePath="Id" />
 
                 <!-- Syntax -->
                 <TextBlock Grid.Column="5" Text="{DynamicResource snippets_plugin_snippet_syntax}"
@@ -112,9 +119,9 @@
                           SelectionChanged="OnSyntaxSelectionChanged" />
 
                 <!-- Save & Cancel -->
-                <Button Grid.Column="7" x:Name="BtnSave"
+                <Button Grid.Column="7" x:Name="BtnSaveOrUpdate"
                         MinWidth="80" Margin="5 0"
-                        Content="{DynamicResource snippets_plugin_save}"
+                        Content=""
                         Click="OnSaveButtonClick"
                         Style="{DynamicResource AccentButtonStyle}" />
                 <Button Grid.Column="8" x:Name="BtnCancel"

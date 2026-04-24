@@ -23,24 +23,19 @@ namespace Flow.Launcher.Plugin.Snippets
             _context = context;
             _settings = _context.API.LoadSettingJsonStorage<Settings>();
 
-            InnerLogger.SetAsFlowLauncherLogger(_context, LoggerLevel.TRACE);
+            InnerLogger.SetAsFlowLauncherLogger(_context, LoggerLevel.DEBUG);
 
             var pluginSettingPath = context.CurrentPluginMetadata.PluginSettingsDirectoryPath;
 
-            _snippetManage = new SqliteSnippetManage(pluginSettingPath, context.CurrentPluginMetadata.Version);
-            _upgradeJsonToSqlite(pluginSettingPath);
+            var needUpdateDb = _settings.StorageType == StorageType.Sqlite;
 
-            // if (_settings.StorageType == StorageType.Sqlite)
-            // {
-            //     _snippetManage =
-            //         new SqliteSnippetManage(context.CurrentPluginMetadata.PluginSettingsDirectoryPath,
-            //             context.CurrentPluginMetadata.Version);
-            // }
-            // else
-            // {
-            //     _snippetManage = new JsonSettingSnippetManage(context);
-            //     _mergeOldSnippet(); // merge old snippets
-            // }
+            _snippetManage = new SqliteSnippetManage(pluginSettingPath, needUpdateDb);
+
+            // upgrade
+            if (!needUpdateDb)
+            {
+                _upgradeJsonToSqlite(pluginSettingPath);
+            }
         }
 
         public List<Result> Query(Query query)
@@ -310,13 +305,10 @@ namespace Flow.Launcher.Plugin.Snippets
         /// <param name="pluginSettingPath"></param>
         private void _upgradeJsonToSqlite(string pluginSettingPath)
         {
-            if (_settings.StorageType == StorageType.JsonSetting)
-            {
-                // merge to Sqlite
-                UpgradeHelper.UpgradeJsonToSqlite(_snippetManage, pluginSettingPath);
-                _settings.StorageType = StorageType.Sqlite;
-                _context.API.SavePluginSettings();
-            }
+            // merge to Sqlite
+            UpgradeHelper.UpgradeJsonToSqlite(_snippetManage, pluginSettingPath);
+            _settings.StorageType = StorageType.Sqlite;
+            _context.API.SavePluginSettings();
         }
 
 

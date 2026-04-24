@@ -5,10 +5,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:conv="clr-namespace:Flow.Launcher.Plugin.Snippets.UI.Converters"
         Title="{DynamicResource snippets_plugin_manage_snippets}"
-        Width="1200"
-        Height="640"
-        MinWidth="940"
-        MinHeight="600"
+        Width="1280"
+        Height="720"
+        MinWidth="960"
+        MinHeight="640"
         Closed="OnClosed"
         Loaded="OnLoaded"
         StateChanged="Window_StateChanged"
@@ -465,7 +465,7 @@
                         CornerRadius="4"
                         Background="Red"
                         Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <TextBlock Text="0-234234"></TextBlock>
+                        <TextBlock Text="0-234234" />
                     </Border>
 
                 </Grid>

@@ -3,20 +3,24 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:Flow.Launcher.Plugin.Snippets"
         mc:Ignorable="d"
-        Height="450"
-        Width="500"
+        Height="312"
+        Width="480"
         ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen"
+        ShowInTaskbar="False"
         Background="{DynamicResource PopuBGColor}"
         Foreground="{DynamicResource PopupTextColor}">
 
-    <!-- Remove Windows Default Title Bar. Height: 32 -->
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="32"
                       ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}" />
     </WindowChrome.WindowChrome>
+    <Window.InputBindings>
+        <KeyBinding Key="Escape" Command="Close" />
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="Close" Executed="OnCloseExecuted" />
+    </Window.CommandBindings>
 
     <StackPanel Orientation="Vertical">
         <!-- Custom Windows Bar. Height: 32 -->
@@ -68,12 +72,13 @@
         </DockPanel>
         <!-- Windows Title Bar And Title Bar Height: 64 -->
 
-        <StackPanel Height="386">
+        <StackPanel>
             <!-- Content Area -->
-            <StackPanel Height="306" Orientation="Vertical">
+            <StackPanel Orientation="Vertical">
+
                 <Grid Margin="30,0,30,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="80" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -81,74 +86,47 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <!-- ID (read-only) -->
                     <Label
                         Grid.Row="0" Grid.Column="0"
+                        x:Name="LabelName"
+                        Margin="8 16"
                         VerticalAlignment="Center"
-                        Margin="0,8,10,0"
-                        Content="{DynamicResource snippets_plugin_folder_id}" />
-                    <TextBlock
-                        x:Name="TbId"
+                        Content="{DynamicResource snippets_plugin_snippets_folder_name}" />
+                    <TextBox
                         Grid.Row="0" Grid.Column="1"
-                        VerticalAlignment="Center"
-                        Margin="0,8,0,0"
+                        x:Name="TbName"
+                        Margin="8 16"
                         Text="" />
 
-                    <!-- Name (editable) -->
                     <Label
                         Grid.Row="1" Grid.Column="0"
+                        x:Name="LabelCreateTime"
+                        Margin="8 16"
                         VerticalAlignment="Center"
-                        Margin="0,8,10,0"
-                        Content="{DynamicResource snippets_plugin_folder_name}" />
-                    <TextBox
-                        x:Name="TbName"
+                        Content="{DynamicResource snippets_plugin_create_time}" />
+                    <TextBlock
                         Grid.Row="1" Grid.Column="1"
-                        Margin="0,8,0,0" />
+                        x:Name="TbCreateTime"
+                        Margin="8 16"
+                        VerticalAlignment="Center"
+                        Text="" />
 
-                    <!-- OrderNum (editable) -->
                     <Label
                         Grid.Row="2" Grid.Column="0"
+                        x:Name="LabelUpdateTime"
+                        Margin="8 16"
                         VerticalAlignment="Center"
-                        Margin="0,8,10,0"
-                        Content="{DynamicResource snippets_plugin_folder_order}" />
-                    <TextBox
-                        x:Name="TbOrderNum"
+                        Content="{DynamicResource snippets_plugin_update_time}" />
+                    <TextBlock
                         Grid.Row="2" Grid.Column="1"
-                        Width="120"
-                        HorizontalAlignment="Left"
-                        Margin="0,8,0,0"
-                        PreviewTextInput="TextBox_PreviewTextInput"
-                        DataObject.Pasting="TextBox_Pasting" />
-
-                    <!-- CreateTime (read-only) -->
-                    <Label
-                        Grid.Row="3" Grid.Column="0"
-                        VerticalAlignment="Center"
-                        Margin="0,8,10,0"
-                        Content="{DynamicResource snippets_plugin_folder_create_time}" />
-                    <TextBlock
-                        x:Name="TbCreateTime"
-                        Grid.Row="3" Grid.Column="1"
-                        VerticalAlignment="Center"
-                        Margin="0,8,0,0"
-                        Text="" />
-
-                    <!-- UpdateTime (read-only) -->
-                    <Label
-                        Grid.Row="4" Grid.Column="0"
-                        VerticalAlignment="Center"
-                        Margin="0,8,10,0"
-                        Content="{DynamicResource snippets_plugin_folder_update_time}" />
-                    <TextBlock
                         x:Name="TbUpdateTime"
-                        Grid.Row="4" Grid.Column="1"
+                        Margin="8 16"
                         VerticalAlignment="Center"
-                        Margin="0,8,0,0"
                         Text="" />
                 </Grid>
+
             </StackPanel>
 
             <!-- Bottom Button Bar -->
@@ -156,12 +134,12 @@
                     Background="{DynamicResource PopupButtonAreaBGColor}"
                     BorderBrush="{DynamicResource PopupButtonAreaBorderColor}"
                     BorderThickness="0,1,0,0">
-                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="8 16">
                     <Button
                         MinWidth="120"
                         Margin="5,0,5,0"
                         Click="OnCancelButtonClick"
-                        Content="{DynamicResource cancel}" />
+                        Content="{DynamicResource snippets_plugin_close}" />
                     <Button
                         MinWidth="120"
                         Margin="5,0,5,0"

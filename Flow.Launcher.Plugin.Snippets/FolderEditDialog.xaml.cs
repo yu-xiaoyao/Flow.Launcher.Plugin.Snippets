@@ -1,13 +1,12 @@
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using Flow.Launcher.Plugin.Snippets.Model;
+using Flow.Launcher.Plugin.Snippets.Util;
 using JetBrains.Annotations;
 
 namespace Flow.Launcher.Plugin.Snippets;
 
-public partial class FolderEditDialog : Window, INotifyPropertyChanged
+public partial class FolderEditDialog : Window
 {
     private readonly PluginInitContext _context;
     private readonly SnippetManage _snippetManage;
@@ -15,19 +14,8 @@ public partial class FolderEditDialog : Window, INotifyPropertyChanged
 
     private bool _isEditMode;
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public string TitleName { get; set; }
 
-    private string _titleName;
-
-    public string TitleName
-    {
-        get => _titleName;
-        set
-        {
-            _titleName = value;
-            OnPropertyChanged(nameof(TitleName));
-        }
-    }
 
     public FolderEditDialog(PluginInitContext context, SnippetManage snippetManage,
         [CanBeNull] FolderModel editModel = null)
@@ -39,9 +27,18 @@ public partial class FolderEditDialog : Window, INotifyPropertyChanged
         {
             _isEditMode = true;
             _editModel = editModel;
+            TitleName = _context.API.GetTranslation("snippets_plugin_edit");
+        }
+        else
+        {
+            _isEditMode = false;
+            TitleName = _context.API.GetTranslation("snippets_plugin_add");
         }
 
+        WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
         InitializeComponent();
+
         DataContext = this;
         Closed += (_, _) => { };
         PreviewKeyDown += (_, e) =>
@@ -57,26 +54,37 @@ public partial class FolderEditDialog : Window, INotifyPropertyChanged
 
     private void _renderView()
     {
-        TitleName = _isEditMode
-            ? _context.API.GetTranslation("snippets_plugin_edit_folder")
-            : _context.API.GetTranslation("snippets_plugin_add_folder");
-
         if (_isEditMode && _editModel != null)
         {
-            TbId.Text = _editModel.Id.ToString();
             TbName.Text = _editModel.Name;
-            TbOrderNum.Text = _editModel.OrderNum.ToString();
-            TbCreateTime.Text = _editModel.CreateTime.ToString("yyyy-MM-dd HH:mm:ss");
-            TbUpdateTime.Text = _editModel.UpdateTime.ToString("yyyy-MM-dd HH:mm:ss");
+            TbCreateTime.Text = DateTimeUtil.FormatDateTime(_editModel.CreateTime);
+            TbUpdateTime.Text = DateTimeUtil.FormatDateTime(_editModel.UpdateTime);
         }
         else
         {
-            TbId.Text = "-";
-            TbName.Text = "";
-            TbOrderNum.Text = "0";
-            TbCreateTime.Text = "-";
-            TbUpdateTime.Text = "-";
+            LabelCreateTime.Visibility = Visibility.Hidden;
+            LabelUpdateTime.Visibility = Visibility.Hidden;
         }
+    }
+
+
+    private bool _checkFolderNameExist(string folderName, bool edit)
+    {
+        var fm = _snippetManage.GetFolder(folderName);
+        if (fm != null)
+        {
+            var title = string.Format(
+                _context.API.GetTranslation(edit ? "snippets_plugin_edit_failed" : "snippets_plugin_add_failed"),
+                _context.API.GetTranslation("snippets_plugin_snippets_folder"));
+            var subTitle = string.Format(_context.API.GetTranslation("snippets_plugin_name_already_exists"),
+                folderName);
+
+            _context.API.ShowMsgBox(subTitle, title, icon: MessageBoxImage.Error);
+
+            return true;
+        }
+
+        return false;
     }
 
     private bool _doSave()
@@ -85,18 +93,23 @@ public partial class FolderEditDialog : Window, INotifyPropertyChanged
         if (string.IsNullOrEmpty(name))
             return false;
 
-        var orderResult = long.TryParse(TbOrderNum.Text.Trim(), out var orderNum);
-        if (!orderResult)
-            orderNum = 0;
-
         if (_isEditMode && _editModel != null)
         {
-            return _snippetManage.UpdateFolderById(_editModel.Id, name, orderNum);
+            if (string.Equals(name, _editModel.Name))
+                return false;
+
+            if (_checkFolderNameExist(name, true))
+                return false;
+            _snippetManage.UpdateFolderById(_editModel.Id, name);
         }
         else
         {
-            return _snippetManage.AddFolder(name, orderNum);
+            if (_checkFolderNameExist(name, false))
+                return false;
+            _snippetManage.AddFolder(name);
         }
+
+        return true;
     }
 
     private void SaveAndCloseButtonClick(object sender, RoutedEventArgs e)
@@ -106,12 +119,6 @@ public partial class FolderEditDialog : Window, INotifyPropertyChanged
             DialogResult = true;
             Close();
         }
-        else
-        {
-            _context.API.ShowMsgError(
-                _context.API.GetTranslation("snippets_plugin_error"),
-                _context.API.GetTranslation("snippets_plugin_add_failed"));
-        }
     }
 
     private void OnCancelButtonClick(object sender, RoutedEventArgs e)
@@ -119,44 +126,8 @@ public partial class FolderEditDialog : Window, INotifyPropertyChanged
         Close();
     }
 
-    private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+    private void OnCloseExecuted(object sender, ExecutedRoutedEventArgs e)
     {
-        var input = e.Text.Trim();
-        if (!string.IsNullOrEmpty(input))
-        {
-            if ("-".Equals(input))
-                return;
-
-            var isNum = long.TryParse(input, out _);
-            if (!isNum)
-                e.Handled = true;
-        }
-    }
-
-    private void TextBox_Pasting(object sender, DataObjectPastingEventArgs e)
-    {
-        if (e.DataObject.GetDataPresent(typeof(string)))
-        {
-            var text = (string)e.DataObject.GetData(typeof(string));
-            if (text != null)
-            {
-                var input = text.Trim();
-                if (!string.IsNullOrEmpty(input))
-                {
-                    var isNum = long.TryParse(input, out _);
-                    if (!isNum)
-                        e.CancelCommand();
-                }
-            }
-        }
-        else
-        {
-            e.CancelCommand();
-        }
-    }
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        Close();
     }
 }

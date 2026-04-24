@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Flow.Launcher.Plugin.Snippets.Model;
+using Flow.Launcher.Plugin.Snippets.Util;
 using ICSharpCode.AvalonEdit.Highlighting;
 using JetBrains.Annotations;
 
@@ -10,29 +11,36 @@ namespace Flow.Launcher.Plugin.Snippets;
 
 public partial class SnippetEditWindows : Window
 {
+    private readonly PluginInitContext _context;
     private readonly SnippetManage _snippetManage;
-    private readonly List<FolderModel> _folders;
+
+    public List<FolderModel> Folders { get; set; }
 
     [CanBeNull] private SnippetModel _editModel;
-    private bool _edit;
 
-    public SnippetEditWindows(SnippetManage snippetManage, [CanBeNull] SnippetModel editModel = null)
+    public SnippetEditWindows(PluginInitContext context, SnippetManage snippetManage,
+        [CanBeNull] SnippetModel editModel = null)
     {
+        _context = context;
         _snippetManage = snippetManage;
-        _folders = snippetManage.ListFolders();
 
         if (editModel != null)
         {
-            _edit = true;
             _editModel = editModel;
         }
 
         InitializeComponent();
+
+        Folders = snippetManage.ListFolders();
+
         _initView();
     }
 
     private void _initView()
     {
+        BtnSaveOrUpdate.Content =
+            _context.API.GetTranslation(_editModel != null ? "snippets_plugin_update" : "snippets_plugin_save");
+
         // Syntax
         CbSyntax.Items.Add("(None)");
         CbSyntax.SelectedIndex = 0;
@@ -42,16 +50,15 @@ public partial class SnippetEditWindows : Window
         // Folder
         CbFolder.Items.Add("(None)");
         CbFolder.SelectedIndex = 0;
-        foreach (var folder in _folders)
-            CbFolder.Items.Add(folder.Name);
+        foreach (var folder in Folders)
+            CbFolder.Items.Add(folder);
 
         // Load edit model
         if (_editModel != null)
         {
-            TbKey.Text = _editModel.Name;
-            TbKey.IsEnabled = false;
+            TbSnippetName.Text = _editModel.Name;
             Editor.Text = _editModel.Value;
-            BtnFavorite.IsChecked = _editModel.Faviorites == 1;
+            BtnFavorite.IsChecked = Utils.IntToBool(_editModel.Faviorites);
 
             if (!string.IsNullOrEmpty(_editModel.Syntax))
             {
@@ -61,9 +68,9 @@ public partial class SnippetEditWindows : Window
 
             if (_editModel.FolderId.HasValue)
             {
-                var folder = _folders.FirstOrDefault(f => f.Id == _editModel.FolderId.Value);
+                var folder = Folders.FirstOrDefault(f => f.Id == _editModel.FolderId.Value);
                 if (folder != null)
-                    CbFolder.SelectedItem = folder.Name;
+                    CbFolder.SelectedItem = folder;
             }
         }
         else
@@ -112,7 +119,7 @@ public partial class SnippetEditWindows : Window
 
     private void OnSaveButtonClick(object sender, RoutedEventArgs e)
     {
-        var name = TbKey.Text.Trim();
+        var name = TbSnippetName.Text.Trim();
         var value = Editor.Text;
 
         if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(value))
@@ -126,11 +133,11 @@ public partial class SnippetEditWindows : Window
         long? folderId = null;
         if (CbFolder.SelectedIndex > 0)
         {
-            var folder = _folders.ElementAtOrDefault(CbFolder.SelectedIndex - 1);
+            var folder = Folders.ElementAtOrDefault(CbFolder.SelectedIndex - 1);
             if (folder != null) folderId = folder.Id;
         }
 
-        if (_edit && _editModel != null)
+        if (_editModel != null)
         {
             _snippetManage.UpdateSnippetById(_editModel.Id, name: name, value: value, syntax: syntax,
                 folderId: folderId, favorites: favorites);

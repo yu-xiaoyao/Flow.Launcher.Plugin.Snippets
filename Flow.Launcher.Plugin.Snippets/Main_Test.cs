@@ -24,7 +24,7 @@ public class Main_Test
 
     private static void test_sqlite_query()
     {
-        var sm = new SqliteSnippetManage(dbPath, "2.0.0");
+        var sm = new SqliteSnippetManage(dbPath);
 
         var snippetModels = sm.List(name: "key1");
         foreach (var snippetModel in snippetModels)
@@ -35,7 +35,7 @@ public class Main_Test
 
     private static void test_sqlite_add()
     {
-        var sm = new SqliteSnippetManage(dbPath, "2.0.0");
+        var sm = new SqliteSnippetManage(dbPath);
 
         sm.Add("key1", "value1");
         sm.Add("key2", "value2");

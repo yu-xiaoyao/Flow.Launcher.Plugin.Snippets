@@ -72,16 +72,16 @@ public class SqliteSnippetManage : SnippetManage
 
     private readonly string _connectionString;
 
-    public SqliteSnippetManage(string dbDir, string pluginVersion)
+    public SqliteSnippetManage(string dbDir, bool needUpdate = false)
     {
         var dbPath = Path.Combine(dbDir, "snippets.db");
         _connectionString = $"Data Source={dbPath};Version=3;";
-        _initCheckTable(pluginVersion);
+        InnerLogger.Logger.Debug($"_connectionString: {_connectionString}.");
+        _initCheckTable(needUpdate);
     }
 
-    private void _initCheckTable(string pluginVersion)
+    private void _initCheckTable(bool needUpdate)
     {
-        InnerLogger.Logger.Debug($"_connectionString: {_connectionString}. pluginVersion: {pluginVersion}");
         using var connection = new SQLiteConnection(_connectionString);
         connection.Open();
 
@@ -105,8 +105,11 @@ public class SqliteSnippetManage : SnippetManage
             using var createTableCommand = new SQLiteCommand(TableDDL3, connection);
             createTableCommand.ExecuteNonQuery();
 
-            // merge v2 data to current, after Table is Created
-            _mergeV2DataListToV3(connection);
+            if (needUpdate)
+            {
+                // merge v2 data to current, after Table is Created
+                _mergeV2DataListToV3(connection);
+            }
         }
     }
 

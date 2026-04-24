@@ -9,13 +9,16 @@
 
     <system:String x:Key="snippets_plugin_snippets_empty">Snippets list is empty</system:String>
     <system:String x:Key="snippets_plugin_snippets_empty_add">Snippet is empty, Please add Snippet first</system:String>
-    <system:String x:Key="snippets_plugin_add">Add Snippet</system:String>
-    <system:String x:Key="snippets_plugin_add_info">Add Snippet. {0} = {1}</system:String>
-    <system:String x:Key="snippets_plugin_add_failed">Add Snippet Failed</system:String>
-    <system:String x:Key="snippets_plugin_add_failed_cause">Snippet Key Already exist</system:String>
-    <system:String x:Key="snippets_plugin_update">Update Snippet</system:String>
-    <system:String x:Key="snippets_plugin_update_info">Update Snippet. {0} = {1}</system:String>
+    <system:String x:Key="snippets_plugin_add">Add</system:String>
+    <system:String x:Key="snippets_plugin_edit">Edit</system:String>
+    <system:String x:Key="snippets_plugin_add_snippet">Add Snippet</system:String>
     <system:String x:Key="snippets_plugin_edit_snippet">Edit Snippet</system:String>
+    <system:String x:Key="snippets_plugin_add_info">Add Snippet. {0} = {1}</system:String>
+    <system:String x:Key="snippets_plugin_add_failed">Add {0} Failed</system:String>
+    <system:String x:Key="snippets_plugin_edit_failed">Edit {0} Failed</system:String>
+    <system:String x:Key="snippets_plugin_name_already_exists">Name Already Exists: {0}</system:String>
+    <system:String x:Key="snippets_plugin_add_failed_cause">Snippet Key Already exist</system:String>
+    <system:String x:Key="snippets_plugin_update_info">Update Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_edit_snippet_info">Edit Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_delete_snippet">Delete Snippet</system:String>
     <system:String x:Key="snippets_plugin_move_up">Move Up</system:String>
@@ -27,6 +30,7 @@
     <system:String x:Key="snippets_plugin_open_settings">Open Settings</system:String>
     <system:String x:Key="snippets_plugin_close">Close</system:String>
     <system:String x:Key="snippets_plugin_save">Save</system:String>
+    <system:String x:Key="snippets_plugin_update">Update</system:String>
     <system:String x:Key="snippets_plugin_save_and_close">Save And Close</system:String>
     <system:String x:Key="snippets_plugin_edit_item_key">Current Is Edit Mode, click to switch to Add Mode</system:String>
     <system:String x:Key="snippets_plugin_add_item_key">Current Is Add Mode</system:String>
@@ -35,6 +39,7 @@
     <system:String x:Key="snippets_plugin_snippets_value">Value</system:String>
     <system:String x:Key="snippets_plugin_snippets_score">Score</system:String>
     <system:String x:Key="snippets_plugin_snippets_folder">Folder</system:String>
+    <system:String x:Key="snippets_plugin_snippets_folder_name">Folder Name</system:String>
     <system:String x:Key="snippets_plugin_filter">Filter</system:String>
     <system:String x:Key="snippets_plugin_reset">Reset</system:String>
     <system:String x:Key="snippets_plugin_export">Export</system:String>
@@ -60,5 +65,7 @@
     <system:String x:Key="snippets_plugin_recent">Recent</system:String>
     <system:String x:Key="snippets_plugin_no_folder">No Folder</system:String>
     <system:String x:Key="snippets_plugin_snippet_syntax">Syntax</system:String>
+    <system:String x:Key="snippets_plugin_create_time">Create Time</system:String>
+    <system:String x:Key="snippets_plugin_update_time">Update Time</system:String>
 
 </ResourceDictionary>

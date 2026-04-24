@@ -361,8 +361,7 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
     private void BtnAddSnippets_Click(object sender, RoutedEventArgs e)
     {
         // IsEditing = true;
-        var ew = new SnippetEditWindows(_snippetManage);
-        ew.ShowDialog();
+        _openEditSnippetDialog();
     }
 
 
@@ -459,9 +458,32 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
 
         if (row?.Item is SnippetModel item)
         {
-            IsEditing = true;
+            // IsEditing = true;
             // 调用 ViewModel 命令，传入选中项
             // (DataContext as SnippetModel)?.BeginEditCommand.Execute(item);
+            _openEditSnippetDialog(item);
+        }
+    }
+
+    private void _openEditSnippetDialog([CanBeNull] SnippetModel sm = null)
+    {
+        if (sm == null)
+        {
+            if (_selectFolderId > 0)
+            {
+                // _snippetManage.GetFolder()
+            }
+        }
+
+        var ew = new SnippetEditWindows(_context, _snippetManage, sm)
+        {
+            Owner = this,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        };
+        var result = ew.ShowDialog();
+        if (result == true)
+        {
+            _loadSnippets();
         }
     }
 }

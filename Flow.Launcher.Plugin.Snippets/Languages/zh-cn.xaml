@@ -9,13 +9,16 @@
 
     <system:String x:Key="snippets_plugin_snippets_empty">Snippets 列表为空</system:String>
     <system:String x:Key="snippets_plugin_snippets_empty_add">Snippets 为空, 请先添加 Snippet</system:String>
-    <system:String x:Key="snippets_plugin_add">添加 Snippet</system:String>
-    <system:String x:Key="snippets_plugin_add_info">添加 Snippet. {0} = {1}</system:String>
-    <system:String x:Key="snippets_plugin_add_failed">添加 Snippet 失败</system:String>
-    <system:String x:Key="snippets_plugin_add_failed_cause">Snippet Key 已存在</system:String>
-    <system:String x:Key="snippets_plugin_update">更新 Snippet</system:String>
-    <system:String x:Key="snippets_plugin_update_info">更新 Snippet. {0} = {1}</system:String>
+    <system:String x:Key="snippets_plugin_add">添加</system:String>
+    <system:String x:Key="snippets_plugin_edit">编辑</system:String>
+    <system:String x:Key="snippets_plugin_add_snippet">添加 Snippet</system:String>
     <system:String x:Key="snippets_plugin_edit_snippet">编辑 Snippet</system:String>
+    <system:String x:Key="snippets_plugin_add_info">添加 Snippet. {0} = {1}</system:String>
+    <system:String x:Key="snippets_plugin_add_failed">添加 {0} 失败</system:String>
+    <system:String x:Key="snippets_plugin_edit_failed">编辑 {0} 失败</system:String>
+    <system:String x:Key="snippets_plugin_name_already_exists">名称已存在: {0}</system:String>
+    <system:String x:Key="snippets_plugin_add_failed_cause">Snippet Key 已存在</system:String>
+    <system:String x:Key="snippets_plugin_update_info">更新 Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_edit_snippet_info">编辑 Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_delete_snippet">删除 Snippet</system:String>
     <system:String x:Key="snippets_plugin_move_up">上移</system:String>
@@ -27,6 +30,7 @@
     <system:String x:Key="snippets_plugin_open_settings">打开设置</system:String>
     <system:String x:Key="snippets_plugin_close">关闭</system:String>
     <system:String x:Key="snippets_plugin_save">保存</system:String>
+    <system:String x:Key="snippets_plugin_update">更新</system:String>
     <system:String x:Key="snippets_plugin_save_and_close">保存并关闭</system:String>
     <system:String x:Key="snippets_plugin_edit_item_key">当前为编辑模式, 点击切换为添加模式</system:String>
     <system:String x:Key="snippets_plugin_add_item_key">当前为添加模式</system:String>
@@ -35,6 +39,7 @@
     <system:String x:Key="snippets_plugin_snippets_value">Value</system:String>
     <system:String x:Key="snippets_plugin_snippets_score">Score</system:String>
     <system:String x:Key="snippets_plugin_snippets_folder">目录</system:String>
+    <system:String x:Key="snippets_plugin_snippets_folder_name">目录名称</system:String>
     <system:String x:Key="snippets_plugin_filter">过滤</system:String>
     <system:String x:Key="snippets_plugin_reset">重置</system:String>
     <system:String x:Key="snippets_plugin_export">导出</system:String>
@@ -60,5 +65,7 @@
     <system:String x:Key="snippets_plugin_recent">最近</system:String>
     <system:String x:Key="snippets_plugin_no_folder">无目录</system:String>
     <system:String x:Key="snippets_plugin_snippet_syntax">语法</system:String>
+    <system:String x:Key="snippets_plugin_create_time">创建时间</system:String>
+    <system:String x:Key="snippets_plugin_update_time">更新时间</system:String>
 
 </ResourceDictionary>
