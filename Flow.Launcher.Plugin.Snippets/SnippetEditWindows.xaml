@@ -6,7 +6,10 @@
         xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
         mc:Ignorable="d"
         Title="{DynamicResource snippets_plugin_edit_snippet}"
-        Height="600" Width="800"
+        Width="940"
+        Height="600"
+        MinWidth="940"
+        MinHeight="600"
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource PopuBGColor}"
@@ -47,7 +50,9 @@
                     <Path.Style>
                         <Style TargetType="Path">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Path=IsActive, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="False">
+                                <DataTrigger
+                                    Binding="{Binding Path=IsActive, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+                                    Value="False">
                                     <Setter Property="Opacity" Value="0.5" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -58,68 +63,78 @@
         </Grid>
 
         <!-- Top Toolbar: Key, Favorite, Syntax, Folder, Save, Cancel -->
-        <Border Grid.Row="1" Height="60" Background="{DynamicResource Color14B}" Padding="12 0">
+        <Border Grid.Row="1" Height="60" Background="{DynamicResource Color14B}" CornerRadius="4"
+                Padding="5 0">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="160" />
+
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" MinWidth="200" />
+
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+
+                    <!-- Syntax -->
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="160" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="140" />
-                    <ColumnDefinition Width="*" />
+
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Key -->
-                <TextBlock Grid.Column="0" Text="{DynamicResource snippets_plugin_snippets_key}"
-                           VerticalAlignment="Center" Margin="0 0 6 0" />
-                <TextBox Grid.Column="1" x:Name="TbKey" FontSize="13" />
-
                 <!-- Favorite -->
-                <ToggleButton Grid.Column="2" x:Name="BtnFavorite"
-                              Margin="10 0 6 0"
-                              Width="28" Height="28"
+                <ToggleButton Grid.Column="0" x:Name="BtnFavorite"
+                              Width="40" Height="28" Margin="5 0"
                               ToolTip="{DynamicResource snippets_plugin_favorites}">
                     <Path Data="M 12,2 L 15,9 L 22,9 L 16.5,13.5 L 18.5,21 L 12,16.5 L 5.5,21 L 7.5,13.5 L 2,9 L 9,9 Z"
                           Fill="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}"
                           Stretch="Uniform" Width="16" Height="16" />
                 </ToggleButton>
 
-                <!-- Syntax -->
-                <TextBlock Grid.Column="3" Text="Syntax"
-                           VerticalAlignment="Center" Margin="6 0 6 0" />
-                <ComboBox Grid.Column="4" x:Name="CbSyntax" Width="120" FontSize="13" />
+
+                <!-- Key -->
+                <TextBlock Grid.Column="1" Text="{DynamicResource snippets_plugin_snippets_key}"
+                           VerticalAlignment="Center" Margin="5 0" />
+                <Border Grid.Column="2" VerticalAlignment="Center" Margin="5 0">
+                    <TextBox x:Name="TbKey" FontSize="13" />
+                </Border>
 
                 <!-- Folder -->
-                <TextBlock Grid.Column="6" Text="{DynamicResource snippets_plugin_snippets_folder}"
-                           VerticalAlignment="Center" Margin="10 0 6 0" />
-                <ComboBox Grid.Column="7" x:Name="CbFolder" FontSize="13" />
+                <TextBlock Grid.Column="3" Text="{DynamicResource snippets_plugin_snippets_folder}"
+                           VerticalAlignment="Center" Margin="5 0" />
+                <ComboBox Grid.Column="4" x:Name="CbFolder" FontSize="13" Width="160" Margin="5 0" />
+
+                <!-- Syntax -->
+                <TextBlock Grid.Column="5" Text="{DynamicResource snippets_plugin_snippet_syntax}"
+                           VerticalAlignment="Center" Margin="5 0" />
+                <ComboBox Grid.Column="6" x:Name="CbSyntax" FontSize="13" Width="120" Margin="5 0"
+                          SelectionChanged="OnSyntaxSelectionChanged" />
 
                 <!-- Save & Cancel -->
-                <Button Grid.Column="9" x:Name="BtnSave"
-                        MinWidth="80" Margin="0 0 8 0"
+                <Button Grid.Column="7" x:Name="BtnSave"
+                        MinWidth="80" Margin="5 0"
                         Content="{DynamicResource snippets_plugin_save}"
                         Click="OnSaveButtonClick"
                         Style="{DynamicResource AccentButtonStyle}" />
-                <Button Grid.Column="10" x:Name="BtnCancel"
+                <Button Grid.Column="8" x:Name="BtnCancel"
                         MinWidth="80"
+                        Margin="5 0"
                         Content="{DynamicResource snippets_plugin_close}"
                         Click="OnCancelButtonClick" />
             </Grid>
         </Border>
 
         <!-- Bottom: AvalonEdit -->
-        <avalonEdit:TextEditor Grid.Row="2"
-                               x:Name="Editor"
-                               FontFamily="Consolas"
-                               FontSize="14"
-                               ShowLineNumbers="True"
-                               Margin="4"
-                               Background="{DynamicResource Color01B}"
-                               Foreground="{DynamicResource PopupTextColor}" />
+        <Border Grid.Row="2" Padding="4">
+            <avalonEdit:TextEditor
+                x:Name="Editor"
+                FontFamily="Consolas"
+                FontSize="13"
+                ShowLineNumbers="True"
+                Background="{DynamicResource Color01B}"
+                Foreground="{DynamicResource PopupTextColor}" />
+        </Border>
+
     </Grid>
 </Window>

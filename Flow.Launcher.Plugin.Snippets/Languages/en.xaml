@@ -59,5 +59,6 @@
     <system:String x:Key="snippets_plugin_favorites">Favorites</system:String>
     <system:String x:Key="snippets_plugin_recent">Recent</system:String>
     <system:String x:Key="snippets_plugin_no_folder">No Folder</system:String>
+    <system:String x:Key="snippets_plugin_snippet_syntax">Syntax</system:String>
 
 </ResourceDictionary>

@@ -176,8 +176,12 @@ namespace Flow.Launcher.Plugin.Snippets
                     IcoPath = IconPath,
                     Action = _ =>
                     {
-                        var sw = new SettingWindow(_context, _snippetManage);
-                        sw.Show();
+                        // var sw = new SettingWindow(_context, _snippetManage);
+                        // sw.Show();
+
+                        var ew = new SnippetEditWindows(_snippetManage);
+                        ew.ShowDialog();
+                        
                         return true;
                     }
                 });

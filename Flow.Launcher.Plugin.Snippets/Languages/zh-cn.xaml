@@ -59,5 +59,6 @@
     <system:String x:Key="snippets_plugin_favorites">收藏</system:String>
     <system:String x:Key="snippets_plugin_recent">最近</system:String>
     <system:String x:Key="snippets_plugin_no_folder">无目录</system:String>
+    <system:String x:Key="snippets_plugin_snippet_syntax">语法</system:String>
 
 </ResourceDictionary>

@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using ICSharpCode.AvalonEdit.Highlighting;
 using Flow.Launcher.Plugin.Snippets.Model;
 using JetBrains.Annotations;
 
@@ -74,6 +76,38 @@ public partial class SnippetEditWindows : Window
     {
         "Text", "C#", "Java", "JavaScript", "Python", "HTML", "XML", "JSON", "SQL", "CSS", "Go", "Rust", "TypeScript", "Markdown"
     };
+
+    private static readonly Dictionary<string, string> SyntaxHighlightingMap = new()
+    {
+        { "C#", "C#" },
+        { "Java", "Java" },
+        { "JavaScript", "JavaScript" },
+        { "Python", "Python" },
+        { "HTML", "HTML" },
+        { "XML", "XML" },
+        { "JSON", "JSON" },
+        { "SQL", "TSQL" },
+        { "CSS", "CSS" },
+        { "Go", "Go" },
+        { "Rust", "Rust" },
+        { "TypeScript", "TypeScript" },
+        { "Markdown", "MarkDown" },
+    };
+
+    private void OnSyntaxSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (Editor == null || CbSyntax == null) return;
+
+        var selected = CbSyntax.SelectedItem?.ToString();
+        if (string.IsNullOrEmpty(selected) || selected == "(None)" || selected == "Text")
+        {
+            Editor.SyntaxHighlighting = null;
+            return;
+        }
+
+        var highlightingName = SyntaxHighlightingMap.GetValueOrDefault(selected, selected);
+        Editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition(highlightingName);
+    }
 
     private void OnSaveButtonClick(object sender, RoutedEventArgs e)
     {
