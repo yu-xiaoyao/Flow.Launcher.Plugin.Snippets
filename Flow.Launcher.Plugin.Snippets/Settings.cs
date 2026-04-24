@@ -4,7 +4,11 @@ namespace Flow.Launcher.Plugin.Snippets;
 
 public class Settings : BaseModel
 {
-    public StorageType StorageType { get; set; } = StorageType.JsonSetting;
+    /// <summary>
+    /// remove in next version
+    /// </summary>
+    [Obsolete]
+    public StorageType StorageType { get; set; } = StorageType.Sqlite;
 
     /// <summary>
     /// Enable Folder Mode
