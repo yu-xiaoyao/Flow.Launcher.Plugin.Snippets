@@ -623,14 +623,27 @@ public class SqliteSnippetManage : SnippetManage
         return command.ExecuteNonQuery() > 0;
     }
 
-    public bool UpdateFolderById(long id, string newName, long? orderNum = null)
+    public bool UpdateFolderById(long id, string newName = null, long? orderNum = null)
     {
-        const string sql =
-            $"update {TABLE_NAME_FOLDER} set name = @new_name, update_time = @update_time where id = @id";
+        if (string.IsNullOrEmpty(newName) && orderNum == null) return false;
+
+        var sets = new List<string>();
+        if (!string.IsNullOrEmpty(newName))
+            sets.Add("name = @new_name");
+        if (orderNum != null)
+            sets.Add("order_num = @order_num");
+        sets.Add("update_time = @update_time");
+
+        var setString = string.Join(", ", sets);
+        var sql = $"update {TABLE_NAME_FOLDER} set {setString} where id = @id";
         using var connection = new SQLiteConnection(_connectionString);
         connection.Open();
         using var command = new SQLiteCommand(sql, connection);
-        command.Parameters.AddWithValue("@new_name", newName);
+
+        if (!string.IsNullOrEmpty(newName))
+            command.Parameters.AddWithValue("@name", newName);
+        if (orderNum != null)
+            command.Parameters.AddWithValue("@order_num", orderNum);
         command.Parameters.AddWithValue("@update_time", DateTimeUtil.TrimMilliseconds(DateTime.Now));
         command.Parameters.AddWithValue("@id", id);
         return command.ExecuteNonQuery() > 0;
@@ -657,6 +670,64 @@ public class SqliteSnippetManage : SnippetManage
         while (reader.Read())
             folders.Add(_readFolderModel(reader));
         return folders;
+    }
+
+    public long? GetFolderUpOrderNum(long id, long orderNum)
+    {
+        const string sql =
+            $"select order_num - 1 from {TABLE_NAME_FOLDER} where order_num < @order_num order by order_num desc limit 1";
+        using var connection = new SQLiteConnection(_connectionString);
+        connection.Open();
+
+        using var command = new SQLiteCommand(sql, connection);
+        command.Parameters.AddWithValue("@order_num", orderNum);
+
+        using var reader = command.ExecuteReader();
+        return reader.Read() ? reader.GetInt64(0) : null;
+    }
+
+    public long? GetFolderDownOrderNum(long id, long orderNum)
+    {
+        const string sql =
+            $"select order_num + 1 from {TABLE_NAME_FOLDER} where order_num > @order_num order by order_num asc limit 1";
+        using var connection = new SQLiteConnection(_connectionString);
+        connection.Open();
+
+        using var command = new SQLiteCommand(sql, connection);
+        command.Parameters.AddWithValue("@order_num", orderNum);
+
+        using var reader = command.ExecuteReader();
+        return reader.Read() ? reader.GetInt64(0) : null;
+    }
+
+    public long? GetFolderMinOrderNum(long id)
+    {
+        const string sql = $"{FolderQueryAllSql} order by order_num asc limit 1";
+        using var connection = new SQLiteConnection(_connectionString);
+        connection.Open();
+
+        using var command = new SQLiteCommand(sql, connection);
+
+        using var reader = command.ExecuteReader();
+        var folder = reader.Read() ? _readFolderModel(reader) : null;
+        if (folder == null) return null;
+        if (id == folder.Id) return null; // same 
+        return folder.OrderNum - 1;
+    }
+
+    public long? GetFolderMaxOrderNum(long id)
+    {
+        const string sql = $"{FolderQueryAllSql} order by order_num desc limit 1";
+        using var connection = new SQLiteConnection(_connectionString);
+        connection.Open();
+
+        using var command = new SQLiteCommand(sql, connection);
+
+        using var reader = command.ExecuteReader();
+        var folder = reader.Read() ? _readFolderModel(reader) : null;
+        if (folder == null) return null;
+        if (id == folder.Id) return null; // same 
+        return folder.OrderNum + 1;
     }
 
     public void CleanFolders()

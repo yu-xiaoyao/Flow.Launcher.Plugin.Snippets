@@ -51,11 +51,14 @@
 
     </Window.Resources>
 
-
-    <!--  New  -->
+    <!-- Windows UI View -->
     <Grid>
         <Border Style="{StaticResource WindowMainPanelStyle}">
             <Grid Background="{DynamicResource Color01B}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="32" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
@@ -63,19 +66,15 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="32" />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
+
                 <!--  TitleBar and Control  -->
-                <Image
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Width="16"
-                    Height="16"
-                    Margin="10 4 4 4"
-                    RenderOptions.BitmapScalingMode="HighQuality"
-                    Source="/Images/Snippets.png" />
+                <Image x:Name="IconImage"
+                       Grid.Row="0"
+                       Grid.Column="0"
+                       Width="16"
+                       Height="16"
+                       Margin="10 4 4 4"
+                       RenderOptions.BitmapScalingMode="HighQuality" />
                 <TextBlock
                     Grid.Row="0"
                     Grid.Column="1"
@@ -83,7 +82,7 @@
                     VerticalAlignment="Center"
                     FontSize="12"
                     Foreground="{DynamicResource Color05B}"
-                    Text="{DynamicResource flowlauncher_settings}" />
+                    Text="{DynamicResource snippets_plugin_manage_snippets}" />
 
                 <Button
                     Grid.Row="0"

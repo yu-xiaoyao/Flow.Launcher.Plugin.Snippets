@@ -50,9 +50,21 @@ public interface SnippetManage
 
     bool RemoveFolderById(long folderId);
 
-    bool UpdateFolderById(long id, string newName, long? orderNum = null);
+    bool UpdateFolderById(long id, [CanBeNull] string newName = null, long? orderNum = null);
 
     List<FolderModel> ListFolders([CanBeNull] string name = null);
+
+    [CanBeNull]
+    long? GetFolderUpOrderNum(long id, long orderNum);
+
+    [CanBeNull]
+    long? GetFolderDownOrderNum(long id, long orderNum);
+
+    [CanBeNull]
+    long? GetFolderMinOrderNum(long id);
+
+    [CanBeNull]
+    long? GetFolderMaxOrderNum(long id);
 
     void CleanFolders();
 

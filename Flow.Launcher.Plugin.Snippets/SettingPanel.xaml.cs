@@ -20,7 +20,7 @@ public partial class SettingPanel : UserControl
         _snippetManage = snippetManage;
         InitializeComponent();
 
-        ComboBoxStorageMode.SelectedIndex = _settings.StorageType == StorageType.Sqlite ? 1 : 0;
+        // ComboBoxStorageMode.SelectedIndex = _settings.StorageType == StorageType.Sqlite ? 1 : 0;
         CheckBoxAutoPaste.IsChecked = _settings.AutoPasteEnabled;
         CheckBoxDynamicVariables.IsChecked = _settings.DynamicVariables;
     }
@@ -97,15 +97,15 @@ public partial class SettingPanel : UserControl
 
     private void ButtonChangeAndRestart_OnClick(object sender, RoutedEventArgs e)
     {
-        var mode = ComboBoxStorageMode.SelectedIndex;
-        var storageType = mode == 0 ? StorageType.JsonSetting : StorageType.Sqlite;
-
-        if (storageType != _settings.StorageType)
-        {
-            _settings.StorageType = storageType;
-            _publicApi.SavePluginSettings();
-            _publicApi.RestartApp();
-        }
+        // var mode = ComboBoxStorageMode.SelectedIndex;
+        // var storageType = mode == 0 ? StorageType.JsonSetting : StorageType.Sqlite;
+        //
+        // if (storageType != _settings.StorageType)
+        // {
+        //     _settings.StorageType = storageType;
+        //     _publicApi.SavePluginSettings();
+        //     _publicApi.RestartApp();
+        // }
     }
 
     private void CheckBoxAutoPaste_Checked(object sender, RoutedEventArgs e)

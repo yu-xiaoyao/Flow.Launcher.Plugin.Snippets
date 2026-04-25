@@ -3,11 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        mc:Ignorable="d"
-        Height="312"
         Width="480"
+        Height="312"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
+        
+        mc:Ignorable="d"
         Background="{DynamicResource PopuBGColor}"
         Foreground="{DynamicResource PopupTextColor}">
 
@@ -150,4 +151,6 @@
             </Border>
         </StackPanel>
     </StackPanel>
+    
+    
 </Window>

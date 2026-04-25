@@ -42,7 +42,7 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
     private long _selectFolderId = IndexAllSnippets;
 
 
-    #region UI Fields
+    #region UI Fields and Properties Event
 
     private bool _isEditing;
 
@@ -64,6 +64,13 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
         return true;
     }
 
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
     #endregion
 
 
@@ -73,14 +80,28 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
         _snippetManage = snippetManage;
 
         DataContext = this;
-
         InitializeComponent();
+
+        _loadPluginImage();
+
         // ComboBoxFilterType.SelectedIndex = 0;
         // _renderItemSelectStyle(false);
         _reloadFolders();
         _loadSnippets();
         // _loadAllSnippets();
     }
+
+    #region Init
+
+    private void _loadPluginImage()
+    {
+        var ico = Utils.LoadPluginIcon(_context);
+        if (ico == null) return;
+        Icon = ico;
+        IconImage.Source = ico;
+    }
+
+    #endregion
 
     #region Data Load
 
@@ -296,9 +317,11 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
             menu.PlacementTarget is Border border &&
             border.DataContext is FolderModel folder)
         {
-            //TODO
+            var newOrderNum = _snippetManage.GetFolderUpOrderNum(folder.Id, folder.OrderNum);
+            _updateFolderNewOrderNum(folder, newOrderNum);
         }
     }
+
 
     private void FolderList_MoveDownOnClick(object sender, RoutedEventArgs e)
     {
@@ -307,9 +330,23 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
             menu.PlacementTarget is Border border &&
             border.DataContext is FolderModel folder)
         {
-            //TODO
+            var newOrderNum = _snippetManage.GetFolderDownOrderNum(folder.Id, folder.OrderNum);
+            _updateFolderNewOrderNum(folder, newOrderNum);
         }
     }
+
+    private void _updateFolderNewOrderNum(FolderModel folder, long? newOrderNum)
+    {
+        if (newOrderNum != null)
+        {
+            var result = _snippetManage.UpdateFolderById(folder.Id, orderNum: newOrderNum);
+            if (result)
+            {
+                _reloadFolders();
+            }
+        }
+    }
+
 
     private void FolderList_RenameFolderOnClick(object sender, RoutedEventArgs e)
     {
@@ -318,7 +355,11 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
             menu.PlacementTarget is Border border &&
             border.DataContext is FolderModel folder)
         {
-            var fed = new FolderEditDialog(_context, _snippetManage, folder);
+            var fed = new FolderEditDialog(_context, _snippetManage, folder)
+            {
+                Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            };
             var result = fed.ShowDialog();
             if (result == true)
             {
@@ -346,8 +387,11 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
 
     private void BtnAddFolder_OnClick(object sender, RoutedEventArgs e)
     {
-        _snippetManage.AddFolder($"Folder - {new Random().Next()}");
-        var fed = new FolderEditDialog(_context, _snippetManage);
+        var fed = new FolderEditDialog(_context, _snippetManage)
+        {
+            Owner = this,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        };
         var result = fed.ShowDialog();
         if (result == true)
         {
@@ -392,44 +436,6 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
     }
 
 
-    #region Window Custom TitleBar
-
-    private void OnMinimizeButtonClick(object sender, RoutedEventArgs e)
-    {
-        WindowState = WindowState.Minimized;
-    }
-
-    private void OnMaximizeRestoreButtonClick(object sender, RoutedEventArgs e)
-    {
-        WindowState = WindowState switch
-        {
-            WindowState.Maximized => WindowState.Normal,
-            _ => WindowState.Maximized
-        };
-    }
-
-    private void OnCloseButtonClick(object sender, RoutedEventArgs e)
-    {
-        Close();
-    }
-
-    private void RefreshMaximizeRestoreButton()
-    {
-        if (WindowState == WindowState.Maximized)
-        {
-            MaximizeButton.Visibility = Visibility.Hidden;
-            RestoreButton.Visibility = Visibility.Visible;
-        }
-        else
-        {
-            MaximizeButton.Visibility = Visibility.Visible;
-            RestoreButton.Visibility = Visibility.Hidden;
-        }
-    }
-
-    #endregion
-
-
     private void BtnReset_OnClick(object sender, RoutedEventArgs e)
     {
         TbFilterKey.Text = "";
@@ -439,13 +445,6 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
 
     private void BtnFilter_OnClick(object sender, RoutedEventArgs e)
     {
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
 
@@ -486,4 +485,42 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
             _loadSnippets();
         }
     }
+
+
+    #region Window Custom TitleBar
+
+    private void OnMinimizeButtonClick(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+
+    private void OnMaximizeRestoreButtonClick(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState switch
+        {
+            WindowState.Maximized => WindowState.Normal,
+            _ => WindowState.Maximized
+        };
+    }
+
+    private void OnCloseButtonClick(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
+    private void RefreshMaximizeRestoreButton()
+    {
+        if (WindowState == WindowState.Maximized)
+        {
+            MaximizeButton.Visibility = Visibility.Hidden;
+            RestoreButton.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            MaximizeButton.Visibility = Visibility.Visible;
+            RestoreButton.Visibility = Visibility.Hidden;
+        }
+    }
+
+    #endregion
 }

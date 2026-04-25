@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Flow.Launcher.Plugin.Snippets.Model;
 using Flow.Launcher.Plugin.Snippets.Util;
 using ICSharpCode.AvalonEdit.Highlighting;
@@ -31,9 +32,19 @@ public partial class SnippetEditWindows : Window
 
         InitializeComponent();
 
+        _loadPluginImage();
+
         Folders = snippetManage.ListFolders();
 
         _initView();
+    }
+
+    private void _loadPluginImage()
+    {
+        var ico = Utils.LoadPluginIcon(_context);
+        if (ico == null) return;
+        Icon = ico;
+        IconImage.Source = ico;
     }
 
     private void _initView()
@@ -155,4 +166,47 @@ public partial class SnippetEditWindows : Window
     {
         Close();
     }
+
+    private void OnCloseExecuted(object sender, ExecutedRoutedEventArgs e)
+    {
+        Close();
+    }
+
+
+    #region Window Custom TitleBar
+
+    private void OnMinimizeButtonClick(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+
+    private void OnMaximizeRestoreButtonClick(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState switch
+        {
+            WindowState.Maximized => WindowState.Normal,
+            _ => WindowState.Maximized
+        };
+    }
+
+    private void OnCloseButtonClick(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
+    private void RefreshMaximizeRestoreButton()
+    {
+        if (WindowState == WindowState.Maximized)
+        {
+            MaximizeButton.Visibility = Visibility.Hidden;
+            RestoreButton.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            MaximizeButton.Visibility = Visibility.Visible;
+            RestoreButton.Visibility = Visibility.Hidden;
+        }
+    }
+
+    #endregion
 }

@@ -12,6 +12,12 @@ namespace Flow.Launcher.Plugin.Snippets
 {
     public class Snippets : IPlugin, IPluginI18n, IContextMenu, ISettingProvider, IDisposable
     {
+        public const string PluginPngIconPath = "Images\\Snippets.png";
+        public const string PluginIcoPath = "Images\\Snippets.ico";
+
+        /// <summary>
+        /// Result List Icon
+        /// </summary>
         public static readonly string IconPath = "Images\\Snippet.png";
 
         private PluginInitContext _context;
@@ -172,10 +178,6 @@ namespace Flow.Launcher.Plugin.Snippets
                     {
                         var sw = new SettingWindow(_context, _snippetManage);
                         sw.Show();
-
-                        // var ew = new SnippetEditWindows(_snippetManage);
-                        // ew.ShowDialog();
-
                         return true;
                     }
                 });
