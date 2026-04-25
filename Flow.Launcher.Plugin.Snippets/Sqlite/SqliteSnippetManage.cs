@@ -276,7 +276,9 @@ public class SqliteSnippetManage : SnippetManage
 
         sql += " order by s.order_num desc";
 
-        InnerLogger.Logger.Info($"List: {sql}");
+        InnerLogger.Logger.Debug($"List.sql: {sql}");
+        InnerLogger.Logger.Debug(
+            $"List.params: name:{name}. value:{value}. favorites:{favorites}. folder_id:{folderId}. folderName:{folderName}");
 
         using var connection = new SQLiteConnection(_connectionString);
         connection.Open();

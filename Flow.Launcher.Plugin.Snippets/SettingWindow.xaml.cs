@@ -83,7 +83,7 @@ public partial class SettingWindow : Window
     {
         var name = TbFilterName.Text.Trim();
         var value = TbFilterValue.Text.Trim();
-        var folderName = TbFilterValue.Text.Trim();
+        var folderName = TbFilterFolder.Text.Trim();
 
         Snippets.Clear();
         List<SnippetModel> queryList;
