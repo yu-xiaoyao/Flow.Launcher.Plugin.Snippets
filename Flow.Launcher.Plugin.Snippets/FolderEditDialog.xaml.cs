@@ -35,19 +35,9 @@ public partial class FolderEditDialog : Window
             TitleName = _context.API.GetTranslation("snippets_plugin_add");
         }
 
-        WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        DataContext = this;
 
         InitializeComponent();
-
-        DataContext = this;
-        Closed += (_, _) => { };
-        PreviewKeyDown += (_, e) =>
-        {
-            if (e.Key == Key.Escape)
-            {
-                Close();
-            }
-        };
 
         _renderView();
     }
