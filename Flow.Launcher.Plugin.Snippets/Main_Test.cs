@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Flow.Launcher.Plugin.Snippets.Model;
 using Flow.Launcher.Plugin.Snippets.Sqlite;
 using Flow.Launcher.Plugin.Snippets.Util;
 
@@ -11,15 +11,68 @@ public class Main_Test
     //TEST 
     private static string dbPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\\snippets.db";
 
+
+    /// <summary>
+    /// Run Main Method in Rider.
+    /// New Rider Version config:
+    /// Edit *.csproj File
+    /// Add The Content in First PropertyGroup, after TargetFramework tag
+    /// <OutputType>exe</OutputType>
+    /// </summary>
     public static void Main()
     {
-        var fm = new FolderModel();
-        Console.WriteLine($"{fm.CreateTime == null}");
-        Console.WriteLine($"{fm.Id}");
+        InnerLogger.SetAsConsoleLogger(LoggerLevel.DEBUG);
+
         // test_json_settings();
         // test_sqlite_add();
         // test_sqlite_query();
         // test_variable_expander();
+
+        test_auto_add_flow_data();
+    }
+
+    /// <summary>
+    /// Generate Test Data
+    /// </summary>
+    private static void test_auto_add_flow_data()
+    {
+        const string pluginDir = "FlowLauncher\\Settings\\Plugins\\Flow.Launcher.Plugin.Snippets\\";
+        var appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var sm = new SqliteSnippetManage($"{appDataDir}\\{pluginDir}");
+
+        // add folder 
+        var folderNames = new List<string>()
+        {
+            "Java", "Python", "JavaScript", "DevOps", "Jvm", "Work", "Password", "CodeSnippet", "IDEA", "Windows",
+            "Linux", "Mac", "Google", "OpenAi", "Unix", "github", "GoLang", "Rust", "Prod", "Docs"
+        };
+        var random = new Random();
+
+        foreach (var folderName in folderNames)
+        {
+            var gfm = sm.GetFolder(folderName);
+            if (gfm == null)
+            {
+                var fm = sm.CreateFolderModel(folderName);
+                sm.AddFolder(fm);
+                var count = random.Next(10);
+                for (var i = 0; i < count; i++)
+                {
+                    var name = $"{folderName} Name{i}";
+                    var value = $"{folderName} Value{i}";
+                    sm.Add(name: name, value: value, favorites: random.Next() % 2 == 0, folderId: fm.Id);
+                }
+            }
+        }
+
+        // no folder Snippets
+        var noFolderCount = random.Next(2, 20);
+        for (int i = 0; i < noFolderCount; i++)
+        {
+            var name = $"no folder Name{i}";
+            var value = $"no folder Value{i}";
+            sm.Add(name: name, value: value, favorites: random.Next() % 2 == 0);
+        }
     }
 
     private static void test_sqlite_query()

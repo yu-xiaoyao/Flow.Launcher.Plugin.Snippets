@@ -465,6 +465,55 @@ public partial class SettingWindow : Window
         }
     }
 
+    private void DataGrid_EditSnippetOnClick(object sender, RoutedEventArgs e)
+    {
+        if (DataGridSnippets.SelectedItem is SnippetModel snippet)
+        {
+            _openEditSnippetDialog(snippet);
+        }
+    }
+
+    private void DataGrid_DeleteSnippetOnClick(object sender, RoutedEventArgs e)
+    {
+        if (DataGridSnippets.SelectedItem is SnippetModel snippet)
+        {
+            _snippetManage.RemoveSnippetById(snippet.Id);
+            _loadSnippets();
+        }
+    }
+
+    private void DataGrid_MoveUpOnClick(object sender, RoutedEventArgs e)
+    {
+        if (DataGridSnippets.SelectedItem is SnippetModel snippet)
+        {
+            // Snippets are sorted by order_num desc, so "up" in the visual list means larger order_num
+            var newOrderNum = _snippetManage.GetSnippetDownOrderNum(snippet.Id, snippet.OrderNum);
+            _updateSnippetNewOrderNum(snippet, newOrderNum);
+        }
+    }
+
+    private void DataGrid_MoveDownOnClick(object sender, RoutedEventArgs e)
+    {
+        if (DataGridSnippets.SelectedItem is SnippetModel snippet)
+        {
+            // Snippets are sorted by order_num desc, so "down" in the visual list means smaller order_num
+            var newOrderNum = _snippetManage.GetSnippetUpOrderNum(snippet.Id, snippet.OrderNum);
+            _updateSnippetNewOrderNum(snippet, newOrderNum);
+        }
+    }
+
+    private void _updateSnippetNewOrderNum(SnippetModel snippet, long? newOrderNum)
+    {
+        if (newOrderNum != null)
+        {
+            var result = _snippetManage.UpdateSnippetById(snippet.Id, orderNum: newOrderNum);
+            if (result)
+            {
+                _loadSnippets();
+            }
+        }
+    }
+
     private void _openEditSnippetDialog([CanBeNull] SnippetModel sm = null)
     {
         SnippetEditWindows ew;

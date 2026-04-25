@@ -9,6 +9,8 @@ namespace Flow.Launcher.Plugin.Snippets.Sqlite;
 
 public class SqliteSnippetManage : SnippetManage
 {
+    public const string DbFileName = "snippets.db";
+
     /**
     * version match plugin version
     */
@@ -74,7 +76,7 @@ public class SqliteSnippetManage : SnippetManage
 
     public SqliteSnippetManage(string dbDir, bool needUpdate = false)
     {
-        var dbPath = Path.Combine(dbDir, "snippets.db");
+        var dbPath = Path.Combine(dbDir, DbFileName);
         _connectionString = $"Data Source={dbPath};Version=3;";
         InnerLogger.Logger.Debug($"_connectionString: {_connectionString}.");
         _initCheckTable(needUpdate);
@@ -572,7 +574,7 @@ public class SqliteSnippetManage : SnippetManage
         return reader.Read() ? _readFolderModel(reader) : null;
     }
 
-    private FolderModel _createFolderModel(string name, long? orderNum = null)
+    public FolderModel CreateFolderModel(string name, long? orderNum = null)
     {
         var id = IdHelper.NewId();
         var num = orderNum ?? id;
@@ -589,11 +591,11 @@ public class SqliteSnippetManage : SnippetManage
 
     public bool AddFolder(string name, long? orderNum = null)
     {
-        var fm = _createFolderModel(name, orderNum);
-        return _addFolder(fm);
+        var fm = CreateFolderModel(name, orderNum);
+        return AddFolder(fm);
     }
 
-    private bool _addFolder(FolderModel fm)
+    public bool AddFolder(FolderModel fm)
     {
         const string sql =
             $"replace into {TABLE_NAME_FOLDER} (id, name, order_num, create_time, update_time) values (@id, @name, @order_num, @create_time, @update_time)";
@@ -750,6 +752,64 @@ public class SqliteSnippetManage : SnippetManage
         connection.Open();
         using var command = new SQLiteCommand(sql, connection);
         command.ExecuteNonQuery();
+    }
+
+    public long? GetSnippetUpOrderNum(long id, long orderNum)
+    {
+        const string sql =
+            $"select order_num - 1 from {TABLE_NAME} where order_num < @order_num order by order_num desc limit 1";
+        using var connection = new SQLiteConnection(_connectionString);
+        connection.Open();
+
+        using var command = new SQLiteCommand(sql, connection);
+        command.Parameters.AddWithValue("@order_num", orderNum);
+
+        using var reader = command.ExecuteReader();
+        return reader.Read() ? reader.GetInt64(0) : null;
+    }
+
+    public long? GetSnippetDownOrderNum(long id, long orderNum)
+    {
+        const string sql =
+            $"select order_num + 1 from {TABLE_NAME} where order_num > @order_num order by order_num asc limit 1";
+        using var connection = new SQLiteConnection(_connectionString);
+        connection.Open();
+
+        using var command = new SQLiteCommand(sql, connection);
+        command.Parameters.AddWithValue("@order_num", orderNum);
+
+        using var reader = command.ExecuteReader();
+        return reader.Read() ? reader.GetInt64(0) : null;
+    }
+
+    public long? GetSnippetMinOrderNum(long id)
+    {
+        const string sql = $"{QueryAllSql} order by s.order_num asc limit 1";
+        using var connection = new SQLiteConnection(_connectionString);
+        connection.Open();
+
+        using var command = new SQLiteCommand(sql, connection);
+
+        using var reader = command.ExecuteReader();
+        var snippet = reader.Read() ? _readSnippetModel(reader) : null;
+        if (snippet == null) return null;
+        if (id == snippet.Id) return null;
+        return snippet.OrderNum - 1;
+    }
+
+    public long? GetSnippetMaxOrderNum(long id)
+    {
+        const string sql = $"{QueryAllSql} order by s.order_num desc limit 1";
+        using var connection = new SQLiteConnection(_connectionString);
+        connection.Open();
+
+        using var command = new SQLiteCommand(sql, connection);
+
+        using var reader = command.ExecuteReader();
+        var snippet = reader.Read() ? _readSnippetModel(reader) : null;
+        if (snippet == null) return null;
+        if (id == snippet.Id) return null;
+        return snippet.OrderNum + 1;
     }
 
 

@@ -437,7 +437,8 @@
                             <Border Grid.Row="1" x:Name="SnippetsContainer" Margin="4"
                                     BorderBrush="{DynamicResource Color03B}">
 
-                                <DataGrid ItemsSource="{Binding Snippets}"
+                                <DataGrid x:Name="DataGridSnippets"
+                                          ItemsSource="{Binding Snippets}"
                                           AutoGenerateColumns="False"
                                           IsReadOnly="True"
                                           CanUserAddRows="False"
@@ -446,6 +447,23 @@
                                           HeadersVisibility="Column"
                                           GridLinesVisibility="Horizontal"
                                           MouseDoubleClick="DataGridSnippets_MouseDoubleClick">
+                                    <DataGrid.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem
+                                                Header="{DynamicResource snippets_plugin_edit}"
+                                                Click="DataGrid_EditSnippetOnClick" />
+                                            <MenuItem
+                                                Header="{DynamicResource snippets_plugin_delete}"
+                                                Click="DataGrid_DeleteSnippetOnClick" />
+                                            <Separator />
+                                            <MenuItem
+                                                Header="{DynamicResource snippets_plugin_move_up}"
+                                                Click="DataGrid_MoveUpOnClick" />
+                                            <MenuItem
+                                                Header="{DynamicResource snippets_plugin_move_down}"
+                                                Click="DataGrid_MoveDownOnClick" />
+                                        </ContextMenu>
+                                    </DataGrid.ContextMenu>
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="{DynamicResource snippets_plugin_snippets_name}"
                                                             Binding="{Binding Name}" Width="120" />

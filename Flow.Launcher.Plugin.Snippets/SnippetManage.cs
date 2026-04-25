@@ -71,6 +71,22 @@ public interface SnippetManage
 
     #endregion
 
+    #region Snippet Order Operations
+
+    [CanBeNull]
+    long? GetSnippetUpOrderNum(long id, long orderNum);
+
+    [CanBeNull]
+    long? GetSnippetDownOrderNum(long id, long orderNum);
+
+    [CanBeNull]
+    long? GetSnippetMinOrderNum(long id);
+
+    [CanBeNull]
+    long? GetSnippetMaxOrderNum(long id);
+
+    #endregion
+
     void Close()
     {
     }
