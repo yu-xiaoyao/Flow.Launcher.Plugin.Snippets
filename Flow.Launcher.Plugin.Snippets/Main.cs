@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -165,22 +164,25 @@ namespace Flow.Launcher.Plugin.Snippets
 
         public List<Result> LoadContextMenus(Result selectedResult)
         {
+            var adminResult = new Result
+            {
+                Title = _context.API.GetTranslation("snippets_plugin_manage_snippets"),
+                IcoPath = IconPath,
+                Action = _ =>
+                {
+                    // FormWindows.ShowWindows(_context.API, _snippetManage);
+                    var sw = new SettingWindow(_context, _snippetManage);
+                    sw.Show();
+                    return true;
+                },
+            };
+
             var menus = new List<Result>();
             var contextData = selectedResult.ContextData;
             if (contextData is SnippetModel sm)
             {
-                //TODO TEST
-                menus.Add(new Result
-                {
-                    Title = "New SettingWindow",
-                    IcoPath = IconPath,
-                    Action = _ =>
-                    {
-                        var sw = new SettingWindow(_context, _snippetManage);
-                        sw.Show();
-                        return true;
-                    }
-                });
+                // TODO for quick open when dev
+                menus.Add(adminResult);
 
                 menus.Add(new Result
                 {
@@ -231,16 +233,7 @@ namespace Flow.Launcher.Plugin.Snippets
                         return true;
                     },
                 });
-                menus.Add(new Result
-                {
-                    Title = _context.API.GetTranslation("snippets_plugin_manage_snippets"),
-                    IcoPath = IconPath,
-                    Action = _ =>
-                    {
-                        FormWindows.ShowWindows(_context.API, _snippetManage);
-                        return true;
-                    },
-                });
+                menus.Add(adminResult);
             }
 
             return menus;
@@ -280,26 +273,6 @@ namespace Flow.Launcher.Plugin.Snippets
                 }
             };
         }
-
-        private void _mergeJsonToSqlite(string pluginSettingPath)
-        {
-            // v1
-            var v1JsonPath = Path.Combine(pluginSettingPath, "Settings.json");
-            if (File.Exists(v1JsonPath))
-            {
-                var settings = _context.API.LoadSettingJsonStorage<Settings>();
-
-                // File.Delete(v1JsonPath);
-            }
-
-            // v2
-            var v2JsonPath = Path.Combine(pluginSettingPath, "JsonSetting.json");
-            if (File.Exists(v2JsonPath))
-            {
-                // File.Delete(v2JsonPath);
-            }
-        }
-
 
         /// <summary>
         /// upgrade v2 -> v3

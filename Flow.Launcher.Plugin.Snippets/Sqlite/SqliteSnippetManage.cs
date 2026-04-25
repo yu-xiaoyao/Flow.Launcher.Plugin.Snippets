@@ -253,7 +253,7 @@ public class SqliteSnippetManage : SnippetManage
     }
 
     public List<SnippetModel> List(string name = null, string value = null, bool? favorites = null,
-        long? folderId = null)
+        long? folderId = null, string folderName = null)
     {
         var sql = $"{QueryAllSql} where 1=1";
 
@@ -268,6 +268,9 @@ public class SqliteSnippetManage : SnippetManage
 
         if (folderId != null)
             sql += " and f.id = @folder_id";
+
+        if (!string.IsNullOrEmpty(folderName))
+            sql += " and f.name like @folder_name";
 
         sql += " order by s.order_num desc";
 
@@ -289,6 +292,9 @@ public class SqliteSnippetManage : SnippetManage
         if (folderId != null)
             command.Parameters.AddWithValue("@folder_id", folderId);
 
+        if (!string.IsNullOrEmpty(folderName))
+            command.Parameters.AddWithValue("@folder_name", $"%{folderName}%");
+
         using var reader = command.ExecuteReader();
         var result = new List<SnippetModel>();
         while (reader.Read())
@@ -299,7 +305,8 @@ public class SqliteSnippetManage : SnippetManage
         return result;
     }
 
-    public List<SnippetModel> ListRecent(string name = null, string value = null, int limit = 20)
+    public List<SnippetModel> ListRecent(string name = null, string value = null, string folderName = null,
+        int limit = 20)
     {
         var sql = $"{QueryAllSql} where 1=1";
 
@@ -308,6 +315,9 @@ public class SqliteSnippetManage : SnippetManage
 
         if (!string.IsNullOrEmpty(value))
             sql += " and s.value like @value";
+
+        if (!string.IsNullOrEmpty(folderName))
+            sql += " and f.name like @folder_name";
 
         sql += $" order by s.update_time desc limit {limit}";
 
@@ -322,6 +332,9 @@ public class SqliteSnippetManage : SnippetManage
 
         if (!string.IsNullOrEmpty(value))
             command.Parameters.AddWithValue("@value", $"%{value}%");
+
+        if (!string.IsNullOrEmpty(folderName))
+            command.Parameters.AddWithValue("@folder_name", $"%{folderName}%");
 
         using var reader = command.ExecuteReader();
         var result = new List<SnippetModel>();

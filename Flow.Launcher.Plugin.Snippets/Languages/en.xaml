@@ -7,12 +7,28 @@
     <system:String x:Key="snippets_plugin_title">Snippets</system:String>
     <system:String x:Key="snippets_plugin_description">Manage name/value snippets with auto-paste and clipboard support</system:String>
 
-    <system:String x:Key="snippets_plugin_snippets_empty">Snippets list is empty</system:String>
-    <system:String x:Key="snippets_plugin_snippets_empty_add">Snippet is empty, Please add Snippet first</system:String>
     <system:String x:Key="snippets_plugin_add">Add</system:String>
     <system:String x:Key="snippets_plugin_edit">Edit</system:String>
+    <system:String x:Key="snippets_plugin_delete">Delete</system:String>
+    <system:String x:Key="snippets_plugin_rename">Rename</system:String>
+
+    <system:String x:Key="snippets_plugin_close">Close</system:String>
+    <system:String x:Key="snippets_plugin_save">Save</system:String>
+    <system:String x:Key="snippets_plugin_update">Update</system:String>
+    <system:String x:Key="snippets_plugin_save_and_close">Save And Close</system:String>
+
+    <system:String x:Key="snippets_plugin_snippets_empty">Snippets list is empty</system:String>
+    <system:String x:Key="snippets_plugin_snippets_empty_add">Snippet is empty, Please add Snippet first</system:String>
+
     <system:String x:Key="snippets_plugin_add_snippet">Add Snippet</system:String>
     <system:String x:Key="snippets_plugin_edit_snippet">Edit Snippet</system:String>
+    <system:String x:Key="snippets_plugin_add_folder">Add Folder</system:String>
+    
+    <system:String x:Key="snippets_plugin_move_up">Move Up</system:String>
+    <system:String x:Key="snippets_plugin_move_down">Move Down</system:String>
+    <system:String x:Key="snippets_plugin_move_top">Move Top</system:String>
+    <system:String x:Key="snippets_plugin_move_bottom">Move Bottom</system:String>
+
     <system:String x:Key="snippets_plugin_add_info">Add Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_add_failed">Add {0} Failed</system:String>
     <system:String x:Key="snippets_plugin_edit_failed">Edit {0} Failed</system:String>
@@ -21,21 +37,16 @@
     <system:String x:Key="snippets_plugin_update_info">Update Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_edit_snippet_info">Edit Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_delete_snippet">Delete Snippet</system:String>
-    <system:String x:Key="snippets_plugin_move_up">Move Up</system:String>
-    <system:String x:Key="snippets_plugin_move_down">Move Down</system:String>
+
     <system:String x:Key="snippets_plugin_reset_score">Reset Order Score</system:String>
-    <system:String x:Key="snippets_plugin_move_top">Move Top</system:String>
-    <system:String x:Key="snippets_plugin_move_bottom">Move Bottom</system:String>
+
     <system:String x:Key="snippets_plugin_delete_snippet_info">Delete Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_open_settings">Open Settings</system:String>
-    <system:String x:Key="snippets_plugin_close">Close</system:String>
-    <system:String x:Key="snippets_plugin_save">Save</system:String>
-    <system:String x:Key="snippets_plugin_update">Update</system:String>
-    <system:String x:Key="snippets_plugin_save_and_close">Save And Close</system:String>
     <system:String x:Key="snippets_plugin_edit_item_key">Current Is Edit Mode, click to switch to Add Mode</system:String>
     <system:String x:Key="snippets_plugin_add_item_key">Current Is Add Mode</system:String>
     <system:String x:Key="snippets_plugin_manage_snippets">Manage Snippets</system:String>
     <system:String x:Key="snippets_plugin_snippets_key">Key</system:String>
+    <system:String x:Key="snippets_plugin_snippets_name">Name</system:String>
     <system:String x:Key="snippets_plugin_snippets_value">Value</system:String>
     <system:String x:Key="snippets_plugin_snippets_score">Score</system:String>
     <system:String x:Key="snippets_plugin_snippets_folder">Folder</system:String>
@@ -57,9 +68,6 @@
     <system:String x:Key="snippets_plugin_auto_paste_description">Automatically paste snippets after copying to clipboard</system:String>
     <system:String x:Key="snippets_plugin_enable_dynamic_variables">Enable Dynamic Variables</system:String>
     <system:String x:Key="snippets_plugin_enable_dynamic_variables_desc">Parse variables in this format: {{date}}</system:String>
-    <system:String x:Key="snippets_plugin_add_folder">Add Folder</system:String>
-    <system:String x:Key="snippets_plugin_delete_folder">Delete Folder</system:String>
-    <system:String x:Key="snippets_plugin_rename">Rename</system:String>
     <system:String x:Key="snippets_plugin_all_snippets">All Snippets</system:String>
     <system:String x:Key="snippets_plugin_favorites">Favorites</system:String>
     <system:String x:Key="snippets_plugin_recent">Recent</system:String>

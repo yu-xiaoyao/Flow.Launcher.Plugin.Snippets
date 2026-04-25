@@ -13,9 +13,10 @@ public interface SnippetManage
     SnippetModel GetSnippetById(long id);
 
     List<SnippetModel> List([CanBeNull] string name = null, [CanBeNull] string value = null, bool? favorites = null,
-        long? folderId = null);
+        long? folderId = null, [CanBeNull] string folderName = null);
 
-    List<SnippetModel> ListRecent([CanBeNull] string name = null, [CanBeNull] string value = null, int limit = 20);
+    List<SnippetModel> ListRecent([CanBeNull] string name = null, [CanBeNull] string value = null,
+        [CanBeNull] string folderName = null, int limit = 20);
 
     List<SnippetModel> ListNoFolder([CanBeNull] string name = null, [CanBeNull] string value = null);
 

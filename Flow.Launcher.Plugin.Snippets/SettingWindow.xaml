@@ -273,7 +273,8 @@
 
                                     <Border Grid.Row="1" Background="WhiteSmoke"
                                             CornerRadius="4">
-                                        <TextBlock Text="FOLDER" VerticalAlignment="Center" FontSize="14"
+                                        <TextBlock Text="{DynamicResource snippets_plugin_snippets_folder}"
+                                                   VerticalAlignment="Center" FontSize="14"
                                                    HorizontalAlignment="Center" Margin="8 4" />
                                     </Border>
 
@@ -301,8 +302,15 @@
                                                                         Header="{DynamicResource snippets_plugin_rename}"
                                                                         Click="FolderList_RenameFolderOnClick" />
                                                                     <MenuItem
-                                                                        Header="{DynamicResource snippets_plugin_delete_folder}"
+                                                                        Header="{DynamicResource snippets_plugin_delete}"
                                                                         Click="FolderList_DeleteFolderOnClick" />
+                                                                    <Separator />
+                                                                    <MenuItem
+                                                                        Header="{DynamicResource snippets_plugin_move_top}"
+                                                                        Click="FolderList_MoveTopOnClick" />
+                                                                    <MenuItem
+                                                                        Header="{DynamicResource snippets_plugin_move_bottom}"
+                                                                        Click="FolderList_MoveBottomOnClick" />
                                                                 </ContextMenu>
                                                             </Border.ContextMenu>
                                                             <TextBlock Text="{Binding Name}" Margin="4 0"
@@ -342,8 +350,7 @@
                     <Border
                         Grid.Column="2"
                         Margin="0"
-                        CornerRadius="4"
-                        Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                        CornerRadius="4">
 
                         <Grid>
                             <Grid.RowDefinitions>
@@ -381,11 +388,11 @@
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <Border Grid.Column="0" VerticalAlignment="Center" Margin="4 0 0 0">
-                                                <Label Content="{DynamicResource snippets_plugin_snippets_key}"
+                                                <Label Content="{DynamicResource snippets_plugin_snippets_name}"
                                                        FontSize="13" />
                                             </Border>
                                             <Border Grid.Column="1" Margin="4 0 0 0">
-                                                <TextBox x:Name="TbFilterKey" FontSize="13" />
+                                                <TextBox x:Name="TbFilterName" FontSize="13" />
                                             </Border>
 
                                             <Border Grid.Column="2" VerticalAlignment="Center" Margin="4 0 0 0">
@@ -420,8 +427,8 @@
                                     </Border>
                                     <Border Grid.Column="2" CornerRadius="4" Margin="4 0"
                                             VerticalAlignment="Center" HorizontalAlignment="Center">
-                                        <Button FontSize="13" Content="Add"
-                                                Width="84" Click="BtnAddSnippets_Click" />
+                                        <Button FontSize="13" Content="{DynamicResource snippets_plugin_add_snippet}"
+                                                Width="110" Click="BtnAddSnippets_Click" />
                                     </Border>
 
                                 </Grid>
@@ -440,14 +447,17 @@
                                           GridLinesVisibility="Horizontal"
                                           MouseDoubleClick="DataGridSnippets_MouseDoubleClick">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="120" />
-                                        <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*" />
-                                        <DataGridTextColumn Header="Folder" Binding="{Binding FolderName}"
+                                        <DataGridTextColumn Header="{DynamicResource snippets_plugin_snippets_name}"
+                                                            Binding="{Binding Name}" Width="120" />
+                                        <DataGridTextColumn Header="{DynamicResource snippets_plugin_snippets_value}"
+                                                            Binding="{Binding Value}" Width="*" />
+                                        <DataGridTextColumn Header="{DynamicResource snippets_plugin_snippets_folder}"
+                                                            Binding="{Binding FolderName}"
                                                             Width="160" />
-                                        <DataGridTextColumn Header="CreateTime"
+                                        <DataGridTextColumn Header="{DynamicResource snippets_plugin_create_time}"
                                                             Binding="{Binding CreateTime, StringFormat=yyyy-MM-dd HH:mm:ss}"
                                                             Width="160" />
-                                        <DataGridTextColumn Header="UpdateTime"
+                                        <DataGridTextColumn Header="{DynamicResource snippets_plugin_update_time}"
                                                             Binding="{Binding UpdateTime, StringFormat=yyyy-MM-dd HH:mm:ss}"
                                                             Width="160" />
                                     </DataGrid.Columns>
@@ -456,15 +466,6 @@
 
                         </Grid>
 
-                    </Border>
-
-                    <Border
-                        Grid.Column="2"
-                        Margin="0"
-                        CornerRadius="4"
-                        Background="Red"
-                        Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <TextBlock Text="0-234234" />
                     </Border>
 
                 </Grid>

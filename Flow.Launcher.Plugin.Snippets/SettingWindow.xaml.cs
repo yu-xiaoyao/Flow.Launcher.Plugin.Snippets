@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -12,15 +10,12 @@ using JetBrains.Annotations;
 
 namespace Flow.Launcher.Plugin.Snippets;
 
-public partial class SettingWindow : Window, INotifyPropertyChanged
+public partial class SettingWindow : Window
 {
     public const int IndexAllSnippets = -1;
     public const int IndexFavorites = -2;
     public const int IndexRecent = -3;
     public const int IndexNoFolder = -4;
-
-    public double WindowMinWidth { get; set; } = 1200;
-    public double WindowMinHeight { get; set; } = 640;
 
     private readonly PluginInitContext _context;
     private readonly SnippetManage _snippetManage;
@@ -40,39 +35,6 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
     public ObservableCollection<SnippetModel> Snippets { get; set; } = new();
 
     private long _selectFolderId = IndexAllSnippets;
-
-
-    #region UI Fields and Properties Event
-
-    private bool _isEditing;
-
-    public bool IsEditing
-    {
-        get => _isEditing;
-        set
-        {
-            _isEditing = value;
-            OnPropertyChanged();
-        }
-    }
-
-    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    #endregion
-
 
     public SettingWindow(PluginInitContext context, SnippetManage snippetManage)
     {
@@ -119,33 +81,48 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
 
     private void _loadSnippets()
     {
-        IsEditing = false;
+        var name = TbFilterName.Text.Trim();
+        var value = TbFilterValue.Text.Trim();
+        var folderName = TbFilterValue.Text.Trim();
 
         Snippets.Clear();
-
         List<SnippetModel> queryList;
         switch (_selectFolderId)
         {
             case IndexAllSnippets:
                 FolderAllSnippets.IsSelected = true;
-                queryList = _snippetManage.List();
+                TbFilterFolder.IsEnabled = true;
+                queryList = _snippetManage.List(name: name, value: value, folderName: folderName);
                 break;
             case IndexFavorites:
                 FolderFavorites.IsSelected = true;
-                queryList = _snippetManage.List(favorites: true);
+                TbFilterFolder.IsEnabled = true;
+                queryList = _snippetManage.List(name: name, value: value, favorites: true, folderName: folderName);
                 break;
             case IndexRecent:
                 FolderRecent.IsSelected = true;
-                queryList = _snippetManage.ListRecent();
+                TbFilterFolder.IsEnabled = true;
+                queryList = _snippetManage.ListRecent(name: name, value: value, folderName: folderName);
                 break;
             case IndexNoFolder:
                 FolderNo.IsSelected = true;
-                queryList = _snippetManage.ListNoFolder();
+                TbFilterFolder.IsEnabled = false;
+                queryList = _snippetManage.ListNoFolder(name, value);
                 break;
             default:
-                queryList = _selectFolderId > 0
-                    ? _snippetManage.List(folderId: _selectFolderId)
-                    : new List<SnippetModel>();
+
+                if (_selectFolderId > 0)
+                {
+                    TbFilterFolder.IsEnabled = false;
+                    queryList = _snippetManage.List(name: name, value: value, folderId: _selectFolderId,
+                        folderName: folderName);
+                }
+                else
+                {
+                    TbFilterFolder.IsEnabled = true;
+                    queryList = new List<SnippetModel>();
+                }
+
                 break;
         }
 
@@ -285,13 +262,11 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
 
     private void FolderList_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        InnerLogger.Logger.Info($"FolderList_MouseLeftButtonUp. {sender}");
         FolderListClick(sender as Border);
     }
 
     private void FolderList_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
-        InnerLogger.Logger.Info("FolderList_MouseRightButtonUp");
         FolderListClick(sender as Border);
     }
 
@@ -331,6 +306,30 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
             border.DataContext is FolderModel folder)
         {
             var newOrderNum = _snippetManage.GetFolderDownOrderNum(folder.Id, folder.OrderNum);
+            _updateFolderNewOrderNum(folder, newOrderNum);
+        }
+    }
+
+    private void FolderList_MoveTopOnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem menuItem &&
+            menuItem.Parent is ContextMenu menu &&
+            menu.PlacementTarget is Border border &&
+            border.DataContext is FolderModel folder)
+        {
+            var newOrderNum = _snippetManage.GetFolderMinOrderNum(folder.Id);
+            _updateFolderNewOrderNum(folder, newOrderNum);
+        }
+    }
+
+    private void FolderList_MoveBottomOnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem menuItem &&
+            menuItem.Parent is ContextMenu menu &&
+            menu.PlacementTarget is Border border &&
+            border.DataContext is FolderModel folder)
+        {
+            var newOrderNum = _snippetManage.GetFolderMaxOrderNum(folder.Id);
             _updateFolderNewOrderNum(folder, newOrderNum);
         }
     }
@@ -438,13 +437,15 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
 
     private void BtnReset_OnClick(object sender, RoutedEventArgs e)
     {
-        TbFilterKey.Text = "";
+        TbFilterName.Text = "";
         TbFilterValue.Text = "";
         TbFilterFolder.Text = "";
+        _loadSnippets();
     }
 
     private void BtnFilter_OnClick(object sender, RoutedEventArgs e)
     {
+        _loadSnippets();
     }
 
 
@@ -466,19 +467,14 @@ public partial class SettingWindow : Window, INotifyPropertyChanged
 
     private void _openEditSnippetDialog([CanBeNull] SnippetModel sm = null)
     {
+        SnippetEditWindows ew;
         if (sm == null)
-        {
-            if (_selectFolderId > 0)
-            {
-                // _snippetManage.GetFolder()
-            }
-        }
+            ew = new SnippetEditWindows(_context, _snippetManage, _selectFolderId > 0 ? _selectFolderId : null);
+        else
+            ew = new SnippetEditWindows(_context, _snippetManage, sm);
+        ew.Owner = this;
+        ew.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
-        var ew = new SnippetEditWindows(_context, _snippetManage, sm)
-        {
-            Owner = this,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner
-        };
         var result = ew.ShowDialog();
         if (result == true)
         {

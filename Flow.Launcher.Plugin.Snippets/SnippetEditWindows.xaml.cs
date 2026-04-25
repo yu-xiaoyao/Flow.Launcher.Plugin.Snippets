@@ -19,22 +19,34 @@ public partial class SnippetEditWindows : Window
 
     [CanBeNull] private SnippetModel _editModel;
 
-    public SnippetEditWindows(PluginInitContext context, SnippetManage snippetManage,
-        [CanBeNull] SnippetModel editModel = null)
+    public SnippetEditWindows(PluginInitContext context, SnippetManage snippetManage, long? addFolderId = null)
     {
         _context = context;
         _snippetManage = snippetManage;
+        InitializeComponent();
+        _loadPluginImage();
+        _initView(addFolderId);
+    }
 
-        if (editModel != null)
-        {
-            _editModel = editModel;
-        }
+    public SnippetEditWindows(PluginInitContext context, SnippetManage snippetManage, SnippetModel editModel)
+    {
+        _context = context;
+        _snippetManage = snippetManage;
+        _editModel = editModel;
 
+        InitializeComponent();
+        _loadPluginImage();
+        _initView();
+    }
+
+
+    public SnippetEditWindows()
+    {
         InitializeComponent();
 
         _loadPluginImage();
 
-        Folders = snippetManage.ListFolders();
+        Folders = _snippetManage.ListFolders();
 
         _initView();
     }
@@ -47,8 +59,10 @@ public partial class SnippetEditWindows : Window
         IconImage.Source = ico;
     }
 
-    private void _initView()
+    private void _initView(long? addFolderId = null)
     {
+        Folders = _snippetManage.ListFolders();
+
         BtnSaveOrUpdate.Content =
             _context.API.GetTranslation(_editModel != null ? "snippets_plugin_update" : "snippets_plugin_save");
 
@@ -87,6 +101,12 @@ public partial class SnippetEditWindows : Window
         else
         {
             Editor.Text = "";
+            if (addFolderId != null)
+            {
+                var folder = Folders.FirstOrDefault(f => f.Id == addFolderId);
+                if (folder != null)
+                    CbFolder.SelectedItem = folder;
+            }
         }
     }
 

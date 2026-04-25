@@ -7,12 +7,28 @@
     <system:String x:Key="snippets_plugin_title">Snippets</system:String>
     <system:String x:Key="snippets_plugin_description">管理 key/value Snippets，支持自动粘贴和剪贴板功能</system:String>
 
-    <system:String x:Key="snippets_plugin_snippets_empty">Snippets 列表为空</system:String>
-    <system:String x:Key="snippets_plugin_snippets_empty_add">Snippets 为空, 请先添加 Snippet</system:String>
     <system:String x:Key="snippets_plugin_add">添加</system:String>
     <system:String x:Key="snippets_plugin_edit">编辑</system:String>
+    <system:String x:Key="snippets_plugin_delete">删除</system:String>
+    <system:String x:Key="snippets_plugin_rename">重命名</system:String>
+
+    <system:String x:Key="snippets_plugin_close">关闭</system:String>
+    <system:String x:Key="snippets_plugin_save">保存</system:String>
+    <system:String x:Key="snippets_plugin_update">更新</system:String>
+    <system:String x:Key="snippets_plugin_save_and_close">保存并关闭</system:String>
+
+    <system:String x:Key="snippets_plugin_snippets_empty">Snippets 列表为空</system:String>
+    <system:String x:Key="snippets_plugin_snippets_empty_add">Snippets 为空, 请先添加 Snippet</system:String>
+
     <system:String x:Key="snippets_plugin_add_snippet">添加 Snippet</system:String>
     <system:String x:Key="snippets_plugin_edit_snippet">编辑 Snippet</system:String>
+    <system:String x:Key="snippets_plugin_add_folder">添加目录</system:String>
+    
+    <system:String x:Key="snippets_plugin_move_up">上移</system:String>
+    <system:String x:Key="snippets_plugin_move_down">下移</system:String>
+    <system:String x:Key="snippets_plugin_move_top">移到首行</system:String>
+    <system:String x:Key="snippets_plugin_move_bottom">移到最后</system:String>
+
     <system:String x:Key="snippets_plugin_add_info">添加 Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_add_failed">添加 {0} 失败</system:String>
     <system:String x:Key="snippets_plugin_edit_failed">编辑 {0} 失败</system:String>
@@ -21,22 +37,18 @@
     <system:String x:Key="snippets_plugin_update_info">更新 Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_edit_snippet_info">编辑 Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_delete_snippet">删除 Snippet</system:String>
-    <system:String x:Key="snippets_plugin_move_up">上移</system:String>
-    <system:String x:Key="snippets_plugin_move_down">下移</system:String>
+
     <system:String x:Key="snippets_plugin_reset_score">重置排序分数</system:String>
-    <system:String x:Key="snippets_plugin_move_top">移到首行</system:String>
-    <system:String x:Key="snippets_plugin_move_bottom">移到最后</system:String>
+
     <system:String x:Key="snippets_plugin_delete_snippet_info">删除 Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_open_settings">打开设置</system:String>
-    <system:String x:Key="snippets_plugin_close">关闭</system:String>
-    <system:String x:Key="snippets_plugin_save">保存</system:String>
-    <system:String x:Key="snippets_plugin_update">更新</system:String>
-    <system:String x:Key="snippets_plugin_save_and_close">保存并关闭</system:String>
+
     <system:String x:Key="snippets_plugin_edit_item_key">当前为编辑模式, 点击切换为添加模式</system:String>
     <system:String x:Key="snippets_plugin_add_item_key">当前为添加模式</system:String>
     <system:String x:Key="snippets_plugin_manage_snippets">管理 Snippets</system:String>
-    <system:String x:Key="snippets_plugin_snippets_key">Key</system:String>
-    <system:String x:Key="snippets_plugin_snippets_value">Value</system:String>
+    <system:String x:Key="snippets_plugin_snippets_key">名称</system:String>
+    <system:String x:Key="snippets_plugin_snippets_name">名称</system:String>
+    <system:String x:Key="snippets_plugin_snippets_value">内容</system:String>
     <system:String x:Key="snippets_plugin_snippets_score">Score</system:String>
     <system:String x:Key="snippets_plugin_snippets_folder">目录</system:String>
     <system:String x:Key="snippets_plugin_snippets_folder_name">目录名称</system:String>
@@ -57,9 +69,6 @@
     <system:String x:Key="snippets_plugin_auto_paste_description">复制到剪贴板后自动粘贴片段</system:String>
     <system:String x:Key="snippets_plugin_enable_dynamic_variables">启用动态变量</system:String>
     <system:String x:Key="snippets_plugin_enable_dynamic_variables_desc">解析格式像这样的变量: {{date}}</system:String>
-    <system:String x:Key="snippets_plugin_add_folder">添加目录</system:String>
-    <system:String x:Key="snippets_plugin_delete_folder">删除目录</system:String>
-    <system:String x:Key="snippets_plugin_rename">重命名</system:String>
     <system:String x:Key="snippets_plugin_all_snippets">所有 Snippets</system:String>
     <system:String x:Key="snippets_plugin_favorites">收藏</system:String>
     <system:String x:Key="snippets_plugin_recent">最近</system:String>
