@@ -374,8 +374,17 @@ public partial class SettingWindow : Window
             menu.PlacementTarget is Border border &&
             border.DataContext is FolderModel folder)
         {
-            _snippetManage.RemoveFolderById(folder.Id);
-            _reloadFolders();
+            // _snippetManage.RemoveFolderById(folder.Id);
+            // _reloadFolders();
+            var result = _context.API.ShowMsgBox(
+                string.Format(_context.API.GetTranslation("snippets_plugin_confirm_delete"), folder.Name),
+                _context.API.GetTranslation("snippets_plugin_confirm_delete"),
+                button: MessageBoxButton.YesNo, icon: MessageBoxImage.Asterisk);
+            if (result == MessageBoxResult.Yes)
+            {
+                _snippetManage.RemoveFolderById(folder.Id);
+                _reloadFolders();
+            }
         }
     }
 

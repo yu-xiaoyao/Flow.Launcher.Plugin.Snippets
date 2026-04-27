@@ -55,12 +55,16 @@ public class SqliteSnippetManage : SnippetManage
 
     private const string QueryAllSql = QueryAllSql3;
 
+    /// <summary>
+    /// V3 Folder DDL
+    /// name: Ignore case
+    /// </summary>
     //language=SQL
     private const string FolderTableDDL3 = $"""
                                             create table {TABLE_NAME_FOLDER}
                                             (
                                                 id          BIGINT             NOT NULL PRIMARY KEY,
-                                                name        varchar(200)       NOT NULL UNIQUE,
+                                                name        varchar(200)       NOT NULL UNIQUE COLLATE NOCASE,
                                                 order_num   BIGINT             NOT NULL,
                                                 create_time DATETIME           NOT NULL,
                                                 update_time DATETIME           NOT NULL
@@ -642,7 +646,7 @@ public class SqliteSnippetManage : SnippetManage
 
         var sets = new List<string>();
         if (!string.IsNullOrEmpty(newName))
-            sets.Add("name = @new_name");
+            sets.Add("name = @name");
         if (orderNum != null)
             sets.Add("order_num = @order_num");
         sets.Add("update_time = @update_time");

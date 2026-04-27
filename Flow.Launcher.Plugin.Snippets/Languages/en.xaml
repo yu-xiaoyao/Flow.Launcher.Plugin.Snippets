@@ -29,6 +29,9 @@
     <system:String x:Key="snippets_plugin_move_top">Move Top</system:String>
     <system:String x:Key="snippets_plugin_move_bottom">Move Bottom</system:String>
 
+    <system:String x:Key="snippets_plugin_confirm_delete">Delete confirm?</system:String>
+    <system:String x:Key="snippets_plugin_delete_folder">Confirm delete folder: {0}</system:String>
+    
     <system:String x:Key="snippets_plugin_add_info">Add Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_add_failed">Add {0} Failed</system:String>
     <system:String x:Key="snippets_plugin_edit_failed">Edit {0} Failed</system:String>

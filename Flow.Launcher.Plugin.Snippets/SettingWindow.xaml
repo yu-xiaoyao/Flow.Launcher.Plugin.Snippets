@@ -271,7 +271,7 @@
                                         </Border>
                                     </StackPanel>
 
-                                    <Border Grid.Row="1" Background="WhiteSmoke"
+                                    <Border Grid.Row="1"
                                             CornerRadius="4">
                                         <TextBlock Text="{DynamicResource snippets_plugin_snippets_folder}"
                                                    VerticalAlignment="Center" FontSize="14"
