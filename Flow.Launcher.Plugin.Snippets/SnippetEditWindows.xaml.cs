@@ -66,15 +66,17 @@ public partial class SnippetEditWindows : Window
         BtnSaveOrUpdate.Content =
             _context.API.GetTranslation(_editModel != null ? "snippets_plugin_update" : "snippets_plugin_save");
 
+        var noneText = _context.API.GetTranslation("snippets_plugin_none");
+
         // Syntax
-        CbSyntax.Items.Add("(None)");
-        CbSyntax.SelectedIndex = 0;
+        CbSyntax.Items.Add(noneText);
+        CbSyntax.SelectedIndex = 0; // default
         foreach (var syntax in _getSyntaxList())
             CbSyntax.Items.Add(syntax);
 
         // Folder
-        CbFolder.Items.Add("(None)");
-        CbFolder.SelectedIndex = 0;
+        CbFolder.Items.Add(new FolderModel { Name = noneText, Id = -1L }); // mock none Folder Model
+        CbFolder.SelectedIndex = 0; // default
         foreach (var folder in Folders)
             CbFolder.Items.Add(folder);
 
@@ -137,15 +139,19 @@ public partial class SnippetEditWindows : Window
     {
         if (Editor == null || CbSyntax == null) return;
 
-        var selected = CbSyntax.SelectedItem?.ToString();
-        if (string.IsNullOrEmpty(selected) || selected == "(None)" || selected == "Text")
+        var idx = CbSyntax.SelectedIndex;
+        if (idx > 0)
         {
-            Editor.SyntaxHighlighting = null;
-            return;
+            var selected = CbSyntax.SelectedItem?.ToString();
+            if (!string.IsNullOrEmpty(selected) &&
+                SyntaxHighlightingMap.TryGetValue(selected, out var highlightingName))
+            {
+                Editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition(highlightingName);
+                return;
+            }
         }
 
-        var highlightingName = SyntaxHighlightingMap.GetValueOrDefault(selected, selected);
-        Editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition(highlightingName);
+        Editor.SyntaxHighlighting = null;
     }
 
     private void OnSaveButtonClick(object sender, RoutedEventArgs e)
@@ -170,8 +176,8 @@ public partial class SnippetEditWindows : Window
 
         if (_editModel != null)
         {
-            _snippetManage.UpdateSnippetById(_editModel.Id, name: name, value: value, syntax: syntax,
-                folderId: folderId, favorites: favorites);
+            _snippetManage.UpdateSnippetAlwaysById(_editModel.Id, name, value, _editModel.OrderNum, syntax, folderId,
+                favorites);
         }
         else
         {

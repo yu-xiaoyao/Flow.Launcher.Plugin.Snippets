@@ -76,5 +76,6 @@
     <system:String x:Key="snippets_plugin_snippet_syntax">语法</system:String>
     <system:String x:Key="snippets_plugin_create_time">创建时间</system:String>
     <system:String x:Key="snippets_plugin_update_time">更新时间</system:String>
+    <system:String x:Key="snippets_plugin_none">(无)</system:String>
 
 </ResourceDictionary>

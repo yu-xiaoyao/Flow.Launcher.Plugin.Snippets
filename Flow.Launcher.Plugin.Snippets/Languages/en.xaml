@@ -75,5 +75,6 @@
     <system:String x:Key="snippets_plugin_snippet_syntax">Syntax</system:String>
     <system:String x:Key="snippets_plugin_create_time">Create Time</system:String>
     <system:String x:Key="snippets_plugin_update_time">Update Time</system:String>
+    <system:String x:Key="snippets_plugin_none">(None)</system:String>
 
 </ResourceDictionary>

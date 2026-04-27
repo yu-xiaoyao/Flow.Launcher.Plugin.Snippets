@@ -504,22 +504,20 @@ public class SqliteSnippetManage : SnippetManage
         return command.ExecuteNonQuery() > 0;
     }
 
-    public bool UpdateByKey(string key, string value = null, long? folderId = null, int? score = null)
+    public bool UpdateSnippetAlwaysById(long id, string name, string value, long orderNum, string syntax = null,
+        long? folderId = null, bool? favorites = null)
     {
-        if (value == null && folderId == null && score == null) return false;
-
         var updateSqls = new List<string>();
-        if (value != null)
-            updateSqls.Add("value = @value");
-        if (folderId != null)
-            updateSqls.Add("folder_id = @folderId");
-        if (score != null)
-            updateSqls.Add("score = @score");
-
+        updateSqls.Add("name = @name");
+        updateSqls.Add("value = @value");
+        updateSqls.Add("order_num = @order_num");
+        updateSqls.Add("syntax = @syntax");
+        updateSqls.Add("folder_id = @folder_id");
+        updateSqls.Add("favorites = @favorites");
         updateSqls.Add("update_time = @update_time");
 
         var updateSql = string.Join(", ", updateSqls);
-        var sql = $"update {TABLE_NAME} set {updateSql} where key = @key";
+        var sql = $"update {TABLE_NAME} set {updateSql} where id = @id";
 
         InnerLogger.Logger.Info($"UpdateByKey: {sql}");
 
@@ -527,16 +525,14 @@ public class SqliteSnippetManage : SnippetManage
         connection.Open();
         using var command = new SQLiteCommand(sql, connection);
 
-        if (value != null)
-            command.Parameters.AddWithValue("@value", value);
-        if (folderId != null)
-            command.Parameters.AddWithValue("@folder_id", folderId);
-        if (score != null)
-            command.Parameters.AddWithValue("@score", score);
-
+        command.Parameters.AddWithValue("@name", name);
+        command.Parameters.AddWithValue("@value", value);
+        command.Parameters.AddWithValue("@order_num", orderNum);
+        command.Parameters.AddWithValue("@syntax", syntax);
+        command.Parameters.AddWithValue("@folder_id", folderId);
+        command.Parameters.AddWithValue("@favorites", favorites == null ? null : Utils.BoolToInt(favorites));
         command.Parameters.AddWithValue("@update_time", DateTimeUtil.TrimMilliseconds(DateTime.Now));
-
-        command.Parameters.AddWithValue("@key", key);
+        command.Parameters.AddWithValue("@id", id);
 
         return command.ExecuteNonQuery() > 0;
     }

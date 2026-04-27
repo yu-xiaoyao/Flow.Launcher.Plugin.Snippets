@@ -36,6 +36,12 @@ public interface SnippetManage
         long? folderId = null,
         bool? favorites = null);
 
+    bool UpdateSnippetAlwaysById(long id, string name, string value,
+        long orderNum,
+        [CanBeNull] string syntax = null,
+        long? folderId = null,
+        bool? favorites = null);
+
     void Clear();
 
     void ResetAllScore();
