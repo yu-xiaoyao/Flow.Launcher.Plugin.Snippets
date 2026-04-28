@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using Flow.Launcher.Plugin.Snippets.Sqlite;
 using Flow.Launcher.Plugin.Snippets.Update;
@@ -66,14 +67,15 @@ namespace Flow.Launcher.Plugin.Snippets
 
         private Result _modelToResult(Query query, SnippetModel sm)
         {
-            var key = sm.Name ?? string.Empty;
-            var value = sm.Value ?? string.Empty;
+            var name = sm.Name;
+            var value = sm.Value;
             return new Result
             {
-                Title = key,
+                Title = name,
                 SubTitle = value.Replace("\r\n", "  ").Replace("\n", "  "),
                 IcoPath = IconPath,
-                AutoCompleteText = $"{query.ActionKeyword} {key}",
+                AutoCompleteText = $"{query.ActionKeyword} {name}",
+                CopyText = value,
                 ContextData = sm,
                 Preview = new Result.PreviewInfo
                 {
@@ -136,6 +138,13 @@ namespace Flow.Launcher.Plugin.Snippets
             }
         }
 
+
+        private void _add(string name, string value)
+        {
+            _snippetManage.Add(name, value);
+        }
+
+        /*
         private Result _updateSnippets(Query query, string name, string value)
         {
             return new Result
@@ -152,38 +161,18 @@ namespace Flow.Launcher.Plugin.Snippets
             };
         }
 
-        private void _add(string key, string value)
-        {
-            _snippetManage.Add(key, value);
-        }
-
         private void _update(string key, string value)
         {
             // _snippetManage.UpdateSnippetById(key, value: value);
         }
+        */
 
         public List<Result> LoadContextMenus(Result selectedResult)
         {
-            var adminResult = new Result
-            {
-                Title = _context.API.GetTranslation("snippets_plugin_manage_snippets"),
-                IcoPath = IconPath,
-                Action = _ =>
-                {
-                    // FormWindows.ShowWindows(_context.API, _snippetManage);
-                    var sw = new SettingWindow(_context, _snippetManage);
-                    sw.Show();
-                    return true;
-                },
-            };
-
             var menus = new List<Result>();
             var contextData = selectedResult.ContextData;
             if (contextData is SnippetModel sm)
             {
-                // TODO for quick open when dev
-                menus.Add(adminResult);
-
                 menus.Add(new Result
                 {
                     Title = _context.API.GetTranslation("snippets_plugin_edit_snippet"),
@@ -192,7 +181,12 @@ namespace Flow.Launcher.Plugin.Snippets
                     IcoPath = IconPath,
                     Action = _ =>
                     {
-                        FormWindows.ShowWindows(_context.API, _snippetManage, sm);
+                        var w = new SnippetEditWindows(_context, _snippetManage, sm)
+                        {
+                            WindowStartupLocation = WindowStartupLocation.CenterScreen
+                        };
+                        w.ShowDialog();
+
                         return true;
                     }
                 });
@@ -209,31 +203,32 @@ namespace Flow.Launcher.Plugin.Snippets
                     },
                 });
 
-                // new edit
                 menus.Add(new Result
                 {
-                    Title = _context.API.GetTranslation("snippets_plugin_edit_snippet"),
-                    SubTitle = string.Format(_context.API.GetTranslation("snippets_plugin_edit_snippet_info"),
-                        sm.Name, sm.Value.Replace("\r\n", "  ").Replace("\n", "  ")),
+                    Title = _context.API.GetTranslation("snippets_plugin_manage_snippets"),
                     IcoPath = IconPath,
                     Action = _ =>
                     {
-                        SnippetDialog.ShowDialog(_context.API, _snippetManage, sm);
+                        SettingWindow.Show(_context, _snippetManage);
                         return true;
-                    }
+                    },
                 });
-
+                
+                // open Add Snippet Dialog
                 menus.Add(new Result
                 {
                     Title = _context.API.GetTranslation("snippets_plugin_add"),
                     IcoPath = IconPath,
                     Action = _ =>
                     {
-                        SnippetDialog.ShowDialog(_context.API, _snippetManage);
+                        var w = new SnippetEditWindows(_context, _snippetManage)
+                        {
+                            WindowStartupLocation = WindowStartupLocation.CenterScreen
+                        };
+                        w.ShowDialog();
                         return true;
                     },
                 });
-                menus.Add(adminResult);
             }
 
             return menus;
@@ -252,7 +247,7 @@ namespace Flow.Launcher.Plugin.Snippets
 
         public Control CreateSettingPanel()
         {
-            return new SettingPanel(_context.API, _settings, _snippetManage);
+            return new SettingPanel(_context, _settings, _snippetManage);
         }
 
         public void Dispose()

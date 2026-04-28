@@ -138,29 +138,51 @@
 
                 <!-- Data Container -->
                 <!-- Top Toolbar: Key, Favorite, Syntax, Folder, Save, Cancel -->
-                <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5"
+                <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
                         Height="60" Background="{DynamicResource Color14B}" CornerRadius="4"
                         Padding="5 0">
                     <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
-                            <!-- Favorite -->
+
+                            <!-- Folder -->
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
 
                             <!-- SnippetName -->
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" MinWidth="200" />
 
-                            <!-- Folder -->
+                            <!-- Favorite -->
+                            <ColumnDefinition Width="Auto" />
+
+                            <!-- Action Button -->
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
 
-                            <!-- Syntax -->
+                            <!-- Syntax for Edit display -->
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
 
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
+
+                        <!-- Folder -->
+                        <TextBlock Grid.Column="0" Text="{DynamicResource snippets_plugin_snippets_folder}"
+                                   VerticalAlignment="Center" Margin="5 0" />
+                        <ComboBox Grid.Column="1" x:Name="CbFolder" FontSize="13" MinWidth="160" MaxWidth="250"
+                                  Width="200"
+                                  Margin="5 0"
+                                  ItemsSource="{Binding Folders}"
+                                  DisplayMemberPath="Name"
+                                  SelectedValuePath="Id" />
+
+
+                        <!-- SnippetName -->
+                        <TextBlock Grid.Column="2" Text="{DynamicResource snippets_plugin_snippets_key}"
+                                   VerticalAlignment="Center" Margin="5 0" />
+                        <Border Grid.Column="3" VerticalAlignment="Center" Margin="5 0">
+                            <TextBox x:Name="TbSnippetName" FontSize="13" />
+                        </Border>
+
 
                         <!-- Favorite -->
                         <ToggleButton Grid.Column="0" x:Name="BtnFavorite"
@@ -172,41 +194,24 @@
                                 Stretch="Uniform" Width="16" Height="16" />
                         </ToggleButton>
 
-
-                        <!-- SnippetName -->
-                        <TextBlock Grid.Column="1" Text="{DynamicResource snippets_plugin_snippets_key}"
-                                   VerticalAlignment="Center" Margin="5 0" />
-                        <Border Grid.Column="2" VerticalAlignment="Center" Margin="5 0">
-                            <TextBox x:Name="TbSnippetName" FontSize="13" />
-                        </Border>
-
-                        <!-- Folder -->
-                        <TextBlock Grid.Column="3" Text="{DynamicResource snippets_plugin_snippets_folder}"
-                                   VerticalAlignment="Center" Margin="5 0" />
-                        <ComboBox Grid.Column="4" x:Name="CbFolder" FontSize="13" MinWidth="160" MaxWidth="250"
-                                  Width="200"
-                                  Margin="5 0"
-                                  ItemsSource="{Binding Folders}"
-                                  DisplayMemberPath="Name"
-                                  SelectedValuePath="Id" />
-
-                        <!-- Syntax -->
-                        <TextBlock Grid.Column="5" Text="{DynamicResource snippets_plugin_snippet_syntax}"
-                                   VerticalAlignment="Center" Margin="5 0" />
-                        <ComboBox Grid.Column="6" x:Name="CbSyntax" FontSize="13" Width="120" Margin="5 0"
-                                  SelectionChanged="OnSyntaxSelectionChanged" />
-
                         <!-- Save & Cancel -->
-                        <Button Grid.Column="7" x:Name="BtnSaveOrUpdate"
+                        <Button Grid.Column="5" x:Name="BtnSaveOrUpdate"
                                 MinWidth="80" Margin="5 0"
                                 Content=""
                                 Click="OnSaveButtonClick"
                                 Style="{DynamicResource AccentButtonStyle}" />
-                        <Button Grid.Column="8" x:Name="BtnCancel"
+                        <Button Grid.Column="6" x:Name="BtnCancel"
                                 MinWidth="80"
                                 Margin="5 0"
                                 Content="{DynamicResource snippets_plugin_close}"
                                 Click="OnCancelButtonClick" />
+
+                        <!-- Syntax -->
+                        <TextBlock Grid.Column="7" Text="{DynamicResource snippets_plugin_snippet_syntax}"
+                                   VerticalAlignment="Center" Margin="5 0" />
+                        <ComboBox Grid.Column="8" x:Name="CbSyntax" FontSize="13" Width="120" Margin="5 0"
+                                  SelectionChanged="OnSyntaxSelectionChanged" />
+
                     </Grid>
                 </Border>
 

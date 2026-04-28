@@ -39,18 +39,6 @@ public partial class SnippetEditWindows : Window
         _initView();
     }
 
-
-    public SnippetEditWindows()
-    {
-        InitializeComponent();
-
-        _loadPluginImage();
-
-        Folders = _snippetManage.ListFolders();
-
-        _initView();
-    }
-
     private void _loadPluginImage()
     {
         var ico = Utils.LoadPluginIcon(_context);

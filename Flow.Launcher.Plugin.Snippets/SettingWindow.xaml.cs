@@ -12,6 +12,22 @@ namespace Flow.Launcher.Plugin.Snippets;
 
 public partial class SettingWindow : Window
 {
+    private static SettingWindow _instance;
+
+    public static void Show(PluginInitContext context, SnippetManage snippetManage,
+        [CanBeNull] SnippetModel selectSm = null)
+    {
+        if (_instance == null)
+        {
+            _instance = new SettingWindow(context, snippetManage);
+            _instance.Show();
+        }
+        else
+        {
+            _instance.Activate();
+        }
+    }
+
     public const int IndexAllSnippets = -1;
     public const int IndexFavorites = -2;
     public const int IndexRecent = -3;
@@ -43,6 +59,9 @@ public partial class SettingWindow : Window
 
         DataContext = this;
         InitializeComponent();
+
+        Activated += (sender, args) => { _loadSnippets(); };
+        Closed += (sender, args) => { _instance = null; };
 
         _loadPluginImage();
 
@@ -577,4 +596,12 @@ public partial class SettingWindow : Window
     }
 
     #endregion
+
+    private void ToggleButton_OnChecked(object sender, RoutedEventArgs e)
+    {
+        if (DataGridSnippets.SelectedItem is SnippetModel snippet)
+        {
+            InnerLogger.Logger.Debug($"ToggleButton_OnChecked. {snippet}");
+        }
+    }
 }

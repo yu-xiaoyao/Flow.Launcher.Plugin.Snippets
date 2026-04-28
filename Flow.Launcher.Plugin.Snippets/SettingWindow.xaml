@@ -49,6 +49,8 @@
         <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
 
+        <conv:SnippetFavoritesToBoolConverter x:Key="SnippetFavoritesToBoolConverter" />
+
     </Window.Resources>
 
     <!-- Windows UI View -->
@@ -464,20 +466,138 @@
                                                 Click="DataGrid_MoveDownOnClick" />
                                         </ContextMenu>
                                     </DataGrid.ContextMenu>
+
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="{DynamicResource snippets_plugin_snippets_name}"
-                                                            Binding="{Binding Name}" Width="120" />
-                                        <DataGridTextColumn Header="{DynamicResource snippets_plugin_snippets_value}"
-                                                            Binding="{Binding Value}" Width="*" />
-                                        <DataGridTextColumn Header="{DynamicResource snippets_plugin_snippets_folder}"
-                                                            Binding="{Binding FolderName}"
-                                                            Width="160" />
-                                        <DataGridTextColumn Header="{DynamicResource snippets_plugin_create_time}"
-                                                            Binding="{Binding CreateTime, StringFormat=yyyy-MM-dd HH:mm:ss}"
-                                                            Width="160" />
-                                        <DataGridTextColumn Header="{DynamicResource snippets_plugin_update_time}"
-                                                            Binding="{Binding UpdateTime, StringFormat=yyyy-MM-dd HH:mm:ss}"
-                                                            Width="160" />
+
+                                        <DataGridTemplateColumn Width="3*" MinWidth="100">
+                                            <DataGridTemplateColumn.Header>
+                                                <TextBlock Text="{DynamicResource snippets_plugin_snippets_name}"
+                                                           HorizontalAlignment="Center" />
+                                            </DataGridTemplateColumn.Header>
+
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Border Height="36" MaxHeight="36" Margin="4 2"
+                                                            VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Name}"
+                                                                   ToolTip="{Binding Name}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="13" />
+                                                    </Border>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <!-- Value -->
+                                        <DataGridTemplateColumn Width="6*" MinWidth="100">
+                                            <DataGridTemplateColumn.Header>
+                                                <TextBlock Text="{DynamicResource snippets_plugin_snippets_value}"
+                                                           HorizontalAlignment="Center" />
+                                            </DataGridTemplateColumn.Header>
+
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Border Height="36" MaxHeight="36" Margin="4 2"
+                                                            VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Value}"
+                                                                   ToolTip="{Binding Value}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="13" />
+                                                    </Border>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <!-- Folder -->
+                                        <DataGridTemplateColumn Width="140" MinWidth="120" MaxWidth="200">
+                                            <DataGridTemplateColumn.Header>
+                                                <TextBlock Text="{DynamicResource snippets_plugin_snippets_folder}"
+                                                           HorizontalAlignment="Center" />
+                                            </DataGridTemplateColumn.Header>
+
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Border Height="36" MaxHeight="36" Margin="4 2"
+                                                            VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding FolderName}"
+                                                                   ToolTip="{Binding FolderName}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="13" />
+                                                    </Border>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+
+                                        <DataGridTemplateColumn MinWidth="48" MaxWidth="64">
+                                            <DataGridTemplateColumn.Header>
+                                                <TextBlock Text="{DynamicResource snippets_plugin_favorites}"
+                                                           HorizontalAlignment="Center" />
+                                            </DataGridTemplateColumn.Header>
+
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Border VerticalAlignment="Center"
+                                                            HorizontalAlignment="Center"
+                                                            Margin="4 2">
+                                                        <ToggleButton
+                                                            ToolTip="{DynamicResource snippets_plugin_favorites}"
+                                                            IsChecked="{Binding Faviorites, Converter={StaticResource SnippetFavoritesToBoolConverter}}"
+                                                            Checked="ToggleButton_OnChecked"
+                                                            >
+                                                            <Path
+                                                                Data="M 12,2 L 15,9 L 22,9 L 16.5,13.5 L 18.5,21 L 12,16.5 L 5.5,21 L 7.5,13.5 L 2,9 L 9,9 Z"
+                                                                Fill="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}"
+                                                                Stretch="Uniform" Height="12" Width="12" />
+                                                        </ToggleButton>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+
+                                        <!-- CreateTime -->
+                                        <DataGridTemplateColumn Width="160" MinWidth="120">
+                                            <DataGridTemplateColumn.Header>
+                                                <TextBlock Text="{DynamicResource snippets_plugin_create_time}"
+                                                           HorizontalAlignment="Center" />
+                                            </DataGridTemplateColumn.Header>
+
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Border Height="36" MaxHeight="36" Margin="4 2"
+                                                            VerticalAlignment="Center">
+                                                        <TextBlock
+                                                            Text="{Binding CreateTime, StringFormat=yyyy-MM-dd HH:mm:ss}"
+                                                            VerticalAlignment="Center"
+                                                            HorizontalAlignment="Center"
+                                                            FontSize="13" />
+                                                    </Border>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <!-- UpdateTime -->
+                                        <DataGridTemplateColumn Width="160" MinWidth="120">
+                                            <DataGridTemplateColumn.Header>
+                                                <TextBlock Text="{DynamicResource snippets_plugin_update_time}"
+                                                           HorizontalAlignment="Center" />
+                                            </DataGridTemplateColumn.Header>
+
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Border Height="36" MaxHeight="36" Margin="4 2"
+                                                            VerticalAlignment="Center">
+                                                        <TextBlock
+                                                            Text="{Binding UpdateTime, StringFormat=yyyy-MM-dd HH:mm:ss}"
+                                                            VerticalAlignment="Center"
+                                                            HorizontalAlignment="Center"
+                                                            FontSize="13" />
+                                                    </Border>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </Border>

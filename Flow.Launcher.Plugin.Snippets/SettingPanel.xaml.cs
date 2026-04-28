@@ -9,13 +9,13 @@ namespace Flow.Launcher.Plugin.Snippets;
 
 public partial class SettingPanel : UserControl
 {
-    private IPublicAPI _publicApi;
+    private PluginInitContext _context;
     private Settings _settings;
     private SnippetManage _snippetManage;
 
-    public SettingPanel(IPublicAPI contextApi, Settings settings, SnippetManage snippetManage)
+    public SettingPanel(PluginInitContext context, Settings settings, SnippetManage snippetManage)
     {
-        _publicApi = contextApi;
+        _context = context;
         _settings = settings;
         _snippetManage = snippetManage;
         InitializeComponent();
@@ -27,7 +27,9 @@ public partial class SettingPanel : UserControl
 
     private void ButtonOpenManage_OnClick(object sender, RoutedEventArgs e)
     {
-        FormWindows.ShowWindows(_publicApi, _snippetManage);
+        // FormWindows.ShowWindows(_publicApi, _snippetManage);
+        SettingWindow.Show(_context, _snippetManage);
+
         /*var fw = new FormWindows(_publicApi, _snippetManage)
         {
             // Title = _publicApi.GetTranslation("snippets_plugin_manage_snippets"),
@@ -56,7 +58,7 @@ public partial class SettingPanel : UserControl
         var dialog = new OpenFileDialog
         {
             Filter = "Json file (*.json)|*.json",
-            Title = _publicApi.GetTranslation("snippets_plugin_select_json_file"),
+            Title = _context.API.GetTranslation("snippets_plugin_select_json_file"),
             Multiselect = false
         };
 
@@ -66,8 +68,8 @@ public partial class SettingPanel : UserControl
 
         if (!File.Exists(file))
         {
-            _publicApi.ShowMsgError(_publicApi.GetTranslation("snippets_plugin_error"),
-                _publicApi.GetTranslation("snippets_plugin_file_not_found"));
+            _context.API.ShowMsgError(_context.API.GetTranslation("snippets_plugin_error"),
+                _context.API.GetTranslation("snippets_plugin_file_not_found"));
             return;
         }
 
@@ -86,7 +88,7 @@ public partial class SettingPanel : UserControl
         var dialog = new SaveFileDialog
         {
             Filter = "Json file (*.json)|*.json",
-            Title = _publicApi.GetTranslation("snippets_plugin_save_json_file"),
+            Title = _context.API.GetTranslation("snippets_plugin_save_json_file"),
             FileName = "snippets.json"
         };
         if (dialog.ShowDialog() != true) return;
@@ -111,25 +113,25 @@ public partial class SettingPanel : UserControl
     private void CheckBoxAutoPaste_Checked(object sender, RoutedEventArgs e)
     {
         _settings.AutoPasteEnabled = true;
-        _publicApi.SavePluginSettings();
+        _context.API.SavePluginSettings();
     }
 
     private void CheckBoxAutoPaste_Unchecked(object sender, RoutedEventArgs e)
     {
         _settings.AutoPasteEnabled = false;
-        _publicApi.SavePluginSettings();
+        _context.API.SavePluginSettings();
     }
 
 
     private void CheckBoxDynamicVariables_Checked(object sender, RoutedEventArgs e)
     {
         _settings.DynamicVariables = true;
-        _publicApi.SavePluginSettings();
+        _context.API.SavePluginSettings();
     }
 
     private void CheckBoxDynamicVariables_Unchecked(object sender, RoutedEventArgs e)
     {
         _settings.DynamicVariables = false;
-        _publicApi.SavePluginSettings();
+        _context.API.SavePluginSettings();
     }
 }
