@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Controls;
+using System.Windows.Forms;
 using Flow.Launcher.Plugin.Snippets.Json;
 using Flow.Launcher.Plugin.Snippets.Sqlite;
 using Flow.Launcher.Plugin.Snippets.Util;
+using Control = System.Windows.Controls.Control;
 
 namespace Flow.Launcher.Plugin.Snippets
 {
@@ -92,7 +94,12 @@ namespace Flow.Launcher.Plugin.Snippets
                         if (_settings.AutoPasteEnabled)
                         {
                             Task.Run(() =>
-                                AutoPasteHelper.PasteWhenFocusRestoredAsyncNew(_context, _settings.PasteDelayMs));
+                            {
+                                // AutoPasteHelper.PasteWhenFocusRestoredAsyncNew(_context, _settings.PasteDelayMs);
+                                
+                                Thread.Sleep(100);
+                                SendKeys.SendWait("^v");
+                            });
                         }
                     }
                     catch (Exception ex)

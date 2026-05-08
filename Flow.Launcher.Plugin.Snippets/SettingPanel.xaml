@@ -49,9 +49,10 @@
         </WrapPanel>
 
         <WrapPanel Orientation="Horizontal">
-            <CheckBox Name="CheckBoxDynamicVariables" Content="{DynamicResource snippets_plugin_enable_dynamic_variables}"
+            <CheckBox Name="CheckBoxDynamicVariables"
+                      Content="{DynamicResource snippets_plugin_enable_dynamic_variables}"
                       Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
-                      VerticalAlignment="Center" Checked="CheckBoxDynamicVariables_Checked" 
+                      VerticalAlignment="Center" Checked="CheckBoxDynamicVariables_Checked"
                       Unchecked="CheckBoxDynamicVariables_Unchecked" />
             <Label Content="{DynamicResource snippets_plugin_enable_dynamic_variables_desc}"
                    Margin="{StaticResource SettingPanelItemTopBottomMargin}"
@@ -66,6 +67,13 @@
             <Label Content="{DynamicResource snippets_plugin_auto_paste_description}"
                    Margin="{StaticResource SettingPanelItemTopBottomMargin}"
                    FontStyle="Italic" VerticalAlignment="Center" />
+
+            <Border Margin="16" />
+            <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                   Content="{DynamicResource snippets_plugin_paste_delay_ms}" />
+
+            <TextBlock></TextBlock>
+
         </WrapPanel>
     </StackPanel>
 
