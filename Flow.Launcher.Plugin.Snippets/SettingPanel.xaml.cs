@@ -1,7 +1,9 @@
 ﻿using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Flow.Launcher.Plugin.Snippets.Util;
 using Microsoft.Win32;
 
@@ -23,6 +25,11 @@ public partial class SettingPanel : UserControl
         ComboBoxStorageMode.SelectedIndex = _settings.StorageType == StorageType.Sqlite ? 1 : 0;
         CheckBoxAutoPaste.IsChecked = _settings.AutoPasteEnabled;
         CheckBoxDynamicVariables.IsChecked = _settings.DynamicVariables;
+
+        AutoPasteConfigPanel.IsEnabled = _settings.AutoPasteEnabled;
+        TbAutoPasteDelayMs.Text = $"{_settings.PasteDelayMs}";
+
+        // CbAutoPasteMethod.Items
     }
 
     private void ButtonOpenManage_OnClick(object sender, RoutedEventArgs e)
@@ -111,16 +118,18 @@ public partial class SettingPanel : UserControl
     private void CheckBoxAutoPaste_Checked(object sender, RoutedEventArgs e)
     {
         _settings.AutoPasteEnabled = true;
+        AutoPasteConfigPanel.IsEnabled = true;
         _publicApi.SavePluginSettings();
     }
 
     private void CheckBoxAutoPaste_Unchecked(object sender, RoutedEventArgs e)
     {
         _settings.AutoPasteEnabled = false;
+        AutoPasteConfigPanel.IsEnabled = false;
         _publicApi.SavePluginSettings();
     }
-    
-    
+
+
     private void CheckBoxDynamicVariables_Checked(object sender, RoutedEventArgs e)
     {
         _settings.DynamicVariables = true;
@@ -132,4 +141,33 @@ public partial class SettingPanel : UserControl
         _settings.DynamicVariables = false;
         _publicApi.SavePluginSettings();
     }
+
+    private void ButtonSaveSettings_OnClick(object sender, RoutedEventArgs e)
+    {
+        var delayMs = TbAutoPasteDelayMs.Text.Trim();
+        if (int.TryParse(delayMs, out var result))
+        {
+            _settings.PasteDelayMs = result;
+        }
+        
+        _publicApi.SavePluginSettings();
+    }
+
+
+    private void AutoPasteDelayMsTextBox(object sender, TextCompositionEventArgs e)
+    {
+        var text = e.Text;
+        if (string.IsNullOrEmpty(text))
+        {
+            e.Handled = false;
+        }
+        else
+        {
+            var regex = NumberRegex();
+            e.Handled = regex.IsMatch(text);
+        }
+    }
+
+    [GeneratedRegex("[^0-9]+")]
+    private static partial Regex NumberRegex();
 }

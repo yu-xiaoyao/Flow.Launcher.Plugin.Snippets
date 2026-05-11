@@ -51,6 +51,8 @@
     <system:String x:Key="snippets_plugin_auto_paste_description">复制到剪贴板后自动粘贴片段</system:String>
     <system:String x:Key="snippets_plugin_enable_dynamic_variables">启用动态变量</system:String>
     <system:String x:Key="snippets_plugin_enable_dynamic_variables_desc">解析格式像这样的变量: {{date}}</system:String>
-    <system:String x:Key="snippets_plugin_paste_delay_ms">自动粘贴延迟(毫秒)</system:String>
+    <system:String x:Key="snippets_plugin_auto_paste_delay_ms">自动粘贴延迟(毫秒)</system:String>
+    <system:String x:Key="snippets_plugin_auto_paste_method">自动粘贴方法</system:String>
+    <system:String x:Key="snippets_plugin_save_settings">保存设置</system:String>
 
 </ResourceDictionary>

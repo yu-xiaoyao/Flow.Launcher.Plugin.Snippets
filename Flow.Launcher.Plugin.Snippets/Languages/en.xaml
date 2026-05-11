@@ -51,6 +51,8 @@
     <system:String x:Key="snippets_plugin_auto_paste_description">Automatically paste snippets after copying to clipboard</system:String>
     <system:String x:Key="snippets_plugin_enable_dynamic_variables">Enable Dynamic Variables</system:String>
     <system:String x:Key="snippets_plugin_enable_dynamic_variables_desc">Parse variables in this format: {{date}}</system:String>
-    <system:String x:Key="snippets_plugin_paste_delay_ms">Auto Paste Delay(Mills)</system:String>
+    <system:String x:Key="snippets_plugin_auto_paste_delay_ms">Auto Paste Delay(Mills)</system:String>
+    <system:String x:Key="snippets_plugin_auto_paste_method">Auto Paste Method</system:String>
+    <system:String x:Key="snippets_plugin_save_settings">Save Settings</system:String>
 
 </ResourceDictionary>
