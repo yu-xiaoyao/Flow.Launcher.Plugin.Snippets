@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,10 +27,22 @@ public partial class SettingPanel : UserControl
         CheckBoxAutoPaste.IsChecked = _settings.AutoPasteEnabled;
         CheckBoxDynamicVariables.IsChecked = _settings.DynamicVariables;
 
-        AutoPasteConfigPanel.IsEnabled = _settings.AutoPasteEnabled;
-        TbAutoPasteDelayMs.Text = $"{_settings.PasteDelayMs}";
+        _initCopyView();
 
         // CbAutoPasteMethod.Items
+    }
+
+    private void _initCopyView()
+    {
+        // ClipboardUtils.CopyMethod
+        ComboBoxCopyMethod.Items.Add("Flow Launcher API");
+        ComboBoxCopyMethod.Items.Add("Dotnet API");
+        ComboBoxCopyMethod.Items.Add("Win32 Native API");
+        ComboBoxCopyMethod.SelectedIndex = _settings.CopyMethod >= 3 ? 0 : _settings.CopyMethod;
+
+        // Auto Paste
+        AutoPasteConfigPanel.IsEnabled = _settings.AutoPasteEnabled;
+        TbAutoPasteDelayMs.Text = $"{_settings.PasteDelayMs}";
     }
 
     private void ButtonOpenManage_OnClick(object sender, RoutedEventArgs e)
@@ -149,7 +162,13 @@ public partial class SettingPanel : UserControl
         {
             _settings.PasteDelayMs = result;
         }
-        
+
+        var index = CbAutoPasteMethod.SelectedIndex;
+        if (Enum.IsDefined(typeof(ClipboardUtils.CopyMethod), index))
+        {
+            _settings.CopyMethod = index;
+        }
+
         _publicApi.SavePluginSettings();
     }
 

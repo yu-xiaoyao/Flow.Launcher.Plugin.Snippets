@@ -60,6 +60,17 @@
         </WrapPanel>
 
         <WrapPanel Orientation="Horizontal">
+            <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                   Content="{DynamicResource snippets_plugin_copy_method}" />
+
+            <ComboBox Name="ComboBoxCopyMethod" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                      Width="240" VerticalAlignment="Center" />
+
+        </WrapPanel>
+
+
+        <!-- Auto Paste -->
+        <WrapPanel Orientation="Horizontal">
             <CheckBox Name="CheckBoxAutoPaste" Content="{DynamicResource snippets_plugin_auto_paste_enabled}"
                       Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
                       VerticalAlignment="Center" Checked="CheckBoxAutoPaste_Checked"
@@ -69,7 +80,6 @@
                    FontStyle="Italic" VerticalAlignment="Center" />
 
         </WrapPanel>
-
         <WrapPanel Orientation="Horizontal" Name="AutoPasteConfigPanel">
 
             <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
@@ -97,7 +107,7 @@
             <Button Click="ButtonSaveSettings_OnClick" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
                     VerticalAlignment="Center"
                     Content="{DynamicResource snippets_plugin_save_settings}" />
-            
+
         </WrapPanel>
 
     </StackPanel>

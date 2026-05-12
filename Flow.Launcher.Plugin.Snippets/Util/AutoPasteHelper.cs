@@ -1,6 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Flow.Launcher.Plugin.Snippets.Util;
 
@@ -218,6 +220,40 @@ public class AutoPasteHelper
         catch (Exception ex)
         {
             InnerLogger.Logger.Error("SendCtrlV failed", ex);
+        }
+    }
+
+    public interface IAutoPaste
+    {
+        void AutoPaste();
+    }
+
+    public enum AutoPasteMethod
+    {
+        V1,
+        V2,
+        HideFlowAndCtrlV,
+    }
+
+    public static void AutoPasteAsync(PluginInitContext context, int autoPasteMethod, int delayMs)
+    {
+        switch (autoPasteMethod)
+        {
+            case (int)AutoPasteMethod.V1:
+                Task.Run(() => { _ = PasteWhenFocusRestoredAsyncNew(context, delayMs); });
+                break;
+            case (int)AutoPasteMethod.V2:
+                Task.Run(() => { _ = PasteWhenFocusRestoredAsyncNew(context, delayMs); });
+                break;
+            case (int)AutoPasteMethod.HideFlowAndCtrlV:
+                context.API.HideMainWindow();
+                Task.Run(() =>
+                {
+                    if (delayMs > 0)
+                        Thread.Sleep(delayMs);
+                    SendKeys.SendWait("^v");
+                });
+                break;
         }
     }
 }
