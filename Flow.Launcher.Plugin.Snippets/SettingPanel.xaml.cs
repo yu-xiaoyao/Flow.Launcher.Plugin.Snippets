@@ -35,14 +35,19 @@ public partial class SettingPanel : UserControl
     private void _initCopyView()
     {
         // ClipboardUtils.CopyMethod
-        ComboBoxCopyMethod.Items.Add("Flow Launcher API");
-        ComboBoxCopyMethod.Items.Add("Dotnet API");
-        ComboBoxCopyMethod.Items.Add("Win32 Native API");
+        ComboBoxCopyMethod.Items.Add("0. Flow Launcher API");
+        ComboBoxCopyMethod.Items.Add("1. Dotnet API");
+        ComboBoxCopyMethod.Items.Add("2. Win32 Native API");
         ComboBoxCopyMethod.SelectedIndex = _settings.CopyMethod >= 3 ? 0 : _settings.CopyMethod;
 
         // Auto Paste
         AutoPasteConfigPanel.IsEnabled = _settings.AutoPasteEnabled;
         TbAutoPasteDelayMs.Text = $"{_settings.PasteDelayMs}";
+
+        CbAutoPasteMethod.Items.Add("0. Auto Paste Method. (Default)");
+        CbAutoPasteMethod.Items.Add("1. Auto Paste Method. (Hide Flow And Usage Native Send Ctrl+V)");
+        CbAutoPasteMethod.Items.Add("2. Auto Paste Method. (Hide Flow And Usage Simple Send Ctrl+V)");
+        CbAutoPasteMethod.SelectedIndex = _settings.AutoPasteMethod;
     }
 
     private void ButtonOpenManage_OnClick(object sender, RoutedEventArgs e)
@@ -161,15 +166,8 @@ public partial class SettingPanel : UserControl
         if (int.TryParse(delayMs, out var result))
         {
             _settings.PasteDelayMs = result;
+            _publicApi.SavePluginSettings();
         }
-
-        var index = CbAutoPasteMethod.SelectedIndex;
-        if (Enum.IsDefined(typeof(ClipboardUtils.CopyMethod), index))
-        {
-            _settings.CopyMethod = index;
-        }
-
-        _publicApi.SavePluginSettings();
     }
 
 
@@ -185,6 +183,24 @@ public partial class SettingPanel : UserControl
             var regex = NumberRegex();
             e.Handled = regex.IsMatch(text);
         }
+    }
+
+    private void ComboBoxCopyMethod_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var index = CbAutoPasteMethod.SelectedIndex;
+        if (Enum.IsDefined(typeof(ClipboardUtils.CopyMethod), index))
+        {
+            _settings.CopyMethod = index;
+            _publicApi.SavePluginSettings();
+        }
+    }
+
+    private void CbAutoPasteMethod_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var idx = CbAutoPasteMethod.SelectedIndex;
+        if (idx >= 3) return;
+        _settings.AutoPasteMethod = idx;
+        _publicApi.SavePluginSettings();
     }
 
     [GeneratedRegex("[^0-9]+")]

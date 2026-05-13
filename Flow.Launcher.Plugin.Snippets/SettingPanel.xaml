@@ -64,7 +64,7 @@
                    Content="{DynamicResource snippets_plugin_copy_method}" />
 
             <ComboBox Name="ComboBoxCopyMethod" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
-                      Width="240" VerticalAlignment="Center" />
+                      Width="240" VerticalAlignment="Center" SelectionChanged="ComboBoxCopyMethod_OnSelectionChanged" />
 
         </WrapPanel>
 
@@ -91,22 +91,18 @@
                      PreviewTextInput="AutoPasteDelayMsTextBox"
                      InputMethod.IsInputMethodEnabled="False" />
 
+            <Button Click="ButtonSaveSettings_OnClick" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                    VerticalAlignment="Center"
+                    Content="{DynamicResource snippets_plugin_save}" />
+
             <Border Margin="16 0 0 0" />
 
             <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
                    Content="{DynamicResource snippets_plugin_auto_paste_method}" />
 
+
             <ComboBox Name="CbAutoPasteMethod" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
-                      Width="200" VerticalAlignment="Center" />
-
-        </WrapPanel>
-
-
-        <WrapPanel Orientation="Horizontal">
-
-            <Button Click="ButtonSaveSettings_OnClick" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
-                    VerticalAlignment="Center"
-                    Content="{DynamicResource snippets_plugin_save_settings}" />
+                      Width="480" VerticalAlignment="Center" SelectionChanged="CbAutoPasteMethod_OnSelectionChanged" />
 
         </WrapPanel>
 

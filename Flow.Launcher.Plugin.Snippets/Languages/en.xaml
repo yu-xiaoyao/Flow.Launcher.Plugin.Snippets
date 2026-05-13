@@ -53,7 +53,6 @@
     <system:String x:Key="snippets_plugin_enable_dynamic_variables_desc">Parse variables in this format: {{date}}</system:String>
     <system:String x:Key="snippets_plugin_auto_paste_delay_ms">Auto Paste Delay(Mills)</system:String>
     <system:String x:Key="snippets_plugin_auto_paste_method">Auto Paste Method</system:String>
-    <system:String x:Key="snippets_plugin_save_settings">Save Settings</system:String>
     <system:String x:Key="snippets_plugin_copy_method">Copy Method</system:String>
 
 </ResourceDictionary>

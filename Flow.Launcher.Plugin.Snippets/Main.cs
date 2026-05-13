@@ -135,7 +135,7 @@ namespace Flow.Launcher.Plugin.Snippets
 
             if (_settings.AutoPasteEnabled)
             {
-                AutoPasteHelper.AutoPasteAsync(_context, _settings.AutoPasteMehtod, _settings.PasteDelayMs);
+                AutoPasteHelper.AutoPasteAsync(_context, _settings.AutoPasteMethod, _settings.PasteDelayMs);
             }
         }
 

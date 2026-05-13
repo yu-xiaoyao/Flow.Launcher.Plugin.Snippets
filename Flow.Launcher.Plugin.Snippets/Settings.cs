@@ -27,7 +27,10 @@ public class Settings : BaseModel
     /// </summary>
     public int PasteDelayMs { get; set; } = 50;
 
-    public int AutoPasteMehtod { get; set; }
+    /// <summary>
+    /// Auto Paste Method
+    /// </summary>
+    public int AutoPasteMethod { get; set; }
 
     /// <summary>
     /// Enable Dynamic Variables when value is {{VAR}}
