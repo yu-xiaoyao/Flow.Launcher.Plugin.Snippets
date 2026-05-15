@@ -144,6 +144,7 @@
                     <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
 
+                           
                             <!-- Folder -->
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
@@ -183,9 +184,8 @@
                             <TextBox x:Name="TbSnippetName" FontSize="13" />
                         </Border>
 
-
                         <!-- Favorite -->
-                        <ToggleButton Grid.Column="0" x:Name="BtnFavorite"
+                        <ToggleButton Grid.Column="4" x:Name="BtnFavorite"
                                       Width="40" Height="28" Margin="5 0"
                                       ToolTip="{DynamicResource snippets_plugin_favorites}">
                             <Path

@@ -55,8 +55,12 @@ public class UpgradeHelper
             {
             }
 
-            // Rename 
-            File.Move(v2JsonPath, v2JsonPath + ".v2");
+            var tp = v2JsonPath + ".v2";
+            if (!File.Exists(tp))
+            {
+                // Rename 
+                File.Move(v2JsonPath, v2JsonPath + ".v2");
+            }
         }
     }
 }

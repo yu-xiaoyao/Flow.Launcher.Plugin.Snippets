@@ -45,6 +45,7 @@ public partial class SettingWindow : Window
 
     public FolderModel FolderNo { get; set; } = new();
 
+    public bool EnableMoveSnippet { get; set; }
 
     public ObservableCollection<FolderModel> Folders { get; set; } = new();
 
@@ -80,6 +81,9 @@ public partial class SettingWindow : Window
         if (ico == null) return;
         Icon = ico;
         IconImage.Source = ico;
+        
+        // header logo
+        Logo.Source = ico;
     }
 
     #endregion
@@ -144,6 +148,16 @@ public partial class SettingWindow : Window
 
                 break;
         }
+
+        if (_selectFolderId > 0 || _selectFolderId == IndexAllSnippets)
+        {
+            EnableMoveSnippet = true;
+        }
+        else
+        {
+            EnableMoveSnippet = false;
+        }
+
 
         foreach (var sm in queryList)
             Snippets.Add(sm);
@@ -596,12 +610,4 @@ public partial class SettingWindow : Window
     }
 
     #endregion
-
-    private void ToggleButton_OnChecked(object sender, RoutedEventArgs e)
-    {
-        if (DataGridSnippets.SelectedItem is SnippetModel snippet)
-        {
-            InnerLogger.Logger.Debug($"ToggleButton_OnChecked. {snippet}");
-        }
-    }
 }

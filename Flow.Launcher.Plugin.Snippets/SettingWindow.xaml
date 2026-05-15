@@ -219,8 +219,7 @@
 
                             <Border Grid.Row="0" Height="60" Background="{DynamicResource Color14B}"
                                     CornerRadius="4">
-                                <TextBlock Text="这是顶部 (Fixed/Auto)" VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
+                                <Image Name="Logo" Width="48" Height="48"></Image>
                             </Border>
 
                             <Border Grid.Row="1" CornerRadius="4">
@@ -457,13 +456,14 @@
                                             <MenuItem
                                                 Header="{DynamicResource snippets_plugin_delete}"
                                                 Click="DataGrid_DeleteSnippetOnClick" />
-                                            <Separator />
                                             <MenuItem
                                                 Header="{DynamicResource snippets_plugin_move_up}"
-                                                Click="DataGrid_MoveUpOnClick" />
+                                                Click="DataGrid_MoveUpOnClick"
+                                                IsEnabled="{Binding EnableMoveSnippet}" />
                                             <MenuItem
                                                 Header="{DynamicResource snippets_plugin_move_down}"
-                                                Click="DataGrid_MoveDownOnClick" />
+                                                Click="DataGrid_MoveDownOnClick"
+                                                IsEnabled="{Binding EnableMoveSnippet}" />
                                         </ContextMenu>
                                     </DataGrid.ContextMenu>
 
@@ -541,10 +541,9 @@
                                                             HorizontalAlignment="Center"
                                                             Margin="4 2">
                                                         <ToggleButton
+                                                            IsHitTestVisible="False"
                                                             ToolTip="{DynamicResource snippets_plugin_favorites}"
-                                                            IsChecked="{Binding Faviorites, Converter={StaticResource SnippetFavoritesToBoolConverter}}"
-                                                            Checked="ToggleButton_OnChecked"
-                                                            >
+                                                            IsChecked="{Binding Faviorites, Converter={StaticResource SnippetFavoritesToBoolConverter}}">
                                                             <Path
                                                                 Data="M 12,2 L 15,9 L 22,9 L 16.5,13.5 L 18.5,21 L 12,16.5 L 5.5,21 L 7.5,13.5 L 2,9 L 9,9 Z"
                                                                 Fill="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}"
