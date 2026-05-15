@@ -88,25 +88,6 @@ namespace Flow.Launcher.Plugin.Snippets
                         }
 
                         _copyToClipboard(expandedValue);
-
-                        // copy to clipboard first
-                        // _context.API.CopyToClipboard(expandedValue, showDefaultNotification: false);
-
-                        // ClipboardUtils.CopyToClipboard(expandedValue, new ClipboardUtils.FlowCopyContext(_context));
-                        ClipboardUtils.CopyToClipboard(expandedValue, new ClipboardUtils.Win32CopyMethod());
-                        // ClipboardUtils.CopyToClipboard(expandedValue, new ClipboardUtils.DotnetCopyContext());
-
-                        // after Flow Launcher hides, wait until Flow Launcher no longer has focus and paste into previous active window
-                        if (_settings.AutoPasteEnabled)
-                        {
-                            Task.Run(() =>
-                            {
-                                // AutoPasteHelper.PasteWhenFocusRestoredAsyncNew(_context, _settings.PasteDelayMs);
-
-                                Thread.Sleep(100);
-                                SendKeys.SendWait("^v");
-                            });
-                        }
                     }
                     catch (Exception ex)
                     {
