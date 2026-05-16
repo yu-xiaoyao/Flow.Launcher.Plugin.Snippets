@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using Flow.Launcher.Plugin.Snippets.Json;
 using Flow.Launcher.Plugin.Snippets.Sqlite;
 using Flow.Launcher.Plugin.Snippets.Util;
@@ -23,6 +20,8 @@ namespace Flow.Launcher.Plugin.Snippets
         {
             _context = context;
             _settings = _context.API.LoadSettingJsonStorage<Settings>();
+
+            _context.API.VisibilityChanged += VisibilityChangedEventHandler;
 
             InnerLogger.SetAsFlowLauncherLogger(_context.API, LoggerLevel.TRACE);
 
@@ -116,7 +115,15 @@ namespace Flow.Launcher.Plugin.Snippets
 
             if (_settings.AutoPasteEnabled)
             {
-                AutoPasteHelper.AutoPasteAsync(_context, _settings.AutoPasteMethod, _settings.PasteDelayMs);
+                AutoPasteHelper.AutoPasteAsync(_context, _settings.AutoPasteMethod, _settings.PasteDelayMs, text);
+            }
+        }
+
+        private void VisibilityChangedEventHandler(object sender, VisibilityChangedEventArgs args)
+        {
+            if (!args.IsVisible)
+            {
+                AutoPasteHelper.OnFlowHiddenSendCtrlV(_settings.PasteDelayMs);
             }
         }
 

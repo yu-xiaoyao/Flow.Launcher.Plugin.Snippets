@@ -44,10 +44,10 @@ public partial class SettingPanel : UserControl
         AutoPasteConfigPanel.IsEnabled = _settings.AutoPasteEnabled;
         TbAutoPasteDelayMs.Text = $"{_settings.PasteDelayMs}";
 
-        CbAutoPasteMethod.Items.Add("0. Auto Paste Method. (Default)");
-        CbAutoPasteMethod.Items.Add("1. Auto Paste Method. (Hide Flow And Usage Native Send Ctrl+V)");
-        CbAutoPasteMethod.Items.Add("2. Auto Paste Method. (Hide Flow And Usage Simple Send Ctrl+V)");
-        CbAutoPasteMethod.Items.Add("3. Auto Paste Method. (Enhanced to 0(Default))");
+        CbAutoPasteMethod.Items.Add("0. Loop Check Flow Windows Is Hidden and Send CtrlV");
+        CbAutoPasteMethod.Items.Add("1. Check Once Flow Windows Is Hidden and Send CtrlV");
+        CbAutoPasteMethod.Items.Add("2. No Check Flow Windows Is Hidden and Send CtrlV");
+        CbAutoPasteMethod.Items.Add("3. Wait Flow Launcher VisibilityChanged and Send CtrlV");
         CbAutoPasteMethod.SelectedIndex = _settings.AutoPasteMethod;
     }
 
