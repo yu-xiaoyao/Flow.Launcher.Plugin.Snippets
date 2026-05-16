@@ -187,7 +187,7 @@ public partial class SettingPanel : UserControl
 
     private void ComboBoxCopyMethod_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        var index = CbAutoPasteMethod.SelectedIndex;
+        var index = ComboBoxCopyMethod.SelectedIndex;
         if (Enum.IsDefined(typeof(ClipboardUtils.CopyMethod), index))
         {
             _settings.CopyMethod = index;
