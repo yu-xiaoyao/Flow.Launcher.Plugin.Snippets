@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using JetBrains.Annotations;
 
 namespace Flow.Launcher.Plugin.Snippets.Util;
 
@@ -158,6 +159,15 @@ public class AutoPasteHelper
 
     public enum AutoPasteMethod
     {
+        HideWindows_VisibilityChangedCallback = 0,
+
+        NoHideWindows_Check_ManyTimes = 55,
+
+        HideWindows_Check_ManyTimes = 44,
+
+        HideWindows_Check_OnceTimes = 44,
+
+
         WaitNativeSendCtrlV = 0,
 
 
@@ -177,7 +187,7 @@ public class AutoPasteHelper
     public static void AutoPasteAsync(PluginInitContext context, int autoPasteMethod, int delayMs)
     {
         InnerLogger.Logger.Debug($"AutoPasteAsync. method = {autoPasteMethod}, delay = {delayMs}");
-        
+
         switch (autoPasteMethod)
         {
             case (int)AutoPasteMethod.WaitNativeSendCtrlV:
@@ -193,13 +203,58 @@ public class AutoPasteHelper
                 break;
             case (int)AutoPasteMethod.HideFlowAndSendCtrlV:
                 context.API.HideMainWindow();
-                Task.Run(() =>
-                {
-                    if (delayMs > 0)
-                        Thread.Sleep(delayMs);
-                    SendKeys.SendWait("^v");
-                });
+                SimpleAutoPaste_SendKeys(delayMs);
                 break;
         }
+    }
+
+    public static bool IsAutoPasteEventCallbackMethod(int autoPasteMethod)
+    {
+        return autoPasteMethod is 4 or 5;
+    }
+
+    public static void AutoPasteEventCallbackAsync(int autoPasteMethod, int delayMs)
+    {
+        if (autoPasteMethod == 4)
+        {
+            SimpleAutoPaste_SendKeys(delayMs);
+        }
+        else if (autoPasteMethod == 5)
+        {
+            NativeAutoPaste_SendCtrlV(delayMs);
+        }
+    }
+
+
+    public static void NativeAutoPaste_SendCtrlV(int delayMs)
+    {
+        Task.Run(() =>
+        {
+            if (delayMs > 0)
+                Thread.Sleep(delayMs);
+            try
+            {
+                TrySendInputCtrlV();
+            }
+            catch (Exception _)
+            {
+            }
+        });
+    }
+
+    public static void SimpleAutoPaste_SendKeys(int delayMs)
+    {
+        Task.Run(() =>
+        {
+            if (delayMs > 0)
+                Thread.Sleep(delayMs);
+            SendKeys.SendWait("^v");
+        });
+    }
+
+
+    public class TextHolder
+    {
+        [CanBeNull] public static string PasteText { set; get; }
     }
 }

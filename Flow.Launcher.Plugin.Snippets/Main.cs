@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using Flow.Launcher.Plugin.Snippets.Sqlite;
 using Flow.Launcher.Plugin.Snippets.Update;
 using Flow.Launcher.Plugin.Snippets.Util;
+using Control = System.Windows.Controls.Control;
 
 namespace Flow.Launcher.Plugin.Snippets
 {
@@ -27,6 +27,9 @@ namespace Flow.Launcher.Plugin.Snippets
         {
             _context = context;
             _settings = _context.API.LoadSettingJsonStorage<Settings>();
+
+            // add VisibilityChanged Event
+            _context.API.VisibilityChanged += VisibilityChangedEventHandler;
 
             InnerLogger.SetAsFlowLauncherLogger(_context, LoggerLevel.DEBUG);
 
@@ -53,14 +56,19 @@ namespace Flow.Launcher.Plugin.Snippets
                 return _snippetManage.List().Select(sm => _modelToResult(query, sm)).ToList();
             }
 
-            // fuzzy search
-            var results = _snippetManage.List(name: search).Select(sm => _modelToResult(query, sm)).ToList();
+            var results = new List<Result>();
 
-            if (!results.Any() && query.SearchTerms.Length >= 2)
+            var querySearchTerms = query.SearchTerms;
+
+            // fuzzy search
+            var snippets = _snippetManage.List(name: search).Select(sm => _modelToResult(query, sm)).ToList();
+
+            if (!snippets.Any() && querySearchTerms.Length >= 2)
             {
-                _appendSnippets(query, results);
+                _appendSnippets(query, snippets);
             }
 
+            results.AddRange(snippets);
             return results;
         }
 
@@ -121,7 +129,30 @@ namespace Flow.Launcher.Plugin.Snippets
 
             if (_settings.AutoPasteEnabled)
             {
-                AutoPasteHelper.AutoPasteAsync(_context, _settings.AutoPasteMethod, _settings.PasteDelayMs);
+                var autoPasteMethod = _settings.AutoPasteMethod;
+                if (AutoPasteHelper.IsAutoPasteEventCallbackMethod(autoPasteMethod))
+                {
+                    // event set value
+                    AutoPasteHelper.TextHolder.PasteText = text;
+                    _context.API.HideMainWindow();
+                }
+                else
+                {
+                    AutoPasteHelper.AutoPasteAsync(_context, autoPasteMethod, _settings.PasteDelayMs);
+                }
+            }
+        }
+
+        private void VisibilityChangedEventHandler(object sender, VisibilityChangedEventArgs args)
+        {
+            if (!args.IsVisible)
+            {
+                if (!string.IsNullOrWhiteSpace(AutoPasteHelper.TextHolder.PasteText))
+                {
+                    // only event method set this value
+                    AutoPasteHelper.TextHolder.PasteText = null;
+                    AutoPasteHelper.AutoPasteEventCallbackAsync(_settings.AutoPasteMethod, _settings.PasteDelayMs);
+                }
             }
         }
 

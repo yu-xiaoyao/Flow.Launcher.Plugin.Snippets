@@ -46,6 +46,8 @@ public partial class SettingPanel : UserControl
         CbAutoPasteMethod.Items.Add("1. Auto Paste Method. (Hide Flow And Usage Native Send Ctrl+V)");
         CbAutoPasteMethod.Items.Add("2. Auto Paste Method. (Hide Flow And Usage Simple Send Ctrl+V)");
         CbAutoPasteMethod.Items.Add("3. Auto Paste Method. (Enhanced to 0(Default))");
+        CbAutoPasteMethod.Items.Add("4. Visibility Changed. (Simple Send Ctrl+V)");
+        CbAutoPasteMethod.Items.Add("5. Visibility Changed. (Native Send Ctrl+V)");
         CbAutoPasteMethod.SelectedIndex = _settings.AutoPasteMethod;
     }
 
@@ -198,7 +200,7 @@ public partial class SettingPanel : UserControl
     private void CbAutoPasteMethod_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var idx = CbAutoPasteMethod.SelectedIndex;
-        if (idx >= 4) return;
+        if (idx >= 6) return;
         _settings.AutoPasteMethod = idx;
         _context.API.SavePluginSettings();
     }
