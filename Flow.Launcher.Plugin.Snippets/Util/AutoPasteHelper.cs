@@ -158,7 +158,7 @@ public class AutoPasteHelper
 
     public enum AutoPasteMethod
     {
-        NativeSendCtrlV = 0,
+        WaitNativeSendCtrlV = 0,
 
 
         HideAndNativeSendCtrlV = 1,
@@ -167,13 +167,24 @@ public class AutoPasteHelper
         /// My Way
         /// </summary>
         HideFlowAndSendCtrlV = 2,
+
+        /// <summary>
+        /// hide windows and call way 1
+        /// </summary>
+        HideFlowWaitNativeSendCtrlV = 3,
     }
 
     public static void AutoPasteAsync(PluginInitContext context, int autoPasteMethod, int delayMs)
     {
+        InnerLogger.Logger.Debug($"AutoPasteAsync. method = {autoPasteMethod}, delay = {delayMs}");
+        
         switch (autoPasteMethod)
         {
-            case (int)AutoPasteMethod.NativeSendCtrlV:
+            case (int)AutoPasteMethod.WaitNativeSendCtrlV:
+                Task.Run(() => { _ = PasteWhenFocusRestoredAsync(context, delayMs); });
+                break;
+            case (int)AutoPasteMethod.HideFlowWaitNativeSendCtrlV:
+                context.API.HideMainWindow();
                 Task.Run(() => { _ = PasteWhenFocusRestoredAsync(context, delayMs); });
                 break;
             case (int)AutoPasteMethod.HideAndNativeSendCtrlV:
