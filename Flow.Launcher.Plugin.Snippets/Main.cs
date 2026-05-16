@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Flow.Launcher.Plugin.Snippets.Sqlite;
@@ -93,15 +92,7 @@ namespace Flow.Launcher.Plugin.Snippets
                             expandedValue = VariableExpander.Expand(value);
                         }
 
-                        // copy to clipboard first
-                        _context.API.CopyToClipboard(expandedValue, showDefaultNotification: false);
-
-                        // after Flow Launcher hides, wait until Flow Launcher no longer has focus and paste into previous active window
-                        if (_settings.AutoPasteEnabled)
-                        {
-                            Task.Run(() =>
-                                AutoPasteHelper.PasteWhenFocusRestoredAsyncNew(_context, _settings.PasteDelayMs));
-                        }
+                        _copyToClipboard(expandedValue);
                     }
                     catch (Exception ex)
                     {
@@ -111,6 +102,27 @@ namespace Flow.Launcher.Plugin.Snippets
                     return true;
                 }
             };
+        }
+
+        private void _copyToClipboard(string text)
+        {
+            switch (_settings.CopyMethod)
+            {
+                case (int)ClipboardUtils.CopyMethod.Flow:
+                    ClipboardUtils.CopyToClipboard(text, new ClipboardUtils.FlowCopyMethod(_context));
+                    break;
+                case (int)ClipboardUtils.CopyMethod.Win32:
+                    ClipboardUtils.CopyToClipboard(text, new ClipboardUtils.Win32CopyMethod());
+                    break;
+                default:
+                    ClipboardUtils.CopyToClipboard(text, new ClipboardUtils.DotnetCopyMethod());
+                    break;
+            }
+
+            if (_settings.AutoPasteEnabled)
+            {
+                AutoPasteHelper.AutoPasteAsync(_context, _settings.AutoPasteMethod, _settings.PasteDelayMs);
+            }
         }
 
         private void _appendSnippets(Query query, List<Result> results)
@@ -213,7 +225,7 @@ namespace Flow.Launcher.Plugin.Snippets
                         return true;
                     },
                 });
-                
+
                 // open Add Snippet Dialog
                 menus.Add(new Result
                 {

@@ -79,5 +79,8 @@
     <system:String x:Key="snippets_plugin_create_time">Create Time</system:String>
     <system:String x:Key="snippets_plugin_update_time">Update Time</system:String>
     <system:String x:Key="snippets_plugin_none">(None)</system:String>
+    <system:String x:Key="snippets_plugin_auto_paste_delay_ms">Auto Paste Delay(Mills)</system:String>
+    <system:String x:Key="snippets_plugin_auto_paste_method">Auto Paste Method</system:String>
+    <system:String x:Key="snippets_plugin_copy_method">Copy Method</system:String>
 
 </ResourceDictionary>

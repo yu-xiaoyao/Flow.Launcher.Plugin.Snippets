@@ -30,9 +30,8 @@
                     Content="{DynamicResource snippets_plugin_clear}" />
 
         </WrapPanel>
-        
-        <!-- 
-        <WrapPanel Orientation="Horizontal">
+
+        <!-- <WrapPanel Orientation="Horizontal">
 
             <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
                    Content="{DynamicResource snippets_plugin_storage_mode}" />
@@ -47,8 +46,7 @@
                     VerticalAlignment="Center"
                     Content="{DynamicResource snippets_plugin_change_and_restart_app}" />
 
-        </WrapPanel>
-        -->
+        </WrapPanel>  -->
 
         <WrapPanel Orientation="Horizontal">
             <CheckBox Name="CheckBoxDynamicVariables"
@@ -62,6 +60,17 @@
         </WrapPanel>
 
         <WrapPanel Orientation="Horizontal">
+            <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                   Content="{DynamicResource snippets_plugin_copy_method}" />
+
+            <ComboBox Name="ComboBoxCopyMethod" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                      Width="240" VerticalAlignment="Center" SelectionChanged="ComboBoxCopyMethod_OnSelectionChanged" />
+
+        </WrapPanel>
+
+        
+        <!-- Auto Paste -->
+        <WrapPanel Orientation="Horizontal">
             <CheckBox Name="CheckBoxAutoPaste" Content="{DynamicResource snippets_plugin_auto_paste_enabled}"
                       Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
                       VerticalAlignment="Center" Checked="CheckBoxAutoPaste_Checked"
@@ -70,6 +79,33 @@
                    Margin="{StaticResource SettingPanelItemTopBottomMargin}"
                    FontStyle="Italic" VerticalAlignment="Center" />
         </WrapPanel>
+        
+        <WrapPanel Orientation="Horizontal" Name="AutoPasteConfigPanel">
+
+            <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                   Content="{DynamicResource snippets_plugin_auto_paste_delay_ms}" />
+
+            <TextBox Name="TbAutoPasteDelayMs" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                     Width="100"
+                     VerticalAlignment="Center"
+                     PreviewTextInput="AutoPasteDelayMsTextBox"
+                     InputMethod.IsInputMethodEnabled="False" />
+
+            <Button Click="ButtonSaveSettings_OnClick" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                    VerticalAlignment="Center"
+                    Content="{DynamicResource snippets_plugin_save}" />
+
+            <Border Margin="16 0 0 0" />
+
+            <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                   Content="{DynamicResource snippets_plugin_auto_paste_method}" />
+
+
+            <ComboBox Name="CbAutoPasteMethod" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                      Width="480" VerticalAlignment="Center" SelectionChanged="CbAutoPasteMethod_OnSelectionChanged" />
+
+        </WrapPanel>
+        
     </StackPanel>
 
 </UserControl>

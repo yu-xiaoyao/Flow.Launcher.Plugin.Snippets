@@ -16,6 +16,11 @@ public class Settings : BaseModel
     public bool EnableFolder { get; set; } = false;
 
     /// <summary>
+    /// copy method
+    /// </summary>
+    public int CopyMethod { get; set; }
+
+    /// <summary>
     /// Enable Auto Paste Feature
     /// </summary>
     public bool AutoPasteEnabled { get; set; } = true;
@@ -24,6 +29,11 @@ public class Settings : BaseModel
     /// Delay in milliseconds before pasting
     /// </summary>
     public int PasteDelayMs { get; set; } = 50;
+
+    /// <summary>
+    /// Auto Paste Method
+    /// </summary>
+    public int AutoPasteMethod { get; set; }
 
     /// <summary>
     /// Enable Dynamic Variables when value is {{VAR}}

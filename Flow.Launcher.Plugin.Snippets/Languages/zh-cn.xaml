@@ -80,5 +80,8 @@
     <system:String x:Key="snippets_plugin_create_time">创建时间</system:String>
     <system:String x:Key="snippets_plugin_update_time">更新时间</system:String>
     <system:String x:Key="snippets_plugin_none">(无)</system:String>
-
+    <system:String x:Key="snippets_plugin_auto_paste_delay_ms">自动粘贴延迟(毫秒)</system:String>
+    <system:String x:Key="snippets_plugin_auto_paste_method">自动粘贴方法</system:String>
+    <system:String x:Key="snippets_plugin_copy_method">复制方法</system:String>
+    
 </ResourceDictionary>
