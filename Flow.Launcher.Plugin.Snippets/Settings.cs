@@ -33,6 +33,11 @@ public class Settings : BaseModel
     public int AutoPasteMethod { get; set; }
 
     /// <summary>
+    /// Send Ctrl + V Method
+    /// </summary>
+    public int SendCtrlVMethod { get; set; }
+
+    /// <summary>
     /// Enable Dynamic Variables when value is {{VAR}}
     /// </summary>
     public bool DynamicVariables { get; set; }

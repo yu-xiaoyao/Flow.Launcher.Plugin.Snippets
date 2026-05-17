@@ -44,11 +44,31 @@ public partial class SettingPanel : UserControl
         AutoPasteConfigPanel.IsEnabled = _settings.AutoPasteEnabled;
         TbAutoPasteDelayMs.Text = $"{_settings.PasteDelayMs}";
 
-        CbAutoPasteMethod.Items.Add("0. Loop Check Flow Windows Is Hidden and Send CtrlV");
-        CbAutoPasteMethod.Items.Add("1. Check Once Flow Windows Is Hidden and Send CtrlV");
-        CbAutoPasteMethod.Items.Add("2. No Check Flow Windows Is Hidden and Send CtrlV");
-        CbAutoPasteMethod.Items.Add("3. Wait Flow Launcher VisibilityChanged and Send CtrlV");
+        var methods = AutoPasteHelper.AutoPasteMethods();
+        foreach (var method in methods)
+        {
+            CbAutoPasteMethod.Items.Add(method);
+        }
+
+        if (_settings.AutoPasteMethod >= methods.Length)
+        {
+            // reset to default
+            _settings.AutoPasteMethod = 0;
+            _publicApi.SavePluginSettings();
+        }
+
         CbAutoPasteMethod.SelectedIndex = _settings.AutoPasteMethod;
+
+
+        CbSendVMethod.Items.Add("Simple");
+        CbSendVMethod.Items.Add("Native");
+        if (_settings.SendCtrlVMethod >= 2)
+        {
+            _settings.SendCtrlVMethod = 0;
+            _publicApi.SavePluginSettings();
+        }
+
+        CbSendVMethod.SelectedIndex = _settings.SendCtrlVMethod;
     }
 
     private void ButtonOpenManage_OnClick(object sender, RoutedEventArgs e)
@@ -198,9 +218,18 @@ public partial class SettingPanel : UserControl
 
     private void CbAutoPasteMethod_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        var methods = AutoPasteHelper.AutoPasteMethods();
         var idx = CbAutoPasteMethod.SelectedIndex;
-        if (idx >= 4) return;
+        if (idx >= methods.Length) return;
         _settings.AutoPasteMethod = idx;
+        _publicApi.SavePluginSettings();
+    }
+
+    private void CbSendVMethod_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var idx = CbSendVMethod.SelectedIndex;
+        if (idx >= 2) return;
+        _settings.SendCtrlVMethod = idx;
         _publicApi.SavePluginSettings();
     }
 

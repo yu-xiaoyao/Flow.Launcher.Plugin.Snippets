@@ -157,10 +157,23 @@ public class AutoPasteHelper
     }
 
 
-    public static void AutoPasteAsync(PluginInitContext context, int autoPasteMethod, int delayMs, string text,
-        int sendMode = 0)
+    public static string[] AutoPasteMethods()
     {
-        InnerLogger.Logger.Debug($"AutoPasteAsync. method = {autoPasteMethod}, delay = {delayMs}");
+        return new[]
+        {
+            "0. Loop Check Flow Windows is Hidden and send Ctrl + V",
+            "1. Check Once Flow Windows is Hidden and send Ctrl + V",
+            "2. No Check Flow Windows is Hidden and send Ctrl + V",
+            "3. Flow Windows Visibility Changed and send Ctrl + V"
+        };
+    }
+
+
+    public static void AutoPasteAsync(PluginInitContext context, int autoPasteMethod, int delayMs, string text,
+        int sendMode)
+    {
+        InnerLogger.Logger.Debug(
+            $"AutoPasteAsync. method = {autoPasteMethod}, delay = {delayMs}, sendMode = {sendMode}");
 
         switch (autoPasteMethod)
         {
@@ -181,29 +194,19 @@ public class AutoPasteHelper
                 break;
             case 3:
                 // use callback to send CtrlV
-                CallbackCopyTime = DateTime.Now;
+                PasteHolder.SetHolder(text);
                 context.API.HideMainWindow();
                 break;
         }
     }
 
-    private static DateTime? CallbackCopyTime { get; set; }
 
     public static void OnFlowHiddenSendCtrlV(int delayMs, int sendMode = 0)
     {
-        if (CallbackCopyTime == null)
-            return;
-
-        // is copy content is too more, skip
-        if (DateTime.Now - CallbackCopyTime.Value > TimeSpan.FromSeconds(10))
+        if (PasteHolder.HasHolder())
         {
-            CallbackCopyTime = null;
-            return;
+            Task.Run(() => { SendCtrlV(delayMs, sendMode); });
         }
-
-        // reset
-        CallbackCopyTime = null;
-        Task.Run(() => { SendCtrlV(delayMs, sendMode); });
     }
 
 
@@ -241,5 +244,30 @@ public class AutoPasteHelper
         if (delayMs > 0)
             Thread.Sleep(delayMs);
         SendKeys.SendWait("^v");
+    }
+
+    private class PasteHolder
+    {
+        /// <summary>
+        /// 10 seconds expire
+        /// </summary>
+        private const int ExpireSeconds = 10;
+
+        private static DateTime? CallbackCopyTime { get; set; }
+
+        public static void SetHolder(string text)
+        {
+            CallbackCopyTime = DateTime.Now;
+        }
+
+        public static bool HasHolder()
+        {
+            if (CallbackCopyTime == null) return false;
+
+            var hasHolder = DateTime.Now - CallbackCopyTime.Value <= TimeSpan.FromSeconds(ExpireSeconds);
+            // only once, clear
+            CallbackCopyTime = null;
+            return hasHolder;
+        }
     }
 }
