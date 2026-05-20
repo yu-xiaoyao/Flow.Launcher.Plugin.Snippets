@@ -78,31 +78,45 @@
             <Label Content="{DynamicResource snippets_plugin_auto_paste_description}"
                    Margin="{StaticResource SettingPanelItemTopBottomMargin}"
                    FontStyle="Italic" VerticalAlignment="Center" />
+
         </WrapPanel>
-        
-        <WrapPanel Orientation="Horizontal" Name="AutoPasteConfigPanel">
 
-            <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
-                   Content="{DynamicResource snippets_plugin_auto_paste_delay_ms}" />
+        <WrapPanel Orientation="Vertical" Name="AutoPasteConfigPanel">
 
-            <TextBox Name="TbAutoPasteDelayMs" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
-                     Width="100"
-                     VerticalAlignment="Center"
-                     PreviewTextInput="AutoPasteDelayMsTextBox"
-                     InputMethod.IsInputMethodEnabled="False" />
+            <WrapPanel Orientation="Horizontal">
 
-            <Button Click="ButtonSaveSettings_OnClick" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
-                    VerticalAlignment="Center"
-                    Content="{DynamicResource snippets_plugin_save}" />
+                <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                       Content="{DynamicResource snippets_plugin_auto_paste_delay_ms}" />
 
-            <Border Margin="16 0 0 0" />
+                <TextBox Name="TbAutoPasteDelayMs" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                         Width="100"
+                         VerticalAlignment="Center"
+                         PreviewTextInput="AutoPasteDelayMsTextBox"
+                         InputMethod.IsInputMethodEnabled="False" />
 
-            <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
-                   Content="{DynamicResource snippets_plugin_auto_paste_method}" />
+                <Button Click="ButtonSaveSettings_OnClick"
+                        Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                        VerticalAlignment="Center"
+                        Content="{DynamicResource snippets_plugin_save}" />
 
+                <Border Margin="16 0 0 0" />
 
-            <ComboBox Name="CbAutoPasteMethod" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
-                      Width="480" VerticalAlignment="Center" SelectionChanged="CbAutoPasteMethod_OnSelectionChanged" />
+                <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                       Content="{DynamicResource snippets_plugin_auto_paste_method}" />
+
+                <ComboBox Name="CbAutoPasteMethod" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                          Width="440" VerticalAlignment="Center"
+                          SelectionChanged="CbAutoPasteMethod_OnSelectionChanged" />
+
+            </WrapPanel>
+
+            <WrapPanel Orientation="Horizontal">
+                <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                       Content="{DynamicResource snippets_plugin_auto_paste_method}" />
+
+                <ComboBox Name="CbSendVMethod" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                          Width="200" VerticalAlignment="Center" SelectionChanged="CbSendVMethod_OnSelectionChanged" />
+            </WrapPanel>
 
         </WrapPanel>
         

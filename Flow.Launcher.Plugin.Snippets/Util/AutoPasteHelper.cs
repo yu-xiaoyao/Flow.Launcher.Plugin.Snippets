@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using JetBrains.Annotations;
 
 namespace Flow.Launcher.Plugin.Snippets.Util;
 
@@ -111,7 +110,7 @@ public class AutoPasteHelper
     }
 
 
-    public static async Task PasteWhenFocusRestoredAsync(PluginInitContext context, int extraDelayMs = 50)
+    public static async Task PasteWhenFocusRestoredAsync(PluginInitContext context, int extraDelayMs, int sendMode)
     {
         try
         {
@@ -129,7 +128,7 @@ public class AutoPasteHelper
             // small extra delay to ensure target window is ready to accept input
             await Task.Delay(extraDelayMs).ConfigureAwait(false);
 
-            TrySendInputCtrlV();
+            SendCtrlV(0, sendMode);
         }
         catch (Exception ex)
         {
@@ -140,7 +139,7 @@ public class AutoPasteHelper
         }
     }
 
-    public static async Task AutoPasteAfterHideWindowsAsync(PluginInitContext context, int extraDelayMs = 50)
+    public static async Task AutoPasteAfterHideWindowsAsync(PluginInitContext context, int extraDelayMs, int sendMode)
     {
         try
         {
@@ -149,7 +148,7 @@ public class AutoPasteHelper
                 await Task.Delay(extraDelayMs).ConfigureAwait(false);
             }
 
-            TrySendInputCtrlV();
+            SendCtrlV(0, sendMode);
         }
         catch (Exception ex)
         {
@@ -157,104 +156,118 @@ public class AutoPasteHelper
         }
     }
 
-    public enum AutoPasteMethod
+
+    public static string[] AutoPasteMethods()
     {
-        HideWindows_VisibilityChangedCallback = 0,
-
-        NoHideWindows_Check_ManyTimes = 55,
-
-        HideWindows_Check_ManyTimes = 44,
-
-        HideWindows_Check_OnceTimes = 44,
-
-
-        WaitNativeSendCtrlV = 0,
-
-
-        HideAndNativeSendCtrlV = 1,
-
-        /// <summary>
-        /// My Way
-        /// </summary>
-        HideFlowAndSendCtrlV = 2,
-
-        /// <summary>
-        /// hide windows and call way 1
-        /// </summary>
-        HideFlowWaitNativeSendCtrlV = 3,
+        return new[]
+        {
+            "0. Loop Check Flow Windows is Hidden and send Ctrl + V",
+            "1. Check Once Flow Windows is Hidden and send Ctrl + V",
+            "2. No Check Flow Windows is Hidden and send Ctrl + V",
+            "3. Flow Windows Visibility Changed and send Ctrl + V"
+        };
     }
 
-    public static void AutoPasteAsync(PluginInitContext context, int autoPasteMethod, int delayMs)
+
+    public static void AutoPasteAsync(PluginInitContext context, int autoPasteMethod, int delayMs, string text,
+        int sendMode)
     {
-        InnerLogger.Logger.Debug($"AutoPasteAsync. method = {autoPasteMethod}, delay = {delayMs}");
+        InnerLogger.Logger.Debug(
+            $"AutoPasteAsync. method = {autoPasteMethod}, delay = {delayMs}, sendMode = {sendMode}");
 
         switch (autoPasteMethod)
         {
-            case (int)AutoPasteMethod.WaitNativeSendCtrlV:
-                Task.Run(() => { _ = PasteWhenFocusRestoredAsync(context, delayMs); });
-                break;
-            case (int)AutoPasteMethod.HideFlowWaitNativeSendCtrlV:
+            case 0:
+                // loop check MainWindows is hidden and send CtrlV
                 context.API.HideMainWindow();
-                Task.Run(() => { _ = PasteWhenFocusRestoredAsync(context, delayMs); });
+                Task.Run(() => { _ = PasteWhenFocusRestoredAsync(context, delayMs, sendMode); });
                 break;
-            case (int)AutoPasteMethod.HideAndNativeSendCtrlV:
+            case 1:
+                // check once MainWindows is hidden and send CtrlV
                 context.API.HideMainWindow();
-                Task.Run(() => { _ = AutoPasteAfterHideWindowsAsync(context, delayMs); });
+                Task.Run(() => { _ = AutoPasteAfterHideWindowsAsync(context, delayMs, sendMode); });
                 break;
-            case (int)AutoPasteMethod.HideFlowAndSendCtrlV:
+            case 2:
+                // no check MainWindows is hidden, only Sleep and send CtrlV
                 context.API.HideMainWindow();
+                Task.Run(() => { SendCtrlV(delayMs, sendMode); });
+                break;
+            case 3:
+                // use callback to send CtrlV
+                PasteHolder.SetHolder(text);
+                context.API.HideMainWindow();
+                break;
+        }
+    }
+
+
+    public static void OnFlowHiddenSendCtrlV(int delayMs, int sendMode = 0)
+    {
+        if (PasteHolder.HasHolder())
+        {
+            Task.Run(() => { SendCtrlV(delayMs, sendMode); });
+        }
+    }
+
+
+    public static void SendCtrlV(int delayMs, int sendMode)
+    {
+        switch (sendMode)
+        {
+            case 0:
+                // Simple 
                 SimpleAutoPaste_SendKeys(delayMs);
                 break;
-        }
-    }
-
-    public static bool IsAutoPasteEventCallbackMethod(int autoPasteMethod)
-    {
-        return autoPasteMethod is 4 or 5;
-    }
-
-    public static void AutoPasteEventCallbackAsync(int autoPasteMethod, int delayMs)
-    {
-        if (autoPasteMethod == 4)
-        {
-            SimpleAutoPaste_SendKeys(delayMs);
-        }
-        else if (autoPasteMethod == 5)
-        {
-            NativeAutoPaste_SendCtrlV(delayMs);
+            case 1:
+                // Native Win 32
+                NativeAutoPaste_SendCtrlV(delayMs);
+                break;
         }
     }
 
 
-    public static void NativeAutoPaste_SendCtrlV(int delayMs)
+    private static void NativeAutoPaste_SendCtrlV(int delayMs)
     {
-        Task.Run(() =>
+        if (delayMs > 0)
+            Thread.Sleep(delayMs);
+        try
         {
-            if (delayMs > 0)
-                Thread.Sleep(delayMs);
-            try
-            {
-                TrySendInputCtrlV();
-            }
-            catch (Exception _)
-            {
-            }
-        });
+            TrySendInputCtrlV();
+        }
+        catch (Exception _)
+        {
+        }
     }
 
-    public static void SimpleAutoPaste_SendKeys(int delayMs)
+    private static void SimpleAutoPaste_SendKeys(int delayMs)
     {
-        Task.Run(() =>
-        {
-            if (delayMs > 0)
-                Thread.Sleep(delayMs);
-            SendKeys.SendWait("^v");
-        });
+        if (delayMs > 0)
+            Thread.Sleep(delayMs);
+        SendKeys.SendWait("^v");
     }
 
-
-    public class TextHolder
+    private class PasteHolder
     {
-        [CanBeNull] public static string PasteText { set; get; }
+        /// <summary>
+        /// 10 seconds expire
+        /// </summary>
+        private const int ExpireSeconds = 10;
+
+        private static DateTime? CallbackCopyTime { get; set; }
+
+        public static void SetHolder(string text)
+        {
+            CallbackCopyTime = DateTime.Now;
+        }
+
+        public static bool HasHolder()
+        {
+            if (CallbackCopyTime == null) return false;
+
+            var hasHolder = DateTime.Now - CallbackCopyTime.Value <= TimeSpan.FromSeconds(ExpireSeconds);
+            // only once, clear
+            CallbackCopyTime = null;
+            return hasHolder;
+        }
     }
 }

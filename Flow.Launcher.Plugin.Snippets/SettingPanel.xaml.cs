@@ -42,13 +42,31 @@ public partial class SettingPanel : UserControl
         AutoPasteConfigPanel.IsEnabled = _settings.AutoPasteEnabled;
         TbAutoPasteDelayMs.Text = $"{_settings.PasteDelayMs}";
 
-        CbAutoPasteMethod.Items.Add("0. Auto Paste Method. (Default)");
-        CbAutoPasteMethod.Items.Add("1. Auto Paste Method. (Hide Flow And Usage Native Send Ctrl+V)");
-        CbAutoPasteMethod.Items.Add("2. Auto Paste Method. (Hide Flow And Usage Simple Send Ctrl+V)");
-        CbAutoPasteMethod.Items.Add("3. Auto Paste Method. (Enhanced to 0(Default))");
-        CbAutoPasteMethod.Items.Add("4. Visibility Changed. (Simple Send Ctrl+V)");
-        CbAutoPasteMethod.Items.Add("5. Visibility Changed. (Native Send Ctrl+V)");
+        var methods = AutoPasteHelper.AutoPasteMethods();
+        foreach (var method in methods)
+        {
+            CbAutoPasteMethod.Items.Add(method);
+        }
+
+        if (_settings.AutoPasteMethod >= methods.Length)
+        {
+            // reset to default
+            _settings.AutoPasteMethod = 0;
+            _context.API.SavePluginSettings();
+        }
+
         CbAutoPasteMethod.SelectedIndex = _settings.AutoPasteMethod;
+
+
+        CbSendVMethod.Items.Add("Simple");
+        CbSendVMethod.Items.Add("Native");
+        if (_settings.SendCtrlVMethod >= 2)
+        {
+            _settings.SendCtrlVMethod = 0;
+            _context.API.SavePluginSettings();
+        }
+
+        CbSendVMethod.SelectedIndex = _settings.SendCtrlVMethod;
     }
 
     private void ButtonOpenManage_OnClick(object sender, RoutedEventArgs e)
@@ -199,9 +217,18 @@ public partial class SettingPanel : UserControl
 
     private void CbAutoPasteMethod_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        var methods = AutoPasteHelper.AutoPasteMethods();
         var idx = CbAutoPasteMethod.SelectedIndex;
-        if (idx >= 6) return;
+        if (idx >= methods.Length) return;
         _settings.AutoPasteMethod = idx;
+        _context.API.SavePluginSettings();
+    }
+
+    private void CbSendVMethod_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var idx = CbSendVMethod.SelectedIndex;
+        if (idx >= 2) return;
+        _settings.SendCtrlVMethod = idx;
         _context.API.SavePluginSettings();
     }
 

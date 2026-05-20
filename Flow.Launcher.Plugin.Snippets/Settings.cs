@@ -33,12 +33,23 @@ public class Settings : BaseModel
     /// <summary>
     /// Auto Paste Method
     /// </summary>
-    public int AutoPasteMethod { get; set; }
+    public int AutoPasteMethod { get; set; } = 3;
+
+    /// <summary>
+    /// Send Ctrl + V Method
+    /// </summary>
+    public int SendCtrlVMethod { get; set; }
 
     /// <summary>
     /// Enable Dynamic Variables when value is {{VAR}}
     /// </summary>
     public bool DynamicVariables { get; set; }
+
+
+    public bool DisplayFolder { get; set; } = true;
+    public bool DisplayFolderIcon { get; set; } = true;
+
+    public bool FirstKeyPrimaryFolder { get; set; } = true;
 
     /// <summary>
     /// 1.x.x version snippets

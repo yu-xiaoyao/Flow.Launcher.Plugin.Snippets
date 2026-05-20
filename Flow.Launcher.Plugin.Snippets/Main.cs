@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using Flow.Launcher.Plugin.Snippets.Model;
 using Flow.Launcher.Plugin.Snippets.Sqlite;
 using Flow.Launcher.Plugin.Snippets.Update;
 using Flow.Launcher.Plugin.Snippets.Util;
@@ -18,6 +19,8 @@ namespace Flow.Launcher.Plugin.Snippets
         /// Result List Icon
         /// </summary>
         public static readonly string IconPath = "Images\\Snippet.png";
+
+        public static readonly string FolderIconPath = "Images\\Folder.png";
 
         private PluginInitContext _context;
         private Settings _settings;
@@ -48,10 +51,8 @@ namespace Flow.Launcher.Plugin.Snippets
 
         public List<Result> Query(Query query)
         {
-            var search = query.Search;
-
             // all data
-            if (string.IsNullOrEmpty(search))
+            if (string.IsNullOrEmpty(query.Search))
             {
                 return _snippetManage.List().Select(sm => _modelToResult(query, sm)).ToList();
             }
@@ -60,8 +61,33 @@ namespace Flow.Launcher.Plugin.Snippets
 
             var querySearchTerms = query.SearchTerms;
 
-            // fuzzy search
-            var snippets = _snippetManage.List(name: search).Select(sm => _modelToResult(query, sm)).ToList();
+            var snippetKey = query.Search;
+
+            var snippets = new List<Result>();
+            if (_settings.FirstKeyPrimaryFolder)
+            {
+                var folders = _snippetManage.ListFolders(query.FirstSearch);
+                if (folders.Count > 0)
+                {
+                    results.AddRange(folders.Select(fm => _folderToResult(query, fm)));
+                    snippetKey = query.SecondToEndSearch;
+                    if (!string.IsNullOrEmpty(snippetKey))
+                    {
+                        snippets = _snippetManage.List(name: snippetKey).Select(sm => _modelToResult(query, sm))
+                            .ToList();
+                    }
+                }
+                else
+                {
+                    // fuzzy search
+                    snippets = _snippetManage.List(name: snippetKey).Select(sm => _modelToResult(query, sm)).ToList();
+                }
+            }
+            else
+            {
+                // fuzzy search
+                snippets = _snippetManage.List(name: snippetKey).Select(sm => _modelToResult(query, sm)).ToList();
+            }
 
             if (!snippets.Any() && querySearchTerms.Length >= 2)
             {
@@ -76,12 +102,25 @@ namespace Flow.Launcher.Plugin.Snippets
         {
             var name = sm.Name;
             var value = sm.Value;
+
+            var title = name;
+            if (_settings.DisplayFolder && !string.IsNullOrEmpty(sm.FolderName))
+            {
+                var folder = "";
+                if (_settings.DisplayFolderIcon)
+                {
+                    folder = "📁";
+                }
+
+                title = $"{title} | {folder}{sm.FolderName}";
+            }
+
             return new Result
             {
-                Title = name,
+                Title = title,
                 SubTitle = value.Replace("\r\n", "  ").Replace("\n", "  "),
                 IcoPath = IconPath,
-                AutoCompleteText = $"{query.ActionKeyword} {name}",
+                AutoCompleteText = $"{query.ActionKeyword} {name} ",
                 CopyText = value,
                 ContextData = sm,
                 Preview = new Result.PreviewInfo
@@ -112,6 +151,15 @@ namespace Flow.Launcher.Plugin.Snippets
             };
         }
 
+        private Result _folderToResult(Query query, FolderModel fm)
+        {
+            return new Result()
+            {
+                Title = fm.Name,
+                IcoPath = FolderIconPath
+            };
+        }
+
         private void _copyToClipboard(string text)
         {
             switch (_settings.CopyMethod)
@@ -129,17 +177,8 @@ namespace Flow.Launcher.Plugin.Snippets
 
             if (_settings.AutoPasteEnabled)
             {
-                var autoPasteMethod = _settings.AutoPasteMethod;
-                if (AutoPasteHelper.IsAutoPasteEventCallbackMethod(autoPasteMethod))
-                {
-                    // event set value
-                    AutoPasteHelper.TextHolder.PasteText = text;
-                    _context.API.HideMainWindow();
-                }
-                else
-                {
-                    AutoPasteHelper.AutoPasteAsync(_context, autoPasteMethod, _settings.PasteDelayMs);
-                }
+                AutoPasteHelper.AutoPasteAsync(_context, _settings.AutoPasteMethod, _settings.PasteDelayMs, text,
+                    _settings.SendCtrlVMethod);
             }
         }
 
@@ -147,12 +186,7 @@ namespace Flow.Launcher.Plugin.Snippets
         {
             if (!args.IsVisible)
             {
-                if (!string.IsNullOrWhiteSpace(AutoPasteHelper.TextHolder.PasteText))
-                {
-                    // only event method set this value
-                    AutoPasteHelper.TextHolder.PasteText = null;
-                    AutoPasteHelper.AutoPasteEventCallbackAsync(_settings.AutoPasteMethod, _settings.PasteDelayMs);
-                }
+                AutoPasteHelper.OnFlowHiddenSendCtrlV(_settings.PasteDelayMs);
             }
         }
 
