@@ -417,6 +417,7 @@ public partial class SettingWindow : Window
             {
                 _snippetManage.RemoveFolderById(folder.Id);
                 _reloadFolders();
+                Snippets.Clear();
             }
         }
     }
