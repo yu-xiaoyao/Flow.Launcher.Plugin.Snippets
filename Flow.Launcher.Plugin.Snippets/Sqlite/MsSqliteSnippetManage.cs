@@ -278,7 +278,7 @@ public class MsSqliteSnippetManage : SnippetManage
     }
 
     public List<SnippetModel> List(string name = null, string value = null, bool? favorites = null,
-        long? folderId = null, string folderName = null)
+        long? folderId = null, string folderName = null, int limit = -1)
     {
         var sql = $"{QueryAllSql} where 1=1";
 
@@ -298,6 +298,8 @@ public class MsSqliteSnippetManage : SnippetManage
             sql += " and f.name like @folder_name";
 
         sql += " order by s.order_num desc";
+        if (limit > 0)
+            sql += $" limit {limit}";
 
         InnerLogger.Logger.Debug($"List.sql: {sql}");
         InnerLogger.Logger.Debug(
@@ -347,7 +349,7 @@ public class MsSqliteSnippetManage : SnippetManage
 
         sql += $" order by s.update_time desc limit {limit}";
 
-        InnerLogger.Logger.Info($"List: {sql}");
+        InnerLogger.Logger.Debug($"ListRecent: {sql}");
 
         using var connection = OpenConnection();
         using var command = new SqliteCommand(sql, connection);
@@ -440,8 +442,8 @@ public class MsSqliteSnippetManage : SnippetManage
         command.Parameters.AddWithValue("@create_time", sm.CreateTime);
         command.Parameters.AddWithValue("@update_time", sm.UpdateTime);
         command.Parameters.AddWithValue("@favorites", sm.Faviorites);
-        command.Parameters.AddWithValue("@syntax", sm.Syntax);
-        command.Parameters.AddWithValue("@folder_id", sm.FolderId);
+        command.Parameters.AddWithValue("@syntax", (object)sm.Syntax ?? DBNull.Value);
+        command.Parameters.AddWithValue("@folder_id", (object)sm.FolderId ?? DBNull.Value);
         return command.ExecuteNonQuery();
     }
 
@@ -543,8 +545,8 @@ public class MsSqliteSnippetManage : SnippetManage
         command.Parameters.AddWithValue("@name", name);
         command.Parameters.AddWithValue("@value", value);
         command.Parameters.AddWithValue("@order_num", orderNum);
-        command.Parameters.AddWithValue("@syntax", syntax);
-        command.Parameters.AddWithValue("@folder_id", folderId);
+        command.Parameters.AddWithValue("@syntax", (object)syntax ?? DBNull.Value);
+        command.Parameters.AddWithValue("@folder_id", (object)folderId ?? DBNull.Value);
         command.Parameters.AddWithValue("@favorites", favorites == null ? null : Utils.BoolToInt(favorites));
         command.Parameters.AddWithValue("@update_time", DateTimeUtil.TrimMilliseconds(DateTime.Now));
         command.Parameters.AddWithValue("@id", id);

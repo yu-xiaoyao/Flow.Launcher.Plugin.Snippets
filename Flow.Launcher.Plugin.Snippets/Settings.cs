@@ -14,7 +14,7 @@ public class Settings : BaseModel
     /// <summary>
     /// Search Mode
     /// </summary>
-    public SearchMode SearchMode { get; set; }
+    public SearchMode SearchMode { get; set; } = SearchMode.Flow_FuzzySearch;
 
     /// <summary>
     /// Enable Folder Mode
@@ -55,7 +55,7 @@ public class Settings : BaseModel
     public bool DisplayFolder { get; set; } = true;
     public bool DisplayFolderIcon { get; set; } = true;
 
-    public bool FirstKeyPrimaryFolder { get; set; } = true;
+    public bool FirstKeyPrimaryFolder { get; set; } = false;
 
     /// <summary>
     /// 1.x.x version snippets
