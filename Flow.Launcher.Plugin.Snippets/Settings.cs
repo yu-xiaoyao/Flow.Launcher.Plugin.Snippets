@@ -1,4 +1,5 @@
 ﻿using System;
+using Flow.Launcher.Plugin.Snippets.Sqlite;
 
 namespace Flow.Launcher.Plugin.Snippets;
 
@@ -9,6 +10,11 @@ public class Settings : BaseModel
     /// </summary>
     [Obsolete]
     public StorageType StorageType { get; set; } = StorageType.Sqlite;
+
+    /// <summary>
+    /// Search Mode
+    /// </summary>
+    public SearchMode SearchMode { get; set; }
 
     /// <summary>
     /// Enable Folder Mode

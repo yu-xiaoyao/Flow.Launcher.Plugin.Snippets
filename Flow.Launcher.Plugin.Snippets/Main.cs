@@ -36,17 +36,28 @@ namespace Flow.Launcher.Plugin.Snippets
 
             InnerLogger.SetAsFlowLauncherLogger(_context, LoggerLevel.DEBUG);
 
-            var pluginSettingPath = context.CurrentPluginMetadata.PluginSettingsDirectoryPath;
-
             var needUpdateDb = _settings.StorageType == StorageType.Sqlite;
 
-            _snippetManage = new SqliteSnippetManage(pluginSettingPath, needUpdateDb);
+            var pluginSettingPath = _context.CurrentPluginMetadata.PluginSettingsDirectoryPath;
+            _snippetManage = CreateSnippetManage(pluginSettingPath, needUpdateDb);
 
             // upgrade
             if (!needUpdateDb)
             {
                 _upgradeJsonToSqlite(pluginSettingPath);
             }
+        }
+
+        private SnippetManage CreateSnippetManage(string pluginSettingPath, bool needUpdateDb)
+        {
+            // _snippetManage = new SqliteSnippetManage(pluginSettingPath, needUpdateDb);
+
+            if (_settings.SearchMode == SearchMode.Flow_FuzzySearch)
+            {
+                return new MsSqliteSnippetManage(pluginSettingPath, _flowLauncherFuzzySearch, true, needUpdateDb);
+            }
+
+            return new MsSqliteSnippetManage(pluginSettingPath, needUpdate: needUpdateDb);
         }
 
         public List<Result> Query(Query query)
@@ -156,7 +167,13 @@ namespace Flow.Launcher.Plugin.Snippets
             return new Result()
             {
                 Title = fm.Name,
-                IcoPath = FolderIconPath
+                AutoCompleteText = $"{query.ActionKeyword} {fm.Name} ",
+                IcoPath = FolderIconPath,
+                Action = _ =>
+                {
+                    _context.API.ChangeQuery($"{query.ActionKeyword} {fm.Name} ", true);
+                    return false;
+                }
             };
         }
 
@@ -358,6 +375,30 @@ namespace Flow.Launcher.Plugin.Snippets
             _context.API.SavePluginSettings();
         }
 
+        /// <summary>
+        /// 自定义 Sqlite Like 函数
+        /// </summary>
+        /// <param name="pattern">like 的值</param>
+        /// <param name="value">数据库原始值</param>
+        /// <returns></returns>
+        private bool _flowLauncherFuzzySearch(string pattern, string value)
+        {
+            // 处理 NULL 值情况
+            if (pattern == null || value == null) return false;
+
+            // 2. 剥离 SQL 的 LIKE 通配符，提取纯关键字
+            // 当 SQL 执行 LIKE '%abc%' 时，传入的 pattern 实际是字符串 "%abc%"
+            // 我们通过 Trim 把首尾的 '%' 去掉，得到 "abc"
+            var keyword = pattern.Trim('%').Trim('_');
+
+            // 如果用户输入了全通配符（比如 LIKE '%'），直接返回 true
+            if (string.IsNullOrEmpty(keyword)) return true;
+
+            // InnerLogger.Logger.Debug($"MyLike: pattern: {pattern}. value: {value}.");
+
+            var match = _context.API.FuzzySearch(keyword, value);
+            return match.Success;
+        }
 
         /// <summary>
         /// v1 version is only save in Plugin Settings
