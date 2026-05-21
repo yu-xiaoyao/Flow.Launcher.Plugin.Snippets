@@ -82,7 +82,7 @@ public class MsSqliteSnippetManage : SnippetManage
     private readonly bool _isDeterministic;
 
     public MsSqliteSnippetManage(string dbDir, Func<string, string, bool> likeFunc2 = null,
-        bool isDeterministic = false, bool needUpdate = false)
+        bool isDeterministic = false)
     {
         _likeFunc2 = likeFunc2;
         _isDeterministic = isDeterministic;
@@ -90,7 +90,6 @@ public class MsSqliteSnippetManage : SnippetManage
         var dbPath = Path.Combine(dbDir, DbFileName);
         _connectionString = $"Data Source={dbPath}";
         InnerLogger.Logger.Debug($"_connectionString: {_connectionString}");
-        _initCheckTable(needUpdate);
     }
 
     private SqliteConnection OpenConnection()
@@ -108,12 +107,11 @@ public class MsSqliteSnippetManage : SnippetManage
         return connection;
     }
 
-    private void _initCheckTable(bool needUpdate)
+    public void Init(bool needUpdate)
     {
-        using var connection = OpenConnection();
-
         // Folder 
         const string queryFolder = $"SELECT name FROM sqlite_master WHERE type='table' AND name='{TABLE_NAME_FOLDER}';";
+        using var connection = OpenConnection();
         using var folderCommand = new SqliteCommand(queryFolder, connection);
         var folderResult = folderCommand.ExecuteScalar();
         if (folderResult == null)
@@ -123,6 +121,7 @@ public class MsSqliteSnippetManage : SnippetManage
             createTableCommand.ExecuteNonQuery();
         }
 
+        // Snippets
         const string query = $"SELECT name FROM sqlite_master WHERE type='table' AND name='{TABLE_NAME}';";
         using var command = new SqliteCommand(query, connection);
         var result = command.ExecuteScalar();

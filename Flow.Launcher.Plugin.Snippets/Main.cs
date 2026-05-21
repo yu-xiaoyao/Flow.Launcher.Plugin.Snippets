@@ -52,12 +52,22 @@ namespace Flow.Launcher.Plugin.Snippets
         {
             // _snippetManage = new SqliteSnippetManage(pluginSettingPath, needUpdateDb);
 
+            SnippetManage manage;
             if (_settings.SearchMode == SearchMode.Flow_FuzzySearch)
             {
-                return new MsSqliteSnippetManage(pluginSettingPath, _flowLauncherFuzzySearch, true, needUpdateDb);
+                manage = new MsSqliteSnippetManage(pluginSettingPath, _flowLauncherFuzzySearch, true);
+            }
+            else
+            {
+                manage = new MsSqliteSnippetManage(pluginSettingPath);
             }
 
-            return new MsSqliteSnippetManage(pluginSettingPath, needUpdate: needUpdateDb);
+            if (manage is MsSqliteSnippetManage msm)
+            {
+                msm.Init(needUpdateDb);
+            }
+
+            return manage;
         }
 
         public List<Result> Query(Query query)
@@ -76,7 +86,7 @@ namespace Flow.Launcher.Plugin.Snippets
             var snippetKey = query.Search;
 
             var snippets = new List<Result>();
-            if (_settings.FirstKeyPrimaryFolder)
+            if (false)
             {
                 var folders = _snippetManage.ListFolders(query.FirstSearch);
                 if (folders.Count > 0)
@@ -97,7 +107,8 @@ namespace Flow.Launcher.Plugin.Snippets
             }
             else
             {
-                _buildFolderFilterByCommand(query, results);
+                // _buildFolderFilterByCommand(query, results);
+                _test(query, results);
 
                 // fuzzy search
                 // snippets = _snippetManage.List(name: snippetKey).Select(sm => _modelToResult(query, sm)).ToList();
@@ -181,13 +192,105 @@ namespace Flow.Launcher.Plugin.Snippets
             };
         }
 
+        private void _test(Query query, List<Result> results)
+        {
+            var querySearchTerms = query.SearchTerms;
+
+            if (querySearchTerms.Length == 1 && string.Equals(":", querySearchTerms[0]))
+            {
+                // add folder type
+                results.Add(new Result
+                {
+                    Title = $"{query.ActionKeyword} :f ",
+                    IcoPath = FolderIconPath,
+                    Action = _ =>
+                    {
+                        _context.API.ChangeQuery($"{query.ActionKeyword} :f ", true);
+                        return false;
+                    }
+                });
+
+                var snippets = _snippetManage.List(name: query.Search)
+                    .Select(sm => _modelToResult(query, sm))
+                    .ToList();
+                results.AddRange(snippets);
+                return;
+            }
+
+            if (string.Equals(":f", querySearchTerms[0], StringComparison.OrdinalIgnoreCase))
+            {
+                if (querySearchTerms.Length == 2)
+                {
+                    var folderKey = querySearchTerms[1];
+                    var folders = _snippetManage.ListFolders(folderKey);
+                    results.AddRange(folders.Select(fm => new Result
+                    {
+                        Title = fm.Name,
+                        AutoCompleteText = $"{query.ActionKeyword} :f {fm.Name} ",
+                        IcoPath = FolderIconPath,
+                        Action = _ =>
+                        {
+                            _context.API.ChangeQuery($"{query.ActionKeyword} :f {fm.Name} ", true);
+                            return false;
+                        }
+                    }));
+
+                    var snippets = _snippetManage.List(name: query.Search)
+                        .Select(sm => _modelToResult(query, sm))
+                        .ToList();
+                    results.AddRange(snippets);
+                }
+                else
+                {
+                    var folderKey = querySearchTerms[1];
+                    var snippetKey = string.Join(" ", querySearchTerms[2..]);
+                    var snippets = _snippetManage.List(name: snippetKey, folderName: folderKey)
+                        .Select(sm => _modelToResult(query, sm))
+                        .ToList();
+                    results.AddRange(snippets);
+                }
+
+                return;
+            }
+            
+            
+            
+            else
+            {
+                var index = -1;
+                for (var i = 0; i < querySearchTerms.Length; i++)
+                {
+                    var key = querySearchTerms[i];
+                    if (!string.Equals(":f", key, StringComparison.OrdinalIgnoreCase)) continue;
+                    index = i;
+                    break;
+                }
+
+                if (index != -1)
+                {
+                    var snippetKey = string.Join(" ", querySearchTerms[..index]);
+                    var folderKey = string.Join(" ", querySearchTerms[(index + 1)..]);
+
+                    InnerLogger.Logger.Debug(
+                        $"SearchM3. [{query.Search}]. snippetKey: [{snippetKey}]. folderKey: [{folderKey}].");
+
+                    var snippets = _snippetManage.List(name: snippetKey, folderName: folderKey)
+                        .Select(sm => _modelToResult(query, sm))
+                        .ToList();
+                    results.AddRange(snippets);
+                }
+            }
+        }
+
         private void _buildFolderFilterByCommand(Query query, List<Result> results)
         {
             var querySearchTerms = query.SearchTerms;
-            // tip for folder
+
             if (querySearchTerms.Length == 1)
             {
-                if (string.Equals(":", querySearchTerms[0]))
+                var first = querySearchTerms[0];
+                // sp :
+                if (string.Equals(":", first))
                 {
                     // add folder type
                     results.Add(new Result
@@ -201,7 +304,9 @@ namespace Flow.Launcher.Plugin.Snippets
                         }
                     });
                 }
-                else if (string.Equals(":f", querySearchTerms[0], StringComparison.OrdinalIgnoreCase))
+
+                // // sp :f
+                if (string.Equals(":f", first, StringComparison.OrdinalIgnoreCase))
                 {
                     var folders = _snippetManage.ListFolders();
                     results.AddRange(folders.Select(fm => new Result
@@ -217,7 +322,6 @@ namespace Flow.Launcher.Plugin.Snippets
                     }));
                 }
 
-                // search all snippets
                 var snippets = _snippetManage.List(name: query.Search).Select(sm => _modelToResult(query, sm))
                     .ToList();
                 results.AddRange(snippets);
@@ -226,63 +330,45 @@ namespace Flow.Launcher.Plugin.Snippets
             {
                 if (string.Equals(":f", querySearchTerms[0], StringComparison.OrdinalIgnoreCase))
                 {
-                    var folderName = querySearchTerms[1];
-                    var folders = _snippetManage.ListFolders(folderName);
-
-                    if (folders.Count > 0)
+                    var folders = _snippetManage.ListFolders(querySearchTerms[1]);
+                    results.AddRange(folders.Select(fm => new Result
                     {
-                        results.AddRange(folders.Select(fm => new Result
+                        Title = fm.Name,
+                        AutoCompleteText = $"{query.ActionKeyword} :f {fm.Name} ",
+                        IcoPath = FolderIconPath,
+                        Action = _ =>
                         {
-                            Title = fm.Name,
-                            AutoCompleteText = $"{query.ActionKeyword} :f {fm.Name} ",
-                            IcoPath = FolderIconPath,
-                            Action = _ =>
-                            {
-                                _context.API.ChangeQuery($"{query.ActionKeyword} :f {fm.Name} ", true);
-                                return false;
-                            }
-                        }));
-                    }
+                            _context.API.ChangeQuery($"{query.ActionKeyword} :f {fm.Name} ", true);
+                            return false;
+                        }
+                    }));
                 }
 
-                // search all snippets
                 var snippets = _snippetManage.List(name: query.Search).Select(sm => _modelToResult(query, sm))
                     .ToList();
                 results.AddRange(snippets);
             }
             else
             {
-                // len >= 3
-                if (string.Equals(":f", querySearchTerms[0], StringComparison.OrdinalIgnoreCase))
-                {
-                    // :f in first
-
-                    var folderKey = querySearchTerms[1];
-                    var k = querySearchTerms[2..];
-                    var snippetKey = string.Join(" ", k);
-
-                    var snippets = _snippetManage.List(name: snippetKey, folderName: folderKey)
-                        .Select(sm => _modelToResult(query, sm))
-                        .ToList();
-                    results.AddRange(snippets);
-                }
-                else if (string.Equals(":", querySearchTerms[^1]))
+                var last = querySearchTerms[^1];
+                if (string.Equals(":", last) || string.Equals(":f", last, StringComparison.OrdinalIgnoreCase))
                 {
                     // :f in last
+                    var snippetKey = string.Join(" ", querySearchTerms[..^1]);
                     results.Add(new Result
                     {
-                        Title = $"{query.ActionKeyword} :f ",
+                        Title = $"{query.ActionKeyword} {snippetKey} :f ",
                         IcoPath = FolderIconPath,
                         Action = _ =>
                         {
-                            _context.API.ChangeQuery($"{query.ActionKeyword} :f ", true);
+                            _context.API.ChangeQuery($"{query.ActionKeyword} {snippetKey} :f ", true);
                             return false;
                         }
                     });
-                }
-                else if (string.Equals(":f", querySearchTerms[^1], StringComparison.OrdinalIgnoreCase))
-                {
-                    // : in last
+
+                    var snippets = _snippetManage.List(name: snippetKey).Select(sm => _modelToResult(query, sm))
+                        .ToList();
+                    results.AddRange(snippets);
                 }
                 else
                 {
