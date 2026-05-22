@@ -84,4 +84,12 @@
     <system:String x:Key="snippets_plugin_auto_paste_method">自动粘贴方法</system:String>
     <system:String x:Key="snippets_plugin_copy_method">复制方法</system:String>
     
+    <system:String x:Key="snippets_plugin_search_folder_mode">搜索文件夹模式</system:String>
+    <system:String x:Key="snippets_plugin_result_folder">显示文件夹</system:String>
+    <system:String x:Key="snippets_plugin_result_folder_icon">显示文件夹图标</system:String>
+    <system:String x:Key="snippets_plugin_search_folder_mode_0">禁用文件夹参数(:f)</system:String>
+    <system:String x:Key="snippets_plugin_search_folder_mode_1">自动文件夹参数(:f)</system:String>
+    <system:String x:Key="snippets_plugin_search_folder_mode_2">起始文件夹参数(:f)</system:String>
+    <system:String x:Key="snippets_plugin_search_folder_mode_3">最后文件夹参数(:f)</system:String>
+
 </ResourceDictionary>

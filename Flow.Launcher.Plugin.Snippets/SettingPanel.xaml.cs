@@ -27,6 +27,21 @@ public partial class SettingPanel : UserControl
         CheckBoxAutoPaste.IsChecked = _settings.AutoPasteEnabled;
         CheckBoxDynamicVariables.IsChecked = _settings.DynamicVariables;
 
+
+        var searchFolderModes = (SearchFolderMode[])Enum.GetValues(typeof(SearchFolderMode));
+        if ((int)_settings.SearchFolderMode >= searchFolderModes.Length)
+        {
+            _settings.SearchFolderMode = 0;
+            _context.API.SavePluginSettings();
+        }
+
+        for (var i = 0; i < searchFolderModes.Length; i++)
+            CbSearchFolderMode.Items.Add(_context.API.GetTranslation($"snippets_plugin_search_folder_mode_{i}"));
+        CbSearchFolderMode.SelectedIndex = (int)_settings.SearchFolderMode;
+
+        CbDisplayFolder.IsChecked = _settings.DisplayFolder;
+        CbDisplayFolderIcon.IsChecked = _settings.DisplayFolderIcon;
+
         _initCopyView();
     }
 
@@ -141,18 +156,42 @@ public partial class SettingPanel : UserControl
         Task.Run(() => FileUtil.WriteSnippets(file, list));
     }
 
-    private void ButtonChangeAndRestart_OnClick(object sender, RoutedEventArgs e)
+    private void CbSearchFolderMode_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        // var mode = ComboBoxStorageMode.SelectedIndex;
-        // var storageType = mode == 0 ? StorageType.JsonSetting : StorageType.Sqlite;
-        //
-        // if (storageType != _settings.StorageType)
-        // {
-        //     _settings.StorageType = storageType;
-        //     _publicApi.SavePluginSettings();
-        //     _publicApi.RestartApp();
-        // }
+        var index = CbSearchFolderMode.SelectedIndex;
+        if (Enum.IsDefined(typeof(SearchFolderMode), index))
+        {
+            _settings.SearchFolderMode = ((SearchFolderMode[])Enum.GetValues(typeof(SearchFolderMode)))[index];
+            _context.API.SavePluginSettings();
+        }
     }
+
+
+    private void DisplayFolder_Checked(object sender, RoutedEventArgs e)
+    {
+        _settings.DisplayFolder = true;
+        _context.API.SavePluginSettings();
+    }
+
+    private void DisplayFolder_Unchecked(object sender, RoutedEventArgs e)
+    {
+        _settings.DisplayFolder = false;
+        _context.API.SavePluginSettings();
+    }
+
+
+    private void DisplayFolderIcon_Checked(object sender, RoutedEventArgs e)
+    {
+        _settings.DisplayFolderIcon = true;
+        _context.API.SavePluginSettings();
+    }
+
+    private void DisplayFolderIcon_Unchecked(object sender, RoutedEventArgs e)
+    {
+        _settings.DisplayFolderIcon = false;
+        _context.API.SavePluginSettings();
+    }
+
 
     private void CheckBoxAutoPaste_Checked(object sender, RoutedEventArgs e)
     {

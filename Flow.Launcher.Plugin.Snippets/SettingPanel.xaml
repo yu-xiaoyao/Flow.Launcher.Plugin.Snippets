@@ -31,22 +31,29 @@
 
         </WrapPanel>
 
-        <!-- <WrapPanel Orientation="Horizontal">
+        <WrapPanel Orientation="Horizontal">
 
             <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
-                   Content="{DynamicResource snippets_plugin_storage_mode}" />
+                   Content="{DynamicResource snippets_plugin_search_folder_mode}" />
 
-            <ComboBox Name="ComboBoxStorageMode" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
-                      Width="200" VerticalAlignment="Center">
-                <ComboBoxItem Content="{DynamicResource snippets_plugin_storage_json_setting}" />
-                <ComboBoxItem Content="{DynamicResource snippets_plugin_storage_sqlite}" />
-            </ComboBox>
+            <ComboBox Name="CbSearchFolderMode" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                      Width="240" VerticalAlignment="Center" SelectionChanged="CbSearchFolderMode_OnSelectionChanged" />
 
-            <Button Click="ButtonChangeAndRestart_OnClick" Margin="{StaticResource SettingPanelItemTopBottomMargin}"
-                    VerticalAlignment="Center"
-                    Content="{DynamicResource snippets_plugin_change_and_restart_app}" />
+            <Border Margin="16 0 0 0" />
 
-        </WrapPanel>  -->
+            <CheckBox Name="CbDisplayFolder" Content="{DynamicResource snippets_plugin_result_folder}"
+                      Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                      VerticalAlignment="Center" Checked="DisplayFolder_Checked"
+                      Unchecked="DisplayFolder_Unchecked" />
+
+            <Border Margin="16 0 0 0" />
+
+            <CheckBox Name="CbDisplayFolderIcon" Content="{DynamicResource snippets_plugin_result_folder_icon}"
+                      Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                      VerticalAlignment="Center" Checked="DisplayFolderIcon_Checked"
+                      Unchecked="DisplayFolderIcon_Unchecked" />
+
+        </WrapPanel>
 
         <WrapPanel Orientation="Horizontal">
             <CheckBox Name="CheckBoxDynamicVariables"
@@ -68,7 +75,7 @@
 
         </WrapPanel>
 
-        
+
         <!-- Auto Paste -->
         <WrapPanel Orientation="Horizontal">
             <CheckBox Name="CheckBoxAutoPaste" Content="{DynamicResource snippets_plugin_auto_paste_enabled}"
@@ -119,7 +126,7 @@
             </WrapPanel>
 
         </WrapPanel>
-        
+
     </StackPanel>
 
 </UserControl>

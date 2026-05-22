@@ -51,17 +51,27 @@ public class Settings : BaseModel
     /// </summary>
     public bool DynamicVariables { get; set; }
 
-
     public bool DisplayFolder { get; set; } = true;
     public bool DisplayFolderIcon { get; set; } = true;
 
-    public bool FirstKeyPrimaryFolder { get; set; } = false;
+    /// <summary>
+    /// search folder mode
+    /// </summary>
+    public SearchFolderMode SearchFolderMode { get; set; }
 
     /// <summary>
     /// 1.x.x version snippets
     /// </summary>
     // [Obsolete]
     // public Dictionary<string, string> Snippets { get; set; }
+}
+
+public enum SearchFolderMode
+{
+    Disable = 0,
+    AutoFolder = 1,
+    FolderInFirst = 2,
+    FolderInLast = 3
 }
 
 public enum StorageType
