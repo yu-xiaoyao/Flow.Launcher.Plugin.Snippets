@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Flow.Launcher.Plugin.Snippets.Sqlite;
 using Flow.Launcher.Plugin.Snippets.Util;
 using Microsoft.Win32;
 
@@ -27,6 +28,10 @@ public partial class SettingPanel : UserControl
         CheckBoxAutoPaste.IsChecked = _settings.AutoPasteEnabled;
         CheckBoxDynamicVariables.IsChecked = _settings.DynamicVariables;
 
+
+        CbKeywordMatchMode.Items.Add(_context.API.GetTranslation("snippets_plugin_keyword_like"));
+        CbKeywordMatchMode.Items.Add(_context.API.GetTranslation("snippets_plugin_keyword_fuzzy"));
+        CbKeywordMatchMode.SelectedIndex = (int)_settings.KeywordMatchMode;
 
         var searchFolderModes = (SearchFolderMode[])Enum.GetValues(typeof(SearchFolderMode));
         if ((int)_settings.SearchFolderMode >= searchFolderModes.Length)
@@ -154,6 +159,18 @@ public partial class SettingPanel : UserControl
         var file = dialog.FileName;
         var list = _snippetManage.List();
         Task.Run(() => FileUtil.WriteSnippets(file, list));
+    }
+
+    private void CbKeywordMatchMode_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var index = CbKeywordMatchMode.SelectedIndex;
+        if (Enum.IsDefined(typeof(KeywordMatchMode), index))
+        {
+            var keywordMatchMode = ((KeywordMatchMode[])Enum.GetValues(typeof(KeywordMatchMode)))[index];
+            _settings.KeywordMatchMode = keywordMatchMode;
+            _snippetManage.SetKeywordMatchMode(keywordMatchMode);
+            _context.API.SavePluginSettings();
+        }
     }
 
     private void CbSearchFolderMode_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

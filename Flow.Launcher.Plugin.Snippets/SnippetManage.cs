@@ -1,11 +1,18 @@
 ﻿using System.Collections.Generic;
 using Flow.Launcher.Plugin.Snippets.Model;
+using Flow.Launcher.Plugin.Snippets.Sqlite;
 using JetBrains.Annotations;
 
 namespace Flow.Launcher.Plugin.Snippets;
 
 public interface SnippetManage
 {
+    #region Config
+
+    void SetKeywordMatchMode(KeywordMatchMode keywordMatchMode);
+
+    #endregion
+
     [CanBeNull]
     SnippetModel GetByKey(string key);
 

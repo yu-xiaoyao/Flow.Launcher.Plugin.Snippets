@@ -78,11 +78,12 @@ public class MsSqliteSnippetManage : SnippetManage
 
     private readonly string _connectionString;
 
+    private KeywordMatchMode _keywordMatchMode;
+
     private readonly Func<string, string, bool> _likeFunc2;
     private readonly bool _isDeterministic;
 
-    public MsSqliteSnippetManage(string dbDir, Func<string, string, bool> likeFunc2 = null,
-        bool isDeterministic = false)
+    public MsSqliteSnippetManage(string dbDir, Func<string, string, bool> likeFunc2, bool isDeterministic = false)
     {
         _likeFunc2 = likeFunc2;
         _isDeterministic = isDeterministic;
@@ -97,7 +98,7 @@ public class MsSqliteSnippetManage : SnippetManage
         var connection = new SqliteConnection(_connectionString);
         connection.Open();
 
-        if (_likeFunc2 != null)
+        if (_keywordMatchMode == KeywordMatchMode.Flow_FuzzySearch && _likeFunc2 != null)
         {
             // Overwrite native like Function
             // isDeterministic: true, Sqlite will cache search result
@@ -105,6 +106,11 @@ public class MsSqliteSnippetManage : SnippetManage
         }
 
         return connection;
+    }
+
+    public void SetKeywordMatchMode(KeywordMatchMode keywordMatchMode)
+    {
+        _keywordMatchMode = keywordMatchMode;
     }
 
     public void Init(bool needUpdate)

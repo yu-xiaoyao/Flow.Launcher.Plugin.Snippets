@@ -14,7 +14,7 @@ public class Settings : BaseModel
     /// <summary>
     /// Search Mode
     /// </summary>
-    public SearchMode SearchMode { get; set; } = SearchMode.Flow_FuzzySearch;
+    public KeywordMatchMode KeywordMatchMode { get; set; } = KeywordMatchMode.Sql_Like;
 
     /// <summary>
     /// Enable Folder Mode

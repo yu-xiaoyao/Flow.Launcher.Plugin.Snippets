@@ -33,11 +33,21 @@
 
         <WrapPanel Orientation="Horizontal">
 
+
+            <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                   Content="{DynamicResource snippets_plugin_keyword_match_mode}" />
+
+            <ComboBox Name="CbKeywordMatchMode" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
+                      Width="160" VerticalAlignment="Center" SelectionChanged="CbKeywordMatchMode_OnSelectionChanged" />
+
+
+            <Border Margin="16 0 0 0" />
+
             <Label VerticalAlignment="Center" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
                    Content="{DynamicResource snippets_plugin_search_folder_mode}" />
 
             <ComboBox Name="CbSearchFolderMode" Margin="{StaticResource SettingPanelItemRightTopBottomMargin}"
-                      Width="240" VerticalAlignment="Center" SelectionChanged="CbSearchFolderMode_OnSelectionChanged" />
+                      Width="200" VerticalAlignment="Center" SelectionChanged="CbSearchFolderMode_OnSelectionChanged" />
 
             <Border Margin="16 0 0 0" />
 

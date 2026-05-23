@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using Flow.Launcher.Plugin.Snippets.Model;
 using Flow.Launcher.Plugin.Snippets.Sqlite;
 using Flow.Launcher.Plugin.Snippets.Update;
 using Flow.Launcher.Plugin.Snippets.Util;
@@ -51,22 +50,9 @@ namespace Flow.Launcher.Plugin.Snippets
         private SnippetManage CreateSnippetManage(string pluginSettingPath, bool needUpdateDb)
         {
             // _snippetManage = new SqliteSnippetManage(pluginSettingPath, needUpdateDb);
-
-            SnippetManage manage;
-            if (_settings.SearchMode == SearchMode.Flow_FuzzySearch)
-            {
-                manage = new MsSqliteSnippetManage(pluginSettingPath, _flowLauncherFuzzySearch, true);
-            }
-            else
-            {
-                manage = new MsSqliteSnippetManage(pluginSettingPath);
-            }
-
-            if (manage is MsSqliteSnippetManage msm)
-            {
-                msm.Init(needUpdateDb);
-            }
-
+            var manage = new MsSqliteSnippetManage(pluginSettingPath, _flowLauncherFuzzySearch, true);
+            manage.SetKeywordMatchMode(_settings.KeywordMatchMode);
+            manage.Init(needUpdateDb);
             return manage;
         }
 

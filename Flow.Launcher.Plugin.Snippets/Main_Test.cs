@@ -38,7 +38,7 @@ public class Main_Test
     {
         const string pluginDir = "FlowLauncher\\Settings\\Plugins\\Flow.Launcher.Plugin.Snippets\\";
         var appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var sm = new MsSqliteSnippetManage($"{appDataDir}\\{pluginDir}");
+        var sm = new MsSqliteSnippetManage($"{appDataDir}\\{pluginDir}", null);
 
         // add folder 
         var folderNames = new List<string>()
@@ -77,7 +77,7 @@ public class Main_Test
 
     private static void test_sqlite_query()
     {
-        var sm = new MsSqliteSnippetManage(dbPath);
+        var sm = new MsSqliteSnippetManage(dbPath, null);
 
         var snippetModels = sm.List(name: "key1");
         foreach (var snippetModel in snippetModels)
@@ -88,7 +88,7 @@ public class Main_Test
 
     private static void test_sqlite_add()
     {
-        var sm = new MsSqliteSnippetManage(dbPath);
+        var sm = new MsSqliteSnippetManage(dbPath, null);
 
         sm.Add("key1", "value1");
         sm.Add("key2", "value2");

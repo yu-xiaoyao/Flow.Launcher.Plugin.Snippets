@@ -84,6 +84,10 @@
     <system:String x:Key="snippets_plugin_auto_paste_method">自动粘贴方法</system:String>
     <system:String x:Key="snippets_plugin_copy_method">复制方法</system:String>
     
+    <system:String x:Key="snippets_plugin_keyword_match_mode">关键词匹配模式</system:String>
+    <system:String x:Key="snippets_plugin_keyword_like">连续匹配(Like)</system:String>
+    <system:String x:Key="snippets_plugin_keyword_fuzzy">模糊匹配(Flow)</system:String>
+    
     <system:String x:Key="snippets_plugin_search_folder_mode">搜索文件夹模式</system:String>
     <system:String x:Key="snippets_plugin_result_folder">显示文件夹</system:String>
     <system:String x:Key="snippets_plugin_result_folder_icon">显示文件夹图标</system:String>

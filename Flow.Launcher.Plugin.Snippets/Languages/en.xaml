@@ -45,6 +45,7 @@
 
     <system:String x:Key="snippets_plugin_delete_snippet_info">Delete Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_open_settings">Open Settings</system:String>
+    
     <system:String x:Key="snippets_plugin_edit_item_key">Current Is Edit Mode, click to switch to Add Mode</system:String>
     <system:String x:Key="snippets_plugin_add_item_key">Current Is Add Mode</system:String>
     <system:String x:Key="snippets_plugin_manage_snippets">Manage Snippets</system:String>
@@ -83,6 +84,10 @@
     <system:String x:Key="snippets_plugin_auto_paste_method">Auto Paste Method</system:String>
     <system:String x:Key="snippets_plugin_copy_method">Copy Method</system:String>
 
+    <system:String x:Key="snippets_plugin_keyword_match_mode">Keyword Match Mode</system:String>
+    <system:String x:Key="snippets_plugin_keyword_like">Continuous matching(Like)</system:String>
+    <system:String x:Key="snippets_plugin_keyword_fuzzy">fuzzy matching(Flow)</system:String>
+    
     <system:String x:Key="snippets_plugin_search_folder_mode">Search Folder Mode</system:String>
     <system:String x:Key="snippets_plugin_result_folder">Display Folder</system:String>
     <system:String x:Key="snippets_plugin_result_folder_icon">Display Folder Icon</system:String>
