@@ -45,8 +45,6 @@ public partial class SettingWindow : Window
 
     public FolderModel FolderNo { get; set; } = new();
 
-    public bool EnableMoveSnippet { get; set; }
-
     public ObservableCollection<FolderModel> Folders { get; set; } = new();
 
     public ObservableCollection<SnippetModel> Snippets { get; set; } = new();
@@ -81,7 +79,7 @@ public partial class SettingWindow : Window
         if (ico == null) return;
         Icon = ico;
         IconImage.Source = ico;
-        
+
         // header logo
         Logo.Source = ico;
     }
@@ -148,16 +146,6 @@ public partial class SettingWindow : Window
 
                 break;
         }
-
-        if (_selectFolderId > 0 || _selectFolderId == IndexAllSnippets)
-        {
-            EnableMoveSnippet = true;
-        }
-        else
-        {
-            EnableMoveSnippet = false;
-        }
-
 
         foreach (var sm in queryList)
             Snippets.Add(sm);
@@ -529,9 +517,13 @@ public partial class SettingWindow : Window
     {
         if (DataGridSnippets.SelectedItem is SnippetModel snippet)
         {
-            // Snippets are sorted by order_num desc, so "up" in the visual list means larger order_num
-            var newOrderNum = _snippetManage.GetSnippetDownOrderNum(snippet.Id, snippet.OrderNum);
-            _updateSnippetNewOrderNum(snippet, newOrderNum);
+            if (_selectFolderId > 0 || _selectFolderId == IndexAllSnippets)
+            {
+                // Snippets are sorted by order_num desc, so "up" in the visual list means larger order_num
+                var newOrderNum = _snippetManage.GetSnippetDownOrderNum(snippet.Id, snippet.OrderNum,
+                    _selectFolderId > 0 ? _selectFolderId : null);
+                _updateSnippetNewOrderNum(snippet, newOrderNum);
+            }
         }
     }
 
@@ -539,9 +531,13 @@ public partial class SettingWindow : Window
     {
         if (DataGridSnippets.SelectedItem is SnippetModel snippet)
         {
-            // Snippets are sorted by order_num desc, so "down" in the visual list means smaller order_num
-            var newOrderNum = _snippetManage.GetSnippetUpOrderNum(snippet.Id, snippet.OrderNum);
-            _updateSnippetNewOrderNum(snippet, newOrderNum);
+            if (_selectFolderId > 0 || _selectFolderId == IndexAllSnippets)
+            {
+                // Snippets are sorted by order_num desc, so "down" in the visual list means smaller order_num
+                var newOrderNum = _snippetManage.GetSnippetUpOrderNum(snippet.Id, snippet.OrderNum,
+                    _selectFolderId > 0 ? _selectFolderId : null);
+                _updateSnippetNewOrderNum(snippet, newOrderNum);
+            }
         }
     }
 

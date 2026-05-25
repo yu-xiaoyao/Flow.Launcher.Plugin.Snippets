@@ -106,14 +106,21 @@ public partial class SettingPanel : UserControl
         fw.ShowDialog();*/
     }
 
-    private void ButtonResetScore_OnClick(object sender, RoutedEventArgs e)
+    private void ButtonResetSort_OnClick(object sender, RoutedEventArgs e)
     {
         _snippetManage.ResetAllScore();
     }
 
     private void ButtonClear_OnClick(object sender, RoutedEventArgs e)
     {
-        _snippetManage.Clear();
+        var result = _context.API.ShowMsgBox(_context.API.GetTranslation("snippets_plugin_clear_confirm"),
+            button: MessageBoxButton.YesNo, icon: MessageBoxImage.Question, defaultResult: MessageBoxResult.No);
+
+        if (result == MessageBoxResult.Yes)
+        {
+            _snippetManage.Clear();
+            _snippetManage.CleanFolders();
+        }
     }
 
     private void ButtonImport_OnClick(object sender, RoutedEventArgs e)
@@ -212,12 +219,20 @@ public partial class SettingPanel : UserControl
 
     private void CheckBoxAutoPaste_Checked(object sender, RoutedEventArgs e)
     {
+        AutoPasteDelayPanel.IsEnabled = true;
+        AutoPasteConfigPanel.IsEnabled = true;
+        
         _settings.AutoPasteEnabled = true;
         _context.API.SavePluginSettings();
+        
+        
     }
 
     private void CheckBoxAutoPaste_Unchecked(object sender, RoutedEventArgs e)
     {
+        AutoPasteDelayPanel.IsEnabled = false;
+        AutoPasteConfigPanel.IsEnabled = false;
+        
         _settings.AutoPasteEnabled = false;
         _context.API.SavePluginSettings();
     }

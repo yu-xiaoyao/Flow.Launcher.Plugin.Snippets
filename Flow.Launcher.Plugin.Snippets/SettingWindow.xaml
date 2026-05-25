@@ -370,7 +370,8 @@
 
                                     <Border Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"
                                             CornerRadius="4">
-                                        <ComboBox Width="100" FontSize="13" HorizontalAlignment="Center">
+                                        <ComboBox Width="100" FontSize="13" HorizontalAlignment="Center"
+                                                  IsEnabled="False">
                                             <ComboBoxItem Content="正常" FontSize="13" />
                                             <ComboBoxItem Content="语法" FontSize="13" />
                                         </ComboBox>
@@ -458,12 +459,10 @@
                                                 Click="DataGrid_DeleteSnippetOnClick" />
                                             <MenuItem
                                                 Header="{DynamicResource snippets_plugin_move_up}"
-                                                Click="DataGrid_MoveUpOnClick"
-                                                IsEnabled="{Binding EnableMoveSnippet}" />
+                                                Click="DataGrid_MoveUpOnClick" />
                                             <MenuItem
                                                 Header="{DynamicResource snippets_plugin_move_down}"
-                                                Click="DataGrid_MoveDownOnClick"
-                                                IsEnabled="{Binding EnableMoveSnippet}" />
+                                                Click="DataGrid_MoveDownOnClick" />
                                         </ContextMenu>
                                     </DataGrid.ContextMenu>
 

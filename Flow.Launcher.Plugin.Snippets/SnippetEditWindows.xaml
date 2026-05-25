@@ -178,7 +178,7 @@
 
 
                         <!-- SnippetName -->
-                        <TextBlock Grid.Column="2" Text="{DynamicResource snippets_plugin_snippets_key}"
+                        <TextBlock Grid.Column="2" Text="{DynamicResource snippets_plugin_snippets_name}"
                                    VerticalAlignment="Center" Margin="5 0" />
                         <Border Grid.Column="3" VerticalAlignment="Center" Margin="5 0">
                             <TextBox x:Name="TbSnippetName" FontSize="13" />

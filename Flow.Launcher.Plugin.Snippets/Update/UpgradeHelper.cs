@@ -21,7 +21,7 @@ public class UpgradeHelper
         public List<JsonSnippetModel> SnippetList { get; set; }
     }
 
-    public static void UpgradeJsonToSqlite(SnippetManage sm, string settingPath)
+    public static void UpgradeJsonToSqlite(PluginInitContext context, SnippetManage sm, string settingPath)
     {
         // v2 -> v3
         var v2JsonPath = Path.Combine(settingPath, "JsonSetting.json");
@@ -36,11 +36,12 @@ public class UpgradeHelper
                     var list = v2.SnippetList;
                     foreach (var jsm in list)
                     {
+                        var newId = IdHelper.NewId();
                         var dateTime = DateTimeUtil.TrimMilliseconds(jsm.UpdateTime ?? DateTime.Now);
-                        var score = jsm.Score ?? 0;
+                        var score = jsm.Score ?? newId;
                         var model = new SnippetModel
                         {
-                            Id = IdHelper.NewId(),
+                            Id = newId,
                             Name = jsm.Key,
                             Value = jsm.Value,
                             OrderNum = score,
@@ -49,17 +50,29 @@ public class UpgradeHelper
                         };
                         sm.Add(model);
                     }
+
+                    var tp = v2JsonPath + ".v2";
+                    if (File.Exists(tp))
+                    {
+                        File.Delete(tp);
+                    }
+
+                    if (!File.Exists(tp))
+                    {
+                        // delete success after Rename 
+                        File.Move(v2JsonPath, v2JsonPath + ".v2");
+                    }
+                }
+                else
+                {
+                    // no data delete it
+                    File.Delete(v2JsonPath);
                 }
             }
-            catch (JsonException)
+            catch (JsonException e)
             {
-            }
-
-            var tp = v2JsonPath + ".v2";
-            if (!File.Exists(tp))
-            {
-                // Rename 
-                File.Move(v2JsonPath, v2JsonPath + ".v2");
+                InnerLogger.Logger.Error($"Upgrade json storage to sqlite failed. {e.Message}");
+                context.API.ShowMsgError("Upgrade json storage to sqlite failed. ");
             }
         }
     }

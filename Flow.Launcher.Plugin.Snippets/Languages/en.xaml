@@ -41,7 +41,7 @@
     <system:String x:Key="snippets_plugin_edit_snippet_info">Edit Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_delete_snippet">Delete Snippet</system:String>
 
-    <system:String x:Key="snippets_plugin_reset_score">Reset Order Score</system:String>
+    <system:String x:Key="snippets_plugin_reset_sort">Reset Default Sort</system:String>
 
     <system:String x:Key="snippets_plugin_delete_snippet_info">Delete Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_open_settings">Open Settings</system:String>
@@ -60,6 +60,7 @@
     <system:String x:Key="snippets_plugin_export">Export</system:String>
     <system:String x:Key="snippets_plugin_import">Import</system:String>
     <system:String x:Key="snippets_plugin_clear">Clear All Data</system:String>
+    <system:String x:Key="snippets_plugin_clear_confirm">Confirm clearing all data?</system:String>
     <system:String x:Key="snippets_plugin_storage_mode">Storage Mode</system:String>
     <system:String x:Key="snippets_plugin_change_and_restart_app">Change And Restart App</system:String>
     <system:String x:Key="snippets_plugin_storage_json_setting">Json, Simple, Light</system:String>

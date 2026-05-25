@@ -87,10 +87,10 @@ public interface SnippetManage
     #region Snippet Order Operations
 
     [CanBeNull]
-    long? GetSnippetUpOrderNum(long id, long orderNum);
+    long? GetSnippetUpOrderNum(long id, long orderNum, long? folderId = null);
 
     [CanBeNull]
-    long? GetSnippetDownOrderNum(long id, long orderNum);
+    long? GetSnippetDownOrderNum(long id, long orderNum, long? folderId = null);
 
     [CanBeNull]
     long? GetSnippetMinOrderNum(long id);

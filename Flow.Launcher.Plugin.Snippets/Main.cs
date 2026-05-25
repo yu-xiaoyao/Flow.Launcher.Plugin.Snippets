@@ -84,7 +84,6 @@ namespace Flow.Launcher.Plugin.Snippets
                 case SearchFolderMode.FolderInLast:
                     _matchWithFolderOrSnippetLast(query, results);
                     break;
-
                 default:
                     // fuzzy search
                     snippets = _snippetManage.List(name: snippetKey).Select(sm => _modelToResult(query, sm)).ToList();
@@ -214,29 +213,6 @@ namespace Flow.Launcher.Plugin.Snippets
             _snippetManage.Add(name, value);
         }
 
-        /*
-        private Result _updateSnippets(Query query, string name, string value)
-        {
-            return new Result
-            {
-                Title = _context.API.GetTranslation("snippets_plugin_update"),
-                SubTitle = string.Format(_context.API.GetTranslation("snippets_plugin_update_info"), name, value),
-                IcoPath = IconPath,
-                Action = c =>
-                {
-                    _update(name, value);
-                    _context.API.ChangeQuery($"{query.ActionKeyword} {name}", true);
-                    return false;
-                }
-            };
-        }
-
-        private void _update(string key, string value)
-        {
-            // _snippetManage.UpdateSnippetById(key, value: value);
-        }
-        */
-
         public List<Result> LoadContextMenus(Result selectedResult)
         {
             var menus = new List<Result>();
@@ -325,20 +301,6 @@ namespace Flow.Launcher.Plugin.Snippets
             _snippetManage.Close();
         }
 
-        private List<Result> _buildEmpty(Query query)
-        {
-            return new List<Result>
-            {
-                new()
-                {
-                    Title = _context.API.GetTranslation("snippets_plugin_snippets_empty"),
-                    SubTitle = _context.API.GetTranslation("snippets_plugin_snippets_empty_add"),
-                    IcoPath = IconPath,
-                    AutoCompleteText = $"{query.ActionKeyword} "
-                }
-            };
-        }
-
         /// <summary>
         /// upgrade v2 -> v3
         /// </summary>
@@ -346,7 +308,7 @@ namespace Flow.Launcher.Plugin.Snippets
         private void _upgradeJsonToSqlite(string pluginSettingPath)
         {
             // merge to Sqlite
-            UpgradeHelper.UpgradeJsonToSqlite(_snippetManage, pluginSettingPath);
+            UpgradeHelper.UpgradeJsonToSqlite(_context, _snippetManage, pluginSettingPath);
             _settings.StorageType = StorageType.Sqlite;
             _context.API.SavePluginSettings();
         }
@@ -376,9 +338,7 @@ namespace Flow.Launcher.Plugin.Snippets
             return match.Success;
         }
 
-        #region Search Filter With Folder
-
-        //TODO not good code, todo opt
+        #region Search Filter With Folder not good code, todo opt
 
         private void _matchWithFolderOrSnippetFirst(Query query, List<Result> results)
         {

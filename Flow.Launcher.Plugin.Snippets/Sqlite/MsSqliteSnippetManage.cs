@@ -102,7 +102,14 @@ public class MsSqliteSnippetManage : SnippetManage
         {
             // Overwrite native like Function
             // isDeterministic: true, Sqlite will cache search result
-            connection.CreateFunction("like", _likeFunc2, _isDeterministic);
+            try
+            {
+                connection.CreateFunction("like", _likeFunc2, _isDeterministic);
+            }
+            catch (Exception e)
+            {
+                InnerLogger.Logger.Error($"Sqlite.CreateFunction. {e.Message}", e);
+            }
         }
 
         return connection;
@@ -569,7 +576,7 @@ public class MsSqliteSnippetManage : SnippetManage
 
     public void ResetAllScore()
     {
-        const string sql = $"update {TABLE_NAME} set score = 0";
+        const string sql = $"update {TABLE_NAME} set order_num = id";
         using var connection = OpenConnection();
         using var command = new SqliteCommand(sql, connection);
         command.ExecuteNonQuery();
@@ -761,27 +768,38 @@ public class MsSqliteSnippetManage : SnippetManage
         command.ExecuteNonQuery();
     }
 
-    public long? GetSnippetUpOrderNum(long id, long orderNum)
+    public long? GetSnippetUpOrderNum(long id, long orderNum, long? folderId = null)
     {
-        const string sql =
-            $"select order_num - 1 from {TABLE_NAME} where order_num < @order_num order by order_num desc limit 1";
+        var folderWhere = "";
+        if (folderId != null)
+            folderWhere = "folder_id = @folder_id and";
+        var sql =
+            $"select order_num - 1 from {TABLE_NAME} where {folderWhere} order_num < @order_num order by order_num desc limit 1";
         using var connection = OpenConnection();
 
         using var command = new SqliteCommand(sql, connection);
         command.Parameters.AddWithValue("@order_num", orderNum);
+        if (folderId != null)
+            command.Parameters.AddWithValue("@folder_id", folderId);
 
         using var reader = command.ExecuteReader();
         return reader.Read() ? reader.GetInt64(0) : null;
     }
 
-    public long? GetSnippetDownOrderNum(long id, long orderNum)
+    public long? GetSnippetDownOrderNum(long id, long orderNum, long? folderId = null)
     {
-        const string sql =
-            $"select order_num + 1 from {TABLE_NAME} where order_num > @order_num order by order_num asc limit 1";
+        var folderWhere = "";
+        if (folderId != null)
+            folderWhere = "folder_id = @folder_id and";
+        var sql =
+            $"select order_num + 1 from {TABLE_NAME} where {folderWhere} order_num > @order_num order by order_num asc limit 1";
         using var connection = OpenConnection();
 
         using var command = new SqliteCommand(sql, connection);
         command.Parameters.AddWithValue("@order_num", orderNum);
+        if (folderId != null)
+            command.Parameters.AddWithValue("@folder_id", folderId);
+
 
         using var reader = command.ExecuteReader();
         return reader.Read() ? reader.GetInt64(0) : null;
