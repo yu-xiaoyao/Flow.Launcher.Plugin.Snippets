@@ -445,22 +445,35 @@
                                           IsReadOnly="True"
                                           CanUserAddRows="False"
                                           CanUserDeleteRows="True"
-                                          SelectionMode="Single"
+                                          SelectionMode="Extended"
+                                          SelectionUnit="FullRow"
                                           HeadersVisibility="Column"
                                           GridLinesVisibility="Horizontal"
-                                          MouseDoubleClick="DataGridSnippets_MouseDoubleClick">
+                                          MouseDoubleClick="DataGridSnippets_MouseDoubleClick"
+                                          ContextMenuOpening="DataGridSnippets_OnContextMenuOpening">
+
+                                    <DataGrid.CommandBindings>
+                                        <CommandBinding Command="Delete"
+                                                        CanExecute="DataGridSnippetsCommandBinding_OnCanExecute"
+                                                        Executed="DataGridSnippetsCommandBinding_OnExecuted" />
+                                    </DataGrid.CommandBindings>
+
                                     <DataGrid.ContextMenu>
-                                        <ContextMenu>
+                                        <ContextMenu x:Name="SnippetContextMenu">
                                             <MenuItem
+                                                x:Name="SnippetContextMenuEdit"
                                                 Header="{DynamicResource snippets_plugin_edit}"
                                                 Click="DataGrid_EditSnippetOnClick" />
                                             <MenuItem
+                                                x:Name="SnippetContextMenuDelete"
                                                 Header="{DynamicResource snippets_plugin_delete}"
                                                 Click="DataGrid_DeleteSnippetOnClick" />
                                             <MenuItem
+                                                x:Name="SnippetContextMenuMoveUp"
                                                 Header="{DynamicResource snippets_plugin_move_up}"
                                                 Click="DataGrid_MoveUpOnClick" />
                                             <MenuItem
+                                                x:Name="SnippetContextMenuMoveDown"
                                                 Header="{DynamicResource snippets_plugin_move_down}"
                                                 Click="DataGrid_MoveDownOnClick" />
                                         </ContextMenu>

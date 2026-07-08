@@ -179,6 +179,59 @@ public partial class SettingWindow : Window
 
     #region All Snippets Events
 
+    private void DataGridSnippets_OnContextMenuOpening(object sender, ContextMenuEventArgs e)
+    {
+        var selectedCount = DataGridSnippets.SelectedItems.Count;
+        // 场景 A：如果用户点在了空白处，一行都没选，直接拦截事件，不弹菜单
+        if (selectedCount == 0)
+        {
+            e.Handled = true; // 意思是“事件已处理”，系统就不会再弹出菜单了
+            return;
+        }
+
+        // 场景 B：只选中了 1 行
+        if (selectedCount == 1)
+        {
+            SnippetContextMenuEdit.IsEnabled = true;
+            SnippetContextMenuDelete.IsEnabled = true;
+            SnippetContextMenuMoveUp.IsEnabled = true;
+            SnippetContextMenuMoveDown.IsEnabled = true;
+        }
+        // 场景 C：选中了多行
+        else
+        {
+            SnippetContextMenuEdit.IsEnabled = false;
+            SnippetContextMenuDelete.IsEnabled = true;
+            SnippetContextMenuMoveUp.IsEnabled = false;
+            SnippetContextMenuMoveDown.IsEnabled = false;
+        }
+    }
+
+    private void DataGridSnippetsCommandBinding_OnCanExecute(object sender, CanExecuteRoutedEventArgs e)
+    {
+        e.CanExecute = DataGridSnippets.SelectedItems.Count > 0;
+        e.Handled = true;
+    }
+
+    private void DataGridSnippetsCommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+    {
+        var selectedItems = DataGridSnippets.SelectedItems;
+        if (selectedItems.Count > 0)
+        {
+            foreach (var selectedItem in selectedItems)
+            {
+                if (selectedItem is SnippetModel snippet)
+                {
+                    _snippetManage.RemoveSnippetById(snippet.Id);
+                }
+            }
+
+            _loadSnippets();
+        }
+
+        e.Handled = true;
+    }
+
     private void AllSnippetsFolder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         AllSnippetsFolderClick();
@@ -506,11 +559,23 @@ public partial class SettingWindow : Window
 
     private void DataGrid_DeleteSnippetOnClick(object sender, RoutedEventArgs e)
     {
-        if (DataGridSnippets.SelectedItem is SnippetModel snippet)
+        var selectedItems = DataGridSnippets.SelectedItems;
+        if (selectedItems.Count <= 0) return;
+        foreach (var selectedItem in selectedItems)
         {
-            _snippetManage.RemoveSnippetById(snippet.Id);
-            _loadSnippets();
+            if (selectedItem is SnippetModel snippet)
+            {
+                _snippetManage.RemoveSnippetById(snippet.Id);
+            }
         }
+
+        _loadSnippets();
+
+        // if (DataGridSnippets.SelectedItem is SnippetModel snippet)
+        // {
+        //     _snippetManage.RemoveSnippetById(snippet.Id);
+        //     _loadSnippets();
+        // }
     }
 
     private void DataGrid_MoveUpOnClick(object sender, RoutedEventArgs e)
