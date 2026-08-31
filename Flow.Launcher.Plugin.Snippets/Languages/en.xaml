@@ -97,4 +97,11 @@
     <system:String x:Key="snippets_plugin_search_folder_mode_2">First Folder Filter(:f)</system:String>
     <system:String x:Key="snippets_plugin_search_folder_mode_3">Last Folder Filter(:f)</system:String>
 
+    <system:String x:Key="snippets_plugin_section_data">Data</system:String>
+    <system:String x:Key="snippets_plugin_section_search">Search &amp; Display</system:String>
+    <system:String x:Key="snippets_plugin_section_copy_paste">Copy &amp; Paste</system:String>
+    <system:String x:Key="snippets_plugin_section_variables">Dynamic Variables</system:String>
+    <system:String x:Key="snippets_plugin_send_ctrl_v_method">Simulate Ctrl+V Method</system:String>
+    <system:String x:Key="snippets_plugin_danger_hint">Danger zone:</system:String>
+
 </ResourceDictionary>

@@ -97,4 +97,11 @@
     <system:String x:Key="snippets_plugin_search_folder_mode_2">起始文件夹参数(:f)</system:String>
     <system:String x:Key="snippets_plugin_search_folder_mode_3">最后文件夹参数(:f)</system:String>
 
+    <system:String x:Key="snippets_plugin_section_data">数据管理</system:String>
+    <system:String x:Key="snippets_plugin_section_search">搜索与显示</system:String>
+    <system:String x:Key="snippets_plugin_section_copy_paste">复制与粘贴</system:String>
+    <system:String x:Key="snippets_plugin_section_variables">动态变量</system:String>
+    <system:String x:Key="snippets_plugin_send_ctrl_v_method">模拟 Ctrl+V 方式</system:String>
+    <system:String x:Key="snippets_plugin_danger_hint">危险操作:</system:String>
+
 </ResourceDictionary>
