@@ -4,12 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
-             d:DesignHeight="900" d:DesignWidth="760">
+             d:DesignHeight="800" d:DesignWidth="760">
 
     <UserControl.Resources>
         <!-- 组标题 -->
         <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="13" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Foreground" Value="{DynamicResource PopupTextColor}" />
         </Style>
@@ -31,8 +31,8 @@
     <StackPanel Margin="{StaticResource SettingPanelMargin}" MaxWidth="760" HorizontalAlignment="Left">
 
         <!-- ==================== ① 数据管理 ==================== -->
-        <StackPanel Margin="0,0,0,28">
-            <Grid Margin="0,0,0,8">
+        <StackPanel Margin="0,0,0,18">
+            <Grid Margin="0,0,0,6">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3" />
                     <ColumnDefinition Width="*" />
@@ -41,99 +41,74 @@
                 <TextBlock Grid.Column="1" Margin="8,0,0,0" Style="{StaticResource SectionTitleStyle}"
                            Text="{DynamicResource snippets_plugin_section_data}" />
             </Grid>
-            <Border Height="1" Background="{DynamicResource Color06B}" Margin="0,0,0,14" />
+            <Border Height="1" Background="{DynamicResource Color06B}" Margin="0,0,0,6" />
 
             <!-- 常规操作 -->
             <StackPanel Orientation="Horizontal">
-                <Button Click="ButtonOpenManage_OnClick" Margin="0,0,12,0" Padding="14,6" VerticalAlignment="Center">
+                <Button Click="ButtonOpenManage_OnClick" Margin="0,0,6,0" Padding="12,4" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A7;" Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A7;" Margin="0,0,6,0" VerticalAlignment="Center" />
                         <TextBlock Text="{DynamicResource snippets_plugin_manage_snippets}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
-                <Button Click="ButtonExport_OnClick" Margin="0,0,12,0" Padding="14,6" VerticalAlignment="Center">
+                <Button Click="ButtonExport_OnClick" Margin="0,0,6,0" Padding="12,4" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8B6;" Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8B6;" Margin="0,0,6,0" VerticalAlignment="Center" />
                         <TextBlock Text="{DynamicResource snippets_plugin_export}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
-                <Button Click="ButtonImport_OnClick" Margin="0,0,12,0" Padding="14,6" VerticalAlignment="Center">
+                <Button Click="ButtonImport_OnClick" Margin="0,0,6,0" Padding="12,4" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8B5;" Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8B5;" Margin="0,0,6,0" VerticalAlignment="Center" />
                         <TextBlock Text="{DynamicResource snippets_plugin_import}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
             </StackPanel>
 
             <!-- 危险操作:与常规操作分隔开 -->
-            <Border Height="1" Background="{DynamicResource Color06B}" Margin="0,14" />
+            <Border Height="1" Background="{DynamicResource Color06B}" Margin="0,8" />
 
             <StackPanel Orientation="Horizontal">
                 <TextBlock Style="{StaticResource DescriptionTextStyle}" VerticalAlignment="Center"
-                           Margin="0,0,12,0" Text="{DynamicResource snippets_plugin_danger_hint}" />
-                <Button Click="ButtonResetSort_OnClick" Margin="0,0,12,0" Padding="14,6" VerticalAlignment="Center">
+                           Margin="0,0,6,0" Text="{DynamicResource snippets_plugin_danger_hint}" />
+                <Button Click="ButtonResetSort_OnClick" Margin="0,0,6,0" Padding="12,4" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE72C;" Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE72C;" Margin="0,0,6,0" VerticalAlignment="Center" />
                         <TextBlock Text="{DynamicResource snippets_plugin_reset_sort}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
-                <Button Click="ButtonClear_OnClick" Margin="0,0,12,0" Padding="14,6" VerticalAlignment="Center">
+                <Button Click="ButtonClear_OnClick" Margin="0,0,6,0" Padding="12,4" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" Margin="0,0,6,0" VerticalAlignment="Center" />
                         <TextBlock Text="{DynamicResource snippets_plugin_clear}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
             </StackPanel>
         </StackPanel>
-
-        <!-- ==================== ② 搜索与显示 ==================== -->
-        <StackPanel Margin="0,0,0,28">
-            <Grid Margin="0,0,0,8">
+        
+        <!-- ==================== ② 动态变量 ==================== -->
+        <StackPanel Margin="0,0,0,18">
+            <Grid Margin="0,0,0,6">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Border Grid.Column="0" Background="{DynamicResource Color18B}" CornerRadius="1.5" />
                 <TextBlock Grid.Column="1" Margin="8,0,0,0" Style="{StaticResource SectionTitleStyle}"
-                           Text="{DynamicResource snippets_plugin_section_search}" />
+                           Text="{DynamicResource snippets_plugin_section_variables}" />
             </Grid>
-            <Border Height="1" Background="{DynamicResource Color06B}" Margin="0,0,0,14" />
+            <Border Height="1" Background="{DynamicResource Color06B}" Margin="0,0,0,6" />
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="220" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,8" Style="{StaticResource SettingLabelStyle}"
-                           Text="{DynamicResource snippets_plugin_keyword_match_mode}" />
-                <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,8" Width="280" HorizontalAlignment="Left"
-                          Name="CbKeywordMatchMode" SelectionChanged="CbKeywordMatchMode_OnSelectionChanged" />
-
-                <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,8" Style="{StaticResource SettingLabelStyle}"
-                           Text="{DynamicResource snippets_plugin_search_folder_mode}" />
-                <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,8" Width="280" HorizontalAlignment="Left"
-                          Name="CbSearchFolderMode" SelectionChanged="CbSearchFolderMode_OnSelectionChanged" />
-
-                <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8"
-                          Name="CbDisplayFolder" Content="{DynamicResource snippets_plugin_result_folder}"
-                          Checked="DisplayFolder_Checked" Unchecked="DisplayFolder_Unchecked" />
-
-                <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8"
-                          Name="CbDisplayFolderIcon" Content="{DynamicResource snippets_plugin_result_folder_icon}"
-                          Checked="DisplayFolderIcon_Checked" Unchecked="DisplayFolderIcon_Unchecked" />
-            </Grid>
+            <CheckBox Name="CheckBoxDynamicVariables"
+                      Content="{DynamicResource snippets_plugin_enable_dynamic_variables}"
+                      Checked="CheckBoxDynamicVariables_Checked" Unchecked="CheckBoxDynamicVariables_Unchecked" />
+            <TextBlock Margin="24,4,0,0" Style="{StaticResource DescriptionTextStyle}"
+                       Text="{DynamicResource snippets_plugin_enable_dynamic_variables_desc}" />
         </StackPanel>
 
         <!-- ==================== ③ 复制与粘贴 ==================== -->
-        <StackPanel Margin="0,0,0,28">
-            <Grid Margin="0,0,0,8">
+        <StackPanel Margin="0,0,0,18">
+            <Grid Margin="0,0,0,6">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3" />
                     <ColumnDefinition Width="*" />
@@ -142,7 +117,7 @@
                 <TextBlock Grid.Column="1" Margin="8,0,0,0" Style="{StaticResource SectionTitleStyle}"
                            Text="{DynamicResource snippets_plugin_section_copy_paste}" />
             </Grid>
-            <Border Height="1" Background="{DynamicResource Color06B}" Margin="0,0,0,14" />
+            <Border Height="1" Background="{DynamicResource Color06B}" Margin="0,0,0,6" />
 
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -156,15 +131,15 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,8" Style="{StaticResource SettingLabelStyle}"
+                <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,4" Style="{StaticResource SettingLabelStyle}"
                            Text="{DynamicResource snippets_plugin_copy_method}" />
-                <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,8" Width="280" HorizontalAlignment="Left"
+                <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,4" Width="280" HorizontalAlignment="Left"
                           Name="ComboBoxCopyMethod" SelectionChanged="ComboBoxCopyMethod_OnSelectionChanged" />
 
-                <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8"
+                <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,4"
                           Name="CheckBoxAutoPaste" Content="{DynamicResource snippets_plugin_auto_paste_enabled}"
                           Checked="CheckBoxAutoPaste_Checked" Unchecked="CheckBoxAutoPaste_Unchecked" />
-                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8" Style="{StaticResource DescriptionTextStyle}"
+                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,6" Style="{StaticResource DescriptionTextStyle}"
                            Text="{DynamicResource snippets_plugin_auto_paste_description}" />
 
                 <!-- 自动粘贴子项:缩进,开关关闭时随 IsEnabled 整体置灰 -->
@@ -180,19 +155,19 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,8" Style="{StaticResource SettingLabelStyle}"
+                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,4" Style="{StaticResource SettingLabelStyle}"
                                    Text="{DynamicResource snippets_plugin_auto_paste_method}" />
-                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,8" Width="360" HorizontalAlignment="Left"
+                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,4" Width="360" HorizontalAlignment="Left"
                                   Name="CbAutoPasteMethod" SelectionChanged="CbAutoPasteMethod_OnSelectionChanged" />
 
-                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,8" Style="{StaticResource SettingLabelStyle}"
+                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,4" Style="{StaticResource SettingLabelStyle}"
                                    Text="{DynamicResource snippets_plugin_send_ctrl_v_method}" />
-                        <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,8" Width="200" HorizontalAlignment="Left"
+                        <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,4" Width="200" HorizontalAlignment="Left"
                                   Name="CbSendVMethod" SelectionChanged="CbSendVMethod_OnSelectionChanged" />
 
                         <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Name="AutoPasteDelayPanel"
-                                    Orientation="Horizontal" Margin="0,8,0,0">
-                            <TextBlock Style="{StaticResource SettingLabelStyle}" Margin="0,0,12,0"
+                                    Orientation="Horizontal" Margin="0,4,0,0">
+                            <TextBlock Style="{StaticResource SettingLabelStyle}" Margin="0,0,6,0"
                                        Text="{DynamicResource snippets_plugin_auto_paste_delay_ms}" />
                             <TextBox Name="TbAutoPasteDelayMs" Width="100" VerticalAlignment="Center"
                                      PreviewTextInput="AutoPasteDelayMsTextBox"
@@ -205,26 +180,52 @@
                 </StackPanel>
             </Grid>
         </StackPanel>
-
-        <!-- ==================== ④ 动态变量 ==================== -->
+        
+        <!-- ==================== ④ 搜索与显示 ==================== -->
         <StackPanel>
-            <Grid Margin="0,0,0,8">
+            <Grid Margin="0,0,0,6">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Border Grid.Column="0" Background="{DynamicResource Color18B}" CornerRadius="1.5" />
                 <TextBlock Grid.Column="1" Margin="8,0,0,0" Style="{StaticResource SectionTitleStyle}"
-                           Text="{DynamicResource snippets_plugin_section_variables}" />
+                           Text="{DynamicResource snippets_plugin_section_search}" />
             </Grid>
-            <Border Height="1" Background="{DynamicResource Color06B}" Margin="0,0,0,14" />
+            <Border Height="1" Background="{DynamicResource Color06B}" Margin="0,0,0,6" />
 
-            <CheckBox Name="CheckBoxDynamicVariables"
-                      Content="{DynamicResource snippets_plugin_enable_dynamic_variables}"
-                      Checked="CheckBoxDynamicVariables_Checked" Unchecked="CheckBoxDynamicVariables_Unchecked" />
-            <TextBlock Margin="24,6,0,0" Style="{StaticResource DescriptionTextStyle}"
-                       Text="{DynamicResource snippets_plugin_enable_dynamic_variables_desc}" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="220" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,4" Style="{StaticResource SettingLabelStyle}"
+                           Text="{DynamicResource snippets_plugin_keyword_match_mode}" />
+                <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,4" Width="280" HorizontalAlignment="Left"
+                          Name="CbKeywordMatchMode" SelectionChanged="CbKeywordMatchMode_OnSelectionChanged" />
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,4" Style="{StaticResource SettingLabelStyle}"
+                           Text="{DynamicResource snippets_plugin_search_folder_mode}" />
+                <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,4" Width="280" HorizontalAlignment="Left"
+                          Name="CbSearchFolderMode" SelectionChanged="CbSearchFolderMode_OnSelectionChanged" />
+
+                <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,4"
+                          Name="CbDisplayFolder" Content="{DynamicResource snippets_plugin_result_folder}"
+                          Checked="DisplayFolder_Checked" Unchecked="DisplayFolder_Unchecked" />
+
+                <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,4"
+                          Name="CbDisplayFolderIcon" Content="{DynamicResource snippets_plugin_result_folder_icon}"
+                          Checked="DisplayFolderIcon_Checked" Unchecked="DisplayFolderIcon_Unchecked" />
+            </Grid>
         </StackPanel>
+        
 
     </StackPanel>
 </UserControl>

@@ -45,7 +45,18 @@ public partial class SettingPanel : UserControl
         CbSearchFolderMode.SelectedIndex = (int)_settings.SearchFolderMode;
 
         CbDisplayFolder.IsChecked = _settings.DisplayFolder;
-        CbDisplayFolderIcon.IsChecked = _settings.DisplayFolderIcon;
+        if (_settings.DisplayFolder)
+        {
+            CbDisplayFolderIcon.IsChecked = _settings.DisplayFolderIcon;
+            CbDisplayFolderIcon.IsEnabled = true;
+        }
+        else
+        {
+            // 显示文件夹 未勾选时, 显示文件夹图标 强制取消并禁用
+            CbDisplayFolderIcon.IsChecked = false;
+            CbDisplayFolderIcon.IsEnabled = false;
+            _settings.DisplayFolderIcon = false;
+        }
 
         _initCopyView();
     }
@@ -194,12 +205,16 @@ public partial class SettingPanel : UserControl
     private void DisplayFolder_Checked(object sender, RoutedEventArgs e)
     {
         _settings.DisplayFolder = true;
+        CbDisplayFolderIcon.IsEnabled = true;
         _context.API.SavePluginSettings();
     }
 
     private void DisplayFolder_Unchecked(object sender, RoutedEventArgs e)
     {
         _settings.DisplayFolder = false;
+        // 显示文件夹取消勾选时, 显示文件夹图标一并取消且不可勾选
+        CbDisplayFolderIcon.IsChecked = false;
+        CbDisplayFolderIcon.IsEnabled = false;
         _context.API.SavePluginSettings();
     }
 

@@ -90,8 +90,8 @@
     <system:String x:Key="snippets_plugin_keyword_fuzzy">fuzzy matching(Flow)</system:String>
     
     <system:String x:Key="snippets_plugin_search_folder_mode">Search Folder Mode</system:String>
-    <system:String x:Key="snippets_plugin_result_folder">Display Folder</system:String>
-    <system:String x:Key="snippets_plugin_result_folder_icon">Display Folder Icon</system:String>
+    <system:String x:Key="snippets_plugin_result_folder">Result Show Folder Name</system:String>
+    <system:String x:Key="snippets_plugin_result_folder_icon">Result Show Folder Icon</system:String>
     <system:String x:Key="snippets_plugin_search_folder_mode_0">Disable Folder Filter(:f)</system:String>
     <system:String x:Key="snippets_plugin_search_folder_mode_1">Auto Folder Filter(:f)</system:String>
     <system:String x:Key="snippets_plugin_search_folder_mode_2">First Folder Filter(:f)</system:String>

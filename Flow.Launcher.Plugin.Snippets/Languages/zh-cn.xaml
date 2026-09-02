@@ -90,8 +90,8 @@
     <system:String x:Key="snippets_plugin_keyword_fuzzy">模糊匹配(Flow)</system:String>
     
     <system:String x:Key="snippets_plugin_search_folder_mode">搜索文件夹模式</system:String>
-    <system:String x:Key="snippets_plugin_result_folder">显示文件夹</system:String>
-    <system:String x:Key="snippets_plugin_result_folder_icon">显示文件夹图标</system:String>
+    <system:String x:Key="snippets_plugin_result_folder">结果显示文件夹名称</system:String>
+    <system:String x:Key="snippets_plugin_result_folder_icon">结果显示文件夹图标</system:String>
     <system:String x:Key="snippets_plugin_search_folder_mode_0">禁用文件夹参数(:f)</system:String>
     <system:String x:Key="snippets_plugin_search_folder_mode_1">自动文件夹参数(:f)</system:String>
     <system:String x:Key="snippets_plugin_search_folder_mode_2">起始文件夹参数(:f)</system:String>

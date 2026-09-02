@@ -9,7 +9,7 @@ namespace Flow.Launcher.Plugin.Snippets.Sqlite;
 
 public class MsSqliteSnippetManage : SnippetManage
 {
-    public const string DbFileName = "snippets.db";
+    public const string DbFileName = "snippets3.db";
 
     /**
     * version match plugin version

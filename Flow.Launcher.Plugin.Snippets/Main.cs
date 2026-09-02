@@ -5,6 +5,7 @@ using System.Windows;
 using Flow.Launcher.Plugin.Snippets.Sqlite;
 using Flow.Launcher.Plugin.Snippets.Update;
 using Flow.Launcher.Plugin.Snippets.Util;
+using JetBrains.Annotations;
 using Control = System.Windows.Controls.Control;
 
 namespace Flow.Launcher.Plugin.Snippets
@@ -62,7 +63,16 @@ namespace Flow.Launcher.Plugin.Snippets
             if (string.IsNullOrEmpty(query.Search))
             {
                 // return _snippetManage.List().Select(sm => _modelToResult(query, sm)).ToList();
-                return _snippetManage.ListRecent().Select(sm => _modelToResult(query, sm)).ToList();
+                var allSnips = _snippetManage.ListRecent();
+                if (allSnips.Count == 0)
+                {
+                    return new List<Result>
+                    {
+                        _buildManageResult(query)
+                    };
+                }
+
+                return allSnips.Select(sm => _modelToResult(query, sm)).ToList();
             }
 
             var results = new List<Result>();
@@ -87,11 +97,10 @@ namespace Flow.Launcher.Plugin.Snippets
                 default:
                     // fuzzy search
                     snippets = _snippetManage.List(name: snippetKey).Select(sm => _modelToResult(query, sm)).ToList();
-                    if (!snippets.Any() && querySearchTerms.Length >= 2)
-                    {
-                        _appendSnippets(query, snippets);
-                    }
-
+                    // if (!snippets.Any() && querySearchTerms.Length >= 2)
+                    // {
+                    //     _appendSnippets(query, snippets);
+                    // }
                     break;
             }
 
@@ -207,6 +216,21 @@ namespace Flow.Launcher.Plugin.Snippets
             }
         }
 
+        private Result _buildManageResult([CanBeNull] Query query = null)
+        {
+            return new Result
+            {
+                Title = _context.API.GetTranslation("snippets_plugin_manage_snippets"),
+                IcoPath = IconPath,
+                AutoCompleteText = query == null ? "" : $"{query.ActionKeyword} {query.Search}",
+                Action = _ =>
+                {
+                    SettingWindow.Show(_context, _snippetManage);
+                    return true;
+                }
+            };
+        }
+
 
         private void _add(string name, string value)
         {
@@ -249,16 +273,8 @@ namespace Flow.Launcher.Plugin.Snippets
                     },
                 });
 
-                menus.Add(new Result
-                {
-                    Title = _context.API.GetTranslation("snippets_plugin_manage_snippets"),
-                    IcoPath = IconPath,
-                    Action = _ =>
-                    {
-                        SettingWindow.Show(_context, _snippetManage);
-                        return true;
-                    },
-                });
+                // open manage panel
+                menus.Add(_buildManageResult());
 
                 // open Add Snippet Dialog
                 menus.Add(new Result
