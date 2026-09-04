@@ -149,7 +149,7 @@ public partial class SnippetEditWindows : Window
 
         if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(value))
         {
-            MessageBox.Show("Name and Value are required.");
+            MessageBox.Show(_context.API.GetTranslation("snippets_plugin_name_value_not_empty"));
             return;
         }
 

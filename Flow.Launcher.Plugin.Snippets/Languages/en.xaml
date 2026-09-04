@@ -40,6 +40,7 @@
     <system:String x:Key="snippets_plugin_update_info">Update Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_edit_snippet_info">Edit Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_delete_snippet">Delete Snippet</system:String>
+    <system:String x:Key="snippets_plugin_name_value_not_empty">Name and Value can not be empty</system:String>
 
     <system:String x:Key="snippets_plugin_reset_sort">Reset Default Sort</system:String>
 
@@ -61,10 +62,7 @@
     <system:String x:Key="snippets_plugin_import">Import</system:String>
     <system:String x:Key="snippets_plugin_clear">Clear All Data</system:String>
     <system:String x:Key="snippets_plugin_clear_confirm">Confirm clearing all data?</system:String>
-    <system:String x:Key="snippets_plugin_storage_mode">Storage Mode</system:String>
     <system:String x:Key="snippets_plugin_change_and_restart_app">Change And Restart App</system:String>
-    <system:String x:Key="snippets_plugin_storage_json_setting">Json, Simple, Light</system:String>
-    <system:String x:Key="snippets_plugin_storage_sqlite">Sqlite, Large Data</system:String>
     <system:String x:Key="snippets_plugin_select_json_file">Select Json File</system:String>
     <system:String x:Key="snippets_plugin_save_json_file">Save Json File</system:String>
     <system:String x:Key="snippets_plugin_error">Error</system:String>

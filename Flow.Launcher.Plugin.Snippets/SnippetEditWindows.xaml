@@ -57,7 +57,7 @@
                     VerticalAlignment="Center"
                     FontSize="12"
                     Foreground="{DynamicResource Color05B}"
-                    Text="{DynamicResource snippets_plugin_manage_snippets}" />
+                    Text="{DynamicResource snippets_plugin_add_snippet}" />
 
 
                 <Button

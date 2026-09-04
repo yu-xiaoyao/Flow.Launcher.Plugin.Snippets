@@ -40,6 +40,7 @@
     <system:String x:Key="snippets_plugin_update_info">更新 Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_edit_snippet_info">编辑 Snippet. {0} = {1}</system:String>
     <system:String x:Key="snippets_plugin_delete_snippet">删除 Snippet</system:String>
+    <system:String x:Key="snippets_plugin_name_value_not_empty">名称和内容不能为空</system:String>
 
     <system:String x:Key="snippets_plugin_reset_sort">重置到默认排序</system:String>
 
@@ -61,10 +62,7 @@
     <system:String x:Key="snippets_plugin_import">导入</system:String>
     <system:String x:Key="snippets_plugin_clear">清空所有数据</system:String>
     <system:String x:Key="snippets_plugin_clear_confirm">确定清空所有数据?</system:String>
-    <system:String x:Key="snippets_plugin_storage_mode">存储模式</system:String>
     <system:String x:Key="snippets_plugin_change_and_restart_app">修改并重启应用</system:String>
-    <system:String x:Key="snippets_plugin_storage_json_setting">Json,简单,轻量</system:String>
-    <system:String x:Key="snippets_plugin_storage_sqlite">Sqlite,大量数据</system:String>
     <system:String x:Key="snippets_plugin_select_json_file">选择 Json 文件</system:String>
     <system:String x:Key="snippets_plugin_save_json_file">保存 Json 文件</system:String>
     <system:String x:Key="snippets_plugin_error">错误</system:String>
