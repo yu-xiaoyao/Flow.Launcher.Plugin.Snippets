@@ -120,6 +120,19 @@ public class MsSqliteSnippetManage : SnippetManage
         _keywordMatchMode = keywordMatchMode;
     }
 
+    /// <summary>
+    /// LIKE 条件片段，配套 <see cref="LikePattern.Contains"/> 使用。
+    ///
+    /// Sql_Like 模式由 SQLite 内置实现处理，必须加 <c>ESCAPE</c> 子句转义才会生效；
+    /// Flow_FuzzySearch 模式下的 like 已在 <see cref="OpenConnection"/> 里被换成自定义函数，
+    /// 而 SQLite 遇到 <c>ESCAPE</c> 会去调三参数版本 like(x,y,z)，从而**绕过**自定义函数
+    /// （退回内置 LIKE），所以这里不加 ESCAPE，由自定义函数自己反转义。
+    /// </summary>
+    private string LikeCondition(string column, string parameter) =>
+        _keywordMatchMode == KeywordMatchMode.Sql_Like
+            ? $"{column} like {parameter}{LikePattern.EscapeClause}"
+            : $"{column} like {parameter}";
+
     public void Init(bool needUpdate)
     {
         // Folder 
@@ -295,10 +308,10 @@ public class MsSqliteSnippetManage : SnippetManage
         var sql = $"{QueryAllSql} where 1=1";
 
         if (!string.IsNullOrEmpty(name))
-            sql += " and s.name like @name";
+            sql += $" and {LikeCondition("s.name", "@name")}";
 
         if (!string.IsNullOrEmpty(value))
-            sql += " and s.value like @value";
+            sql += $" and {LikeCondition("s.value", "@value")}";
 
         if (favorites != null)
             sql += " and s.favorites = @favorites";
@@ -307,7 +320,7 @@ public class MsSqliteSnippetManage : SnippetManage
             sql += " and f.id = @folder_id";
 
         if (!string.IsNullOrEmpty(folderName))
-            sql += " and f.name like @folder_name";
+            sql += $" and {LikeCondition("f.name", "@folder_name")}";
 
         sql += " order by s.order_num desc";
         if (limit > 0)
@@ -321,10 +334,10 @@ public class MsSqliteSnippetManage : SnippetManage
         using var command = new SqliteCommand(sql, connection);
 
         if (!string.IsNullOrEmpty(name))
-            command.Parameters.AddWithValue("@name", $"%{name}%");
+            command.Parameters.AddWithValue("@name", LikePattern.Contains(name));
 
         if (!string.IsNullOrEmpty(value))
-            command.Parameters.AddWithValue("@value", $"%{value}%");
+            command.Parameters.AddWithValue("@value", LikePattern.Contains(value));
 
         if (favorites != null)
             command.Parameters.AddWithValue("@favorites", Utils.BoolToInt(favorites));
@@ -333,7 +346,7 @@ public class MsSqliteSnippetManage : SnippetManage
             command.Parameters.AddWithValue("@folder_id", folderId);
 
         if (!string.IsNullOrEmpty(folderName))
-            command.Parameters.AddWithValue("@folder_name", $"%{folderName}%");
+            command.Parameters.AddWithValue("@folder_name", LikePattern.Contains(folderName));
 
         using var reader = command.ExecuteReader();
         var result = new List<SnippetModel>();
@@ -351,13 +364,13 @@ public class MsSqliteSnippetManage : SnippetManage
         var sql = $"{QueryAllSql} where 1=1";
 
         if (!string.IsNullOrEmpty(name))
-            sql += " and s.name like @name";
+            sql += $" and {LikeCondition("s.name", "@name")}";
 
         if (!string.IsNullOrEmpty(value))
-            sql += " and s.value like @value";
+            sql += $" and {LikeCondition("s.value", "@value")}";
 
         if (!string.IsNullOrEmpty(folderName))
-            sql += " and f.name like @folder_name";
+            sql += $" and {LikeCondition("f.name", "@folder_name")}";
 
         sql += $" order by s.update_time desc limit {limit}";
 
@@ -367,13 +380,13 @@ public class MsSqliteSnippetManage : SnippetManage
         using var command = new SqliteCommand(sql, connection);
 
         if (!string.IsNullOrEmpty(name))
-            command.Parameters.AddWithValue("@name", $"%{name}%");
+            command.Parameters.AddWithValue("@name", LikePattern.Contains(name));
 
         if (!string.IsNullOrEmpty(value))
-            command.Parameters.AddWithValue("@value", $"%{value}%");
+            command.Parameters.AddWithValue("@value", LikePattern.Contains(value));
 
         if (!string.IsNullOrEmpty(folderName))
-            command.Parameters.AddWithValue("@folder_name", $"%{folderName}%");
+            command.Parameters.AddWithValue("@folder_name", LikePattern.Contains(folderName));
 
         using var reader = command.ExecuteReader();
         var result = new List<SnippetModel>();
@@ -390,10 +403,10 @@ public class MsSqliteSnippetManage : SnippetManage
         var sql = $"{QueryAllSql} where 1=1";
 
         if (!string.IsNullOrEmpty(name))
-            sql += " and s.name like @name";
+            sql += $" and {LikeCondition("s.name", "@name")}";
 
         if (!string.IsNullOrEmpty(value))
-            sql += " and s.value like @value";
+            sql += $" and {LikeCondition("s.value", "@value")}";
 
         sql += " and f.id is null order by s.order_num desc";
 
@@ -403,10 +416,10 @@ public class MsSqliteSnippetManage : SnippetManage
         using var command = new SqliteCommand(sql, connection);
 
         if (!string.IsNullOrEmpty(name))
-            command.Parameters.AddWithValue("@name", $"%{name}%");
+            command.Parameters.AddWithValue("@name", LikePattern.Contains(name));
 
         if (!string.IsNullOrEmpty(value))
-            command.Parameters.AddWithValue("@value", $"%{value}%");
+            command.Parameters.AddWithValue("@value", LikePattern.Contains(value));
 
         using var reader = command.ExecuteReader();
         var result = new List<SnippetModel>();
@@ -687,7 +700,9 @@ public class MsSqliteSnippetManage : SnippetManage
     public List<FolderModel> ListFolders(string name = null)
     {
         var isEmptyQuery = string.IsNullOrEmpty(name);
-        var sql = isEmptyQuery ? $"{FolderQueryAllSql}" : $"{FolderQueryAllSql} where name like @name";
+        var sql = isEmptyQuery
+            ? $"{FolderQueryAllSql}"
+            : $"{FolderQueryAllSql} where {LikeCondition("name", "@name")}";
 
         sql = $"{sql} order by order_num";
 
@@ -697,7 +712,7 @@ public class MsSqliteSnippetManage : SnippetManage
 
         using var command = new SqliteCommand(sql, connection);
         if (!isEmptyQuery)
-            command.Parameters.AddWithValue("@name", $"%{name}%");
+            command.Parameters.AddWithValue("@name", LikePattern.Contains(name));
 
         var folders = new List<FolderModel>();
         using var reader = command.ExecuteReader();
