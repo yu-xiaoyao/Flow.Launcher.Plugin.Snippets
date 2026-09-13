@@ -75,40 +75,52 @@ namespace Flow.Launcher.Plugin.Snippets
                 return allSnips.Select(sm => _modelToResult(query, sm)).ToList();
             }
 
-            var results = new List<Result>();
+            var mode = _settings.SearchFolderMode;
 
-            var querySearchTerms = query.SearchTerms;
-
-            var snippetKey = query.Search;
-
-            var snippets = new List<Result>();
-
-            switch (_settings.SearchFolderMode)
+            // 禁用文件夹过滤时 :f 不生效，整串当作 Snippet 名字搜索
+            if (mode == SearchFolderMode.Disable)
             {
-                case SearchFolderMode.AutoFolder:
-                    _matchWithFolderOrSnippetAuto(query, results);
-                    break;
-                case SearchFolderMode.FolderInFirst:
-                    _matchWithFolderOrSnippetFirst(query, results);
-                    break;
-                case SearchFolderMode.FolderInLast:
-                    _matchWithFolderOrSnippetLast(query, results);
-                    break;
-                default:
-                    // fuzzy search
-                    snippets = _snippetManage.List(name: snippetKey).Select(sm => _modelToResult(query, sm)).ToList();
-                    // if (!snippets.Any() && querySearchTerms.Length >= 2)
-                    // {
-                    //     _appendSnippets(query, snippets);
-                    // }
-                    break;
+                return _snippetManage.List(name: query.Search)
+                    .Select(sm => _modelToResult(query, sm))
+                    .ToList();
             }
 
-            results.AddRange(snippets);
+            var results = new List<Result>();
+            var folderQuery = FolderQuery.Parse(query.SearchTerms);
+
+            // 打了 : / :f 但还没输入 Folder 名 -> 列出候选文件夹，Tab 可直接补全
+            if (folderQuery.Kind == FolderParamKind.Incomplete)
+            {
+                _appendFolderResults(query, results, folderQuery);
+                if (folderQuery.HasSnippetKey)
+                {
+                    results.AddRange(_snippetManage.List(name: folderQuery.SnippetKey)
+                        .Select(sm => _modelToResult(query, sm, folderQuery)));
+                }
+
+                return results;
+            }
+
+            // 当前模式不支持用户写的 :f 位置 -> 明确提示，不要像以前那样静默返回空列表
+            if (!_acceptsFolderParam(folderQuery.Kind, mode))
+            {
+                results.Add(_buildFolderParamMismatchResult(folderQuery.Kind, mode));
+                return results;
+            }
+
+            // 只给了 Folder 没给 Snippet 关键字时，顺便列出候选文件夹（Tab 可补全）
+            if (folderQuery.HasFolderKey && !folderQuery.HasSnippetKey)
+            {
+                _appendFolderResults(query, results, folderQuery);
+            }
+
+            results.AddRange(_snippetManage.List(name: folderQuery.SnippetKey, folderName: folderQuery.FolderKey)
+                .Select(sm => _modelToResult(query, sm, folderQuery)));
+
             return results;
         }
 
-        private Result _modelToResult(Query query, SnippetModel sm)
+        private Result _modelToResult(Query query, SnippetModel sm, [CanBeNull] FolderQuery folderQuery = null)
         {
             var name = sm.Name;
             var value = sm.Value;
@@ -125,12 +137,17 @@ namespace Flow.Launcher.Plugin.Snippets
                 title = $"{title} | {folder}{sm.FolderName}";
             }
 
+            // 带上 :f <Folder> 上下文，Tab 补全后不会丢掉文件夹过滤
+            var autoCompleteText = folderQuery == null || folderQuery.Kind == FolderParamKind.None
+                ? $"{query.ActionKeyword} {name} "
+                : $"{query.ActionKeyword} {folderQuery.Render(name, sm.FolderName)}";
+
             return new Result
             {
                 Title = title,
                 SubTitle = value.Replace("\r\n", "  ").Replace("\n", "  "),
                 IcoPath = IconPath,
-                AutoCompleteText = $"{query.ActionKeyword} {name} ",
+                AutoCompleteText = autoCompleteText,
                 CopyText = value,
                 ContextData = sm,
                 Preview = new Result.PreviewInfo
@@ -340,289 +357,76 @@ namespace Flow.Launcher.Plugin.Snippets
             // 处理 NULL 值情况
             if (pattern == null || value == null) return false;
 
-            // 2. 剥离 SQL 的 LIKE 通配符，提取纯关键字
-            // 当 SQL 执行 LIKE '%abc%' 时，传入的 pattern 实际是字符串 "%abc%"
-            // 我们通过 Trim 把首尾的 '%' 去掉，得到 "abc"
-            var keyword = pattern.Trim('%').Trim('_');
+            // 参数化时 LikePattern 会把用户输入里的 % _ \ 转义，这里还原成原始关键字。
+            // 不能用 Trim('%')：像 "100\%" 这种转义序列的结尾 % 会被一起吃掉。
+            var keyword = LikePattern.ParseContains(pattern);
 
-            // 如果用户输入了全通配符（比如 LIKE '%'），直接返回 true
+            // 如果用户输入的是空关键字（比如 LIKE '%%'），直接返回 true
             if (string.IsNullOrEmpty(keyword)) return true;
-
-            // InnerLogger.Logger.Debug($"MyLike: pattern: {pattern}. value: {value}.");
 
             var match = _context.API.FuzzySearch(keyword, value);
             return match.Success;
         }
 
-        #region Search Filter With Folder not good code, todo opt
-
-        private void _matchWithFolderOrSnippetFirst(Query query, List<Result> results)
+        /// <summary>
+        /// 当前 <see cref="SearchFolderMode"/> 是否接受这种 <c>:f</c> 位置。
+        /// 被拒绝的位置不返回空列表，而是给出提示，避免用户以为「搜不到」。
+        /// </summary>
+        private static bool _acceptsFolderParam(FolderParamKind kind, SearchFolderMode mode)
         {
-            var querySearchTerms = query.SearchTerms;
-            if (querySearchTerms.Length == 1 && string.Equals(":", querySearchTerms[0]))
+            return mode switch
             {
+                SearchFolderMode.FolderInFirst => kind is FolderParamKind.None or FolderParamKind.First,
+                SearchFolderMode.FolderInLast => kind is FolderParamKind.None or FolderParamKind.Last,
+                SearchFolderMode.AutoFolder =>
+                    kind is FolderParamKind.None or FolderParamKind.First or FolderParamKind.Last,
+                _ => kind == FolderParamKind.None,
+            };
+        }
+
+        /// <summary>
+        /// 追加候选文件夹。选中后会把 Folder 名按当前 <c>:f</c> 位置补进查询。
+        /// </summary>
+        private void _appendFolderResults(Query query, List<Result> results, FolderQuery folderQuery)
+        {
+            var folders = _snippetManage.ListFolders(folderQuery.HasFolderKey ? folderQuery.FolderKey : null);
+            foreach (var folderModel in folders)
+            {
+                var name = folderModel.Name;
+                var completeText = $"{query.ActionKeyword} {folderQuery.RenderWithFolder(name)}";
+
                 results.Add(new Result
                 {
-                    Title = $"{query.ActionKeyword} :f ",
+                    Title = name,
+                    AutoCompleteText = completeText,
                     IcoPath = FolderIconPath,
                     Action = _ =>
                     {
-                        _context.API.ChangeQuery($"{query.ActionKeyword} :f ", true);
+                        _context.API.ChangeQuery(completeText, true);
                         return false;
                     }
                 });
-
-                InnerLogger.Logger.Debug($"FolderFirst. [{query.Search}].");
-
-                var snippets = _snippetManage.List(name: query.Search)
-                    .Select(sm => _modelToResult(query, sm))
-                    .ToList();
-                results.AddRange(snippets);
-            }
-            else
-            {
-                var folderKey = "";
-                var snippetKey = "";
-                if (string.Equals(":f", querySearchTerms[0], StringComparison.OrdinalIgnoreCase))
-                {
-                    if (querySearchTerms.Length == 1)
-                    {
-                        var folders = _snippetManage.ListFolders();
-                        results.AddRange(folders.Select(fm => new Result
-                        {
-                            Title = fm.Name,
-                            AutoCompleteText = $"{query.ActionKeyword} :f {fm.Name} ",
-                            IcoPath = FolderIconPath,
-                            Action = _ =>
-                            {
-                                _context.API.ChangeQuery($"{query.ActionKeyword} :f {fm.Name} ", true);
-                                return false;
-                            }
-                        }));
-                        return;
-                    }
-                    else
-                    {
-                        folderKey = querySearchTerms[1];
-                        if (querySearchTerms.Length > 1)
-                            snippetKey = string.Join(" ", querySearchTerms[2..]);
-                    }
-                }
-                else
-                {
-                    snippetKey = query.Search;
-                }
-
-                InnerLogger.Logger.Debug($"FolderFirst. [{folderKey}]. [{snippetKey}]");
-
-                var snippets = _snippetManage.List(name: snippetKey, folderName: folderKey)
-                    .Select(sm => _modelToResult(query, sm))
-                    .ToList();
-                results.AddRange(snippets);
             }
         }
 
-        private void _matchWithFolderOrSnippetLast(Query query, List<Result> results)
+        /// <summary>
+        /// 用户写的 <c>:f</c> 位置和当前模式不匹配时的提示项。
+        /// </summary>
+        private Result _buildFolderParamMismatchResult(FolderParamKind kind, SearchFolderMode mode)
         {
-            var querySearchTerms = query.SearchTerms;
+            var current = _context.API.GetTranslation($"snippets_plugin_search_folder_mode_{(int)mode}");
+            var expected = _context.API.GetTranslation(kind == FolderParamKind.First
+                ? "snippets_plugin_folder_param_form_last"
+                : "snippets_plugin_folder_param_form_first");
 
-            var snippetKey = query.Search;
-            var folderKey = "";
-            if (querySearchTerms.Length > 1)
+            return new Result
             {
-                if (string.Equals(":", querySearchTerms[^1]) ||
-                    string.Equals(":f", querySearchTerms[^1], StringComparison.OrdinalIgnoreCase))
-                {
-                    snippetKey = string.Join(" ", querySearchTerms[..^1]);
-                    results.Add(new Result
-                    {
-                        Title = $"{query.ActionKeyword} {snippetKey} :f ",
-                        IcoPath = FolderIconPath,
-                        Action = _ =>
-                        {
-                            _context.API.ChangeQuery($"{query.ActionKeyword} {snippetKey} :f ", true);
-                            return false;
-                        }
-                    });
-                }
-                else
-                {
-                    var index = -1;
-                    for (var i = 0; i < querySearchTerms.Length; i++)
-                    {
-                        var key = querySearchTerms[i];
-                        if (!string.Equals(":f", key, StringComparison.OrdinalIgnoreCase)) continue;
-                        index = i;
-                        break;
-                    }
-
-                    if (index != -1)
-                    {
-                        snippetKey = string.Join(" ", querySearchTerms[..index]);
-                        folderKey = string.Join(" ", querySearchTerms[(index + 1)..]);
-                    }
-                }
-            }
-
-            InnerLogger.Logger.Debug($"FolderLast. [{folderKey}]. [{snippetKey}]");
-
-            var snippets = _snippetManage.List(name: snippetKey, folderName: folderKey)
-                .Select(sm => _modelToResult(query, sm))
-                .ToList();
-            results.AddRange(snippets);
+                Title = _context.API.GetTranslation("snippets_plugin_folder_param_mismatch"),
+                SubTitle = string.Format(
+                    _context.API.GetTranslation("snippets_plugin_folder_param_mismatch_info"), current, expected),
+                IcoPath = FolderIconPath,
+                Action = _ => false,
+            };
         }
-
-        private void _matchWithFolderOrSnippetAuto(Query query, List<Result> results)
-        {
-            var querySearchTerms = query.SearchTerms;
-
-            if (querySearchTerms.Length == 1)
-            {
-                if (string.Equals(":", querySearchTerms[0]))
-                {
-                    // add folder type
-                    results.Add(new Result
-                    {
-                        Title = $"{query.ActionKeyword} :f ",
-                        IcoPath = FolderIconPath,
-                        Action = _ =>
-                        {
-                            _context.API.ChangeQuery($"{query.ActionKeyword} :f ", true);
-                            return false;
-                        }
-                    });
-                }
-
-                if (string.Equals(":f", querySearchTerms[0], StringComparison.OrdinalIgnoreCase))
-                {
-                    var folders = _snippetManage.ListFolders();
-                    results.AddRange(folders.Select(fm => new Result
-                    {
-                        Title = fm.Name,
-                        AutoCompleteText = $"{query.ActionKeyword} :f {fm.Name} ",
-                        IcoPath = FolderIconPath,
-                        Action = _ =>
-                        {
-                            _context.API.ChangeQuery($"{query.ActionKeyword} :f {fm.Name} ", true);
-                            return false;
-                        }
-                    }));
-                }
-
-                var snippets = _snippetManage.List(name: query.Search)
-                    .Select(sm => _modelToResult(query, sm))
-                    .ToList();
-                results.AddRange(snippets);
-                return;
-            }
-
-            if (querySearchTerms.Length == 2)
-            {
-                if (string.Equals(":f", querySearchTerms[0], StringComparison.OrdinalIgnoreCase))
-                {
-                    var folders = _snippetManage.ListFolders(querySearchTerms[1]);
-                    results.AddRange(folders.Select(fm => new Result
-                    {
-                        Title = fm.Name,
-                        AutoCompleteText = $"{query.ActionKeyword} :f {fm.Name} ",
-                        IcoPath = FolderIconPath,
-                        Action = _ =>
-                        {
-                            _context.API.ChangeQuery($"{query.ActionKeyword} :f {fm.Name} ", true);
-                            return false;
-                        }
-                    }));
-
-                    // folder in first 
-                    var snippets = _snippetManage.List(name: query.Search)
-                        .Select(sm => _modelToResult(query, sm))
-                        .ToList();
-                    results.AddRange(snippets);
-                }
-                else if (string.Equals(":f", querySearchTerms[1], StringComparison.OrdinalIgnoreCase))
-                {
-                    // folder in last
-                    var snippets = _snippetManage.List(name: querySearchTerms[0])
-                        .Select(sm => _modelToResult(query, sm))
-                        .ToList();
-                    results.AddRange(snippets);
-                }
-                else
-                {
-                    var snippets = _snippetManage.List(name: query.Search)
-                        .Select(sm => _modelToResult(query, sm))
-                        .ToList();
-                    results.AddRange(snippets);
-                }
-
-                return;
-            }
-
-            // > 3
-            if (string.Equals(":f", querySearchTerms[0], StringComparison.OrdinalIgnoreCase))
-            {
-                // folder in first
-                var snippetKey = string.Join(" ", querySearchTerms[2..]);
-                var snippets = _snippetManage.List(name: snippetKey, folderName: querySearchTerms[1])
-                    .Select(sm => _modelToResult(query, sm))
-                    .ToList();
-                results.AddRange(snippets);
-            }
-            else if (string.Equals(":", querySearchTerms[^1]) ||
-                     string.Equals(":f", querySearchTerms[^1], StringComparison.OrdinalIgnoreCase))
-            {
-                // folder in last
-                var snippetKey = string.Join(" ", querySearchTerms[..^1]);
-                results.Add(new Result
-                {
-                    Title = $"{query.ActionKeyword} {snippetKey} :f ",
-                    IcoPath = FolderIconPath,
-                    Action = _ =>
-                    {
-                        _context.API.ChangeQuery($"{query.ActionKeyword} {snippetKey} :f ", true);
-                        return false;
-                    }
-                });
-
-                var snippets = _snippetManage.List(name: snippetKey)
-                    .Select(sm => _modelToResult(query, sm))
-                    .ToList();
-                results.AddRange(snippets);
-            }
-            else
-            {
-                var index = -1;
-                for (var i = 0; i < querySearchTerms.Length; i++)
-                {
-                    var key = querySearchTerms[i];
-                    if (!string.Equals(":f", key, StringComparison.OrdinalIgnoreCase)) continue;
-                    index = i;
-                    break;
-                }
-
-                if (index == -1)
-                {
-                    var snippets = _snippetManage.List(name: query.Search)
-                        .Select(sm => _modelToResult(query, sm))
-                        .ToList();
-                    results.AddRange(snippets);
-                }
-                else
-                {
-                    var snippetKey = string.Join(" ", querySearchTerms[..index]);
-                    var folderKey = string.Join(" ", querySearchTerms[(index + 1)..]);
-
-                    InnerLogger.Logger.Debug(
-                        $"SearchM3. [{query.Search}]. snippetKey: [{snippetKey}]. folderKey: [{folderKey}].");
-
-                    var snippets = _snippetManage.List(name: snippetKey, folderName: folderKey)
-                        .Select(sm => _modelToResult(query, sm))
-                        .ToList();
-                    results.AddRange(snippets);
-                }
-            }
-        }
-
-        #endregion
     }
 }

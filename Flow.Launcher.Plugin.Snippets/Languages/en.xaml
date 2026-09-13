@@ -94,6 +94,10 @@
     <system:String x:Key="snippets_plugin_search_folder_mode_1">Auto Folder Filter(:f)</system:String>
     <system:String x:Key="snippets_plugin_search_folder_mode_2">First Folder Filter(:f)</system:String>
     <system:String x:Key="snippets_plugin_search_folder_mode_3">Last Folder Filter(:f)</system:String>
+    <system:String x:Key="snippets_plugin_folder_param_mismatch">Search Folder Mode Mismatch</system:String>
+    <system:String x:Key="snippets_plugin_folder_param_mismatch_info">Current mode: {0}. This mode expects: {1}</system:String>
+    <system:String x:Key="snippets_plugin_folder_param_form_first">sp :f &lt;Folder&gt; &lt;Snippet&gt;</system:String>
+    <system:String x:Key="snippets_plugin_folder_param_form_last">sp &lt;Snippet&gt; :f &lt;Folder&gt;</system:String>
 
     <system:String x:Key="snippets_plugin_section_data">Data</system:String>
     <system:String x:Key="snippets_plugin_section_search">Search &amp; Display</system:String>

@@ -94,6 +94,10 @@
     <system:String x:Key="snippets_plugin_search_folder_mode_1">自动文件夹参数(:f)</system:String>
     <system:String x:Key="snippets_plugin_search_folder_mode_2">起始文件夹参数(:f)</system:String>
     <system:String x:Key="snippets_plugin_search_folder_mode_3">最后文件夹参数(:f)</system:String>
+    <system:String x:Key="snippets_plugin_folder_param_mismatch">搜索文件夹模式不匹配</system:String>
+    <system:String x:Key="snippets_plugin_folder_param_mismatch_info">当前模式: {0}，该模式应为: {1}</system:String>
+    <system:String x:Key="snippets_plugin_folder_param_form_first">sp :f &lt;文件夹&gt; &lt;片段名&gt;</system:String>
+    <system:String x:Key="snippets_plugin_folder_param_form_last">sp &lt;片段名&gt; :f &lt;文件夹&gt;</system:String>
 
     <system:String x:Key="snippets_plugin_section_data">数据管理</system:String>
     <system:String x:Key="snippets_plugin_section_search">搜索与显示</system:String>
