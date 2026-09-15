@@ -1,16 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
+using Flow.Launcher.Plugin.Snippets.Sqlite;
 
 namespace Flow.Launcher.Plugin.Snippets;
 
 public class Settings : BaseModel
 {
-    public StorageType StorageType { get; set; } = StorageType.JsonSetting;
+    /// <summary>
+    /// remove in next version
+    /// </summary>
+    [Obsolete]
+    public StorageType StorageType { get; set; } = StorageType.Sqlite;
 
     /// <summary>
-    /// Enable Folder Mode
+    /// Search Mode
     /// </summary>
-    public bool EnableFolder { get; set; } = false;
+    public KeywordMatchMode KeywordMatchMode { get; set; } = KeywordMatchMode.Sql_Like;
 
     /// <summary>
     /// copy method
@@ -30,7 +34,7 @@ public class Settings : BaseModel
     /// <summary>
     /// Auto Paste Method
     /// </summary>
-    public int AutoPasteMethod { get; set; }
+    public int AutoPasteMethod { get; set; } = 3;
 
     /// <summary>
     /// Send Ctrl + V Method
@@ -42,15 +46,31 @@ public class Settings : BaseModel
     /// </summary>
     public bool DynamicVariables { get; set; }
 
+    public bool DisplayFolder { get; set; } = true;
+    public bool DisplayFolderIcon { get; set; } = true;
+
+    /// <summary>
+    /// search folder mode
+    /// </summary>
+    public SearchFolderMode SearchFolderMode { get; set; }
+
     /// <summary>
     /// 1.x.x version snippets
     /// </summary>
-    [Obsolete]
-    public Dictionary<string, string> Snippets { get; set; }
+    // [Obsolete]
+    // public Dictionary<string, string> Snippets { get; set; }
+}
+
+public enum SearchFolderMode
+{
+    Disable = 0,
+    AutoFolder = 1,
+    FolderInFirst = 2,
+    FolderInLast = 3
 }
 
 public enum StorageType
 {
-    JsonSetting,
+    [Obsolete] JsonSetting,
     Sqlite
 }

@@ -2,7 +2,6 @@
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
-using Flow.Launcher.Plugin.Snippets.Util;
 using JetBrains.Annotations;
 
 namespace Flow.Launcher.Plugin.Snippets;
@@ -90,9 +89,9 @@ public partial class SnippetDialog : Window, INotifyPropertyChanged
         if (_selectSm != null)
         {
             TbKey.IsEnabled = false;
-            TbKey.Text = _selectSm.Key;
+            TbKey.Text = _selectSm.Name;
             TbValue.Text = _selectSm.Value;
-            TbScore.Text = $"{_selectSm.Score}";
+            TbScore.Text = $"{_selectSm.OrderNum}";
         }
         else
         {
@@ -127,23 +126,12 @@ public partial class SnippetDialog : Window, INotifyPropertyChanged
                 return false;
             }
 
-            _snippetManage.Add(new SnippetModel
-            {
-                Key = key,
-                Value = value,
-                Score = score
-            });
+            _snippetManage.Add(key, value);
         }
         else
         {
             // update
-            var sm = new SnippetModel
-            {
-                Key = _selectSm.Key,
-                Value = value,
-                Score = score
-            };
-            var result = _snippetManage.UpdateByKey(sm);
+            var result = _snippetManage.UpdateSnippetById(_selectSm.Id, value: value, orderNum: score);
 
             return result;
         }

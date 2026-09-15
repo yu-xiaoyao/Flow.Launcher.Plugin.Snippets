@@ -1,16 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Flow.Launcher.Plugin.Snippets.Json;
+using System.Windows;
 using Flow.Launcher.Plugin.Snippets.Sqlite;
+using Flow.Launcher.Plugin.Snippets.Update;
 using Flow.Launcher.Plugin.Snippets.Util;
+using JetBrains.Annotations;
 using Control = System.Windows.Controls.Control;
 
 namespace Flow.Launcher.Plugin.Snippets
 {
     public class Snippets : IPlugin, IPluginI18n, IContextMenu, ISettingProvider, IDisposable
     {
+        public const string PluginPngIconPath = "Images\\Snippets.png";
+        public const string PluginIcoPath = "Images\\Snippets.ico";
+
+        /// <summary>
+        /// Result List Icon
+        /// </summary>
         public static readonly string IconPath = "Images\\Snippet.png";
+
+        public static readonly string FolderIconPath = "Images\\Folder.png";
 
         private PluginInitContext _context;
         private Settings _settings;
@@ -21,54 +31,124 @@ namespace Flow.Launcher.Plugin.Snippets
             _context = context;
             _settings = _context.API.LoadSettingJsonStorage<Settings>();
 
+            // add VisibilityChanged Event
             _context.API.VisibilityChanged += VisibilityChangedEventHandler;
 
-            InnerLogger.SetAsFlowLauncherLogger(_context.API, LoggerLevel.TRACE);
+            InnerLogger.SetAsFlowLauncherLogger(_context, LoggerLevel.DEBUG);
 
-            if (_settings.StorageType == StorageType.Sqlite)
+            var needUpdateDb = _settings.StorageType == StorageType.Sqlite;
+
+            var pluginSettingPath = _context.CurrentPluginMetadata.PluginSettingsDirectoryPath;
+            _snippetManage = CreateSnippetManage(pluginSettingPath, needUpdateDb);
+
+            // upgrade
+            if (!needUpdateDb)
             {
-                _snippetManage =
-                    new SqliteSnippetManage(context.CurrentPluginMetadata.PluginSettingsDirectoryPath);
+                _upgradeJsonToSqlite(pluginSettingPath);
             }
-            else
-            {
-                _snippetManage = new JsonSettingSnippetManage(context);
-                _mergeOldSnippet(); // merge old snippets
-            }
+        }
+
+        private SnippetManage CreateSnippetManage(string pluginSettingPath, bool needUpdateDb)
+        {
+            // _snippetManage = new SqliteSnippetManage(pluginSettingPath, needUpdateDb);
+            var manage = new MsSqliteSnippetManage(pluginSettingPath, _flowLauncherFuzzySearch, true);
+            manage.SetKeywordMatchMode(_settings.KeywordMatchMode);
+            manage.Init(needUpdateDb);
+            return manage;
         }
 
         public List<Result> Query(Query query)
         {
-            var search = query.Search;
-
             // all data
-            if (string.IsNullOrEmpty(search))
+            if (string.IsNullOrEmpty(query.Search))
             {
-                return _snippetManage.List().Select(sm => _modelToResult(query, sm)).ToList();
+                // return _snippetManage.List().Select(sm => _modelToResult(query, sm)).ToList();
+                var allSnips = _snippetManage.ListRecent();
+                if (allSnips.Count == 0)
+                {
+                    return new List<Result>
+                    {
+                        _buildManageResult(query)
+                    };
+                }
+
+                return allSnips.Select(sm => _modelToResult(query, sm)).ToList();
             }
 
-            // fuzzy search
-            var results = _snippetManage.List(key: search).Select(sm => _modelToResult(query, sm)).ToList();
+            var mode = _settings.SearchFolderMode;
 
-            if (!results.Any() && query.SearchTerms.Length >= 2)
+            // 禁用文件夹过滤时 :f 不生效，整串当作 Snippet 名字搜索
+            if (mode == SearchFolderMode.Disable)
             {
-                _appendSnippets(query, results);
+                return _snippetManage.List(name: query.Search)
+                    .Select(sm => _modelToResult(query, sm))
+                    .ToList();
             }
+
+            var results = new List<Result>();
+            var folderQuery = FolderQuery.Parse(query.SearchTerms);
+
+            // 打了 : / :f 但还没输入 Folder 名 -> 列出候选文件夹，Tab 可直接补全
+            if (folderQuery.Kind == FolderParamKind.Incomplete)
+            {
+                _appendFolderResults(query, results, folderQuery);
+                if (folderQuery.HasSnippetKey)
+                {
+                    results.AddRange(_snippetManage.List(name: folderQuery.SnippetKey)
+                        .Select(sm => _modelToResult(query, sm, folderQuery)));
+                }
+
+                return results;
+            }
+
+            // 当前模式不支持用户写的 :f 位置 -> 明确提示，不要像以前那样静默返回空列表
+            if (!_acceptsFolderParam(folderQuery.Kind, mode))
+            {
+                results.Add(_buildFolderParamMismatchResult(folderQuery.Kind, mode));
+                return results;
+            }
+
+            // 只给了 Folder 没给 Snippet 关键字时，顺便列出候选文件夹（Tab 可补全）
+            if (folderQuery.HasFolderKey && !folderQuery.HasSnippetKey)
+            {
+                _appendFolderResults(query, results, folderQuery);
+            }
+
+            results.AddRange(_snippetManage.List(name: folderQuery.SnippetKey, folderName: folderQuery.FolderKey)
+                .Select(sm => _modelToResult(query, sm, folderQuery)));
 
             return results;
         }
 
-        private Result _modelToResult(Query query, SnippetModel sm)
+        private Result _modelToResult(Query query, SnippetModel sm, [CanBeNull] FolderQuery folderQuery = null)
         {
-            var key = sm.Key ?? string.Empty;
-            var value = sm.Value ?? string.Empty;
+            var name = sm.Name;
+            var value = sm.Value;
+
+            var title = name;
+            if (_settings.DisplayFolder && !string.IsNullOrEmpty(sm.FolderName))
+            {
+                var folder = "";
+                if (_settings.DisplayFolderIcon)
+                {
+                    folder = "📁";
+                }
+
+                title = $"{title} | {folder}{sm.FolderName}";
+            }
+
+            // 带上 :f <Folder> 上下文，Tab 补全后不会丢掉文件夹过滤
+            var autoCompleteText = folderQuery == null || folderQuery.Kind == FolderParamKind.None
+                ? $"{query.ActionKeyword} {name} "
+                : $"{query.ActionKeyword} {folderQuery.Render(name, sm.FolderName)}";
+
             return new Result
             {
-                Title = key,
+                Title = title,
                 SubTitle = value.Replace("\r\n", "  ").Replace("\n", "  "),
                 IcoPath = IconPath,
-                Score = sm.Score,
-                AutoCompleteText = $"{query.ActionKeyword} {key}",
+                AutoCompleteText = autoCompleteText,
+                CopyText = value,
                 ContextData = sm,
                 Preview = new Result.PreviewInfo
                 {
@@ -153,38 +233,25 @@ namespace Flow.Launcher.Plugin.Snippets
             }
         }
 
-        private Result _updateSnippets(Query query, string name, string value)
+        private Result _buildManageResult([CanBeNull] Query query = null)
         {
             return new Result
             {
-                Title = _context.API.GetTranslation("snippets_plugin_update"),
-                SubTitle = string.Format(_context.API.GetTranslation("snippets_plugin_update_info"), name, value),
+                Title = _context.API.GetTranslation("snippets_plugin_manage_snippets"),
                 IcoPath = IconPath,
-                Action = c =>
+                AutoCompleteText = query == null ? "" : $"{query.ActionKeyword} {query.Search}",
+                Action = _ =>
                 {
-                    _update(name, value);
-                    _context.API.ChangeQuery($"{query.ActionKeyword} {name}", true);
-                    return false;
+                    SettingWindow.Show(_context, _snippetManage);
+                    return true;
                 }
             };
         }
 
-        private void _add(string key, string value)
-        {
-            _snippetManage.Add(new SnippetModel
-            {
-                Key = key,
-                Value = value
-            });
-        }
 
-        private void _update(string key, string value)
+        private void _add(string name, string value)
         {
-            _snippetManage.UpdateByKey(new SnippetModel
-            {
-                Key = key,
-                Value = value
-            });
+            _snippetManage.Add(name, value);
         }
 
         public List<Result> LoadContextMenus(Result selectedResult)
@@ -197,11 +264,16 @@ namespace Flow.Launcher.Plugin.Snippets
                 {
                     Title = _context.API.GetTranslation("snippets_plugin_edit_snippet"),
                     SubTitle = string.Format(_context.API.GetTranslation("snippets_plugin_edit_snippet_info"),
-                        sm.Key, sm.Value.Replace("\r\n", "  ").Replace("\n", "  ")),
+                        sm.Name, sm.Value.Replace("\r\n", "  ").Replace("\n", "  ")),
                     IcoPath = IconPath,
                     Action = _ =>
                     {
-                        FormWindows.ShowWindows(_context.API, _snippetManage, sm);
+                        var w = new SnippetEditWindows(_context, _snippetManage, sm)
+                        {
+                            WindowStartupLocation = WindowStartupLocation.CenterScreen
+                        };
+                        w.ShowDialog();
+
                         return true;
                     }
                 });
@@ -209,46 +281,30 @@ namespace Flow.Launcher.Plugin.Snippets
                 {
                     Title = _context.API.GetTranslation("snippets_plugin_delete_snippet"),
                     SubTitle = string.Format(_context.API.GetTranslation("snippets_plugin_delete_snippet_info"),
-                        sm.Key, sm.Value.Replace("\r\n", "  ").Replace("\n", "  ")),
+                        sm.Name, sm.Value.Replace("\r\n", "  ").Replace("\n", "  ")),
                     IcoPath = IconPath,
                     Action = _ =>
                     {
-                        _snippetManage.RemoveByKey(sm.Key);
+                        _snippetManage.RemoveSnippetById(sm.Id);
                         return true;
                     },
                 });
 
-                // new edit
-                menus.Add(new Result
-                {
-                    Title = _context.API.GetTranslation("snippets_plugin_edit_snippet"),
-                    SubTitle = string.Format(_context.API.GetTranslation("snippets_plugin_edit_snippet_info"),
-                        sm.Key, sm.Value.Replace("\r\n", "  ").Replace("\n", "  ")),
-                    IcoPath = IconPath,
-                    Action = _ =>
-                    {
-                        SnippetDialog.ShowDialog(_context.API, _snippetManage, sm);
-                        return true;
-                    }
-                });
+                // open manage panel
+                menus.Add(_buildManageResult());
 
+                // open Add Snippet Dialog
                 menus.Add(new Result
                 {
                     Title = _context.API.GetTranslation("snippets_plugin_add"),
                     IcoPath = IconPath,
                     Action = _ =>
                     {
-                        SnippetDialog.ShowDialog(_context.API, _snippetManage);
-                        return true;
-                    },
-                });
-                menus.Add(new Result
-                {
-                    Title = _context.API.GetTranslation("snippets_plugin_manage_snippets"),
-                    IcoPath = IconPath,
-                    Action = _ =>
-                    {
-                        FormWindows.ShowWindows(_context.API, _snippetManage);
+                        var w = new SnippetEditWindows(_context, _snippetManage)
+                        {
+                            WindowStartupLocation = WindowStartupLocation.CenterScreen
+                        };
+                        w.ShowDialog();
                         return true;
                     },
                 });
@@ -270,7 +326,7 @@ namespace Flow.Launcher.Plugin.Snippets
 
         public Control CreateSettingPanel()
         {
-            return new SettingPanel(_context.API, _settings, _snippetManage);
+            return new SettingPanel(_context, _settings, _snippetManage);
         }
 
         public void Dispose()
@@ -278,43 +334,99 @@ namespace Flow.Launcher.Plugin.Snippets
             _snippetManage.Close();
         }
 
-        private List<Result> _buildEmpty(Query query)
+        /// <summary>
+        /// upgrade v2 -> v3
+        /// </summary>
+        /// <param name="pluginSettingPath"></param>
+        private void _upgradeJsonToSqlite(string pluginSettingPath)
         {
-            return new List<Result>
+            // merge to Sqlite
+            UpgradeHelper.UpgradeJsonToSqlite(_context, _snippetManage, pluginSettingPath);
+            _settings.StorageType = StorageType.Sqlite;
+            _context.API.SavePluginSettings();
+        }
+
+        /// <summary>
+        /// 自定义 Sqlite Like 函数
+        /// </summary>
+        /// <param name="pattern">like 的值</param>
+        /// <param name="value">数据库原始值</param>
+        /// <returns></returns>
+        private bool _flowLauncherFuzzySearch(string pattern, string value)
+        {
+            // 处理 NULL 值情况
+            if (pattern == null || value == null) return false;
+
+            // 参数化时 LikePattern 会把用户输入里的 % _ \ 转义，这里还原成原始关键字。
+            // 不能用 Trim('%')：像 "100\%" 这种转义序列的结尾 % 会被一起吃掉。
+            var keyword = LikePattern.ParseContains(pattern);
+
+            // 如果用户输入的是空关键字（比如 LIKE '%%'），直接返回 true
+            if (string.IsNullOrEmpty(keyword)) return true;
+
+            var match = _context.API.FuzzySearch(keyword, value);
+            return match.Success;
+        }
+
+        /// <summary>
+        /// 当前 <see cref="SearchFolderMode"/> 是否接受这种 <c>:f</c> 位置。
+        /// 被拒绝的位置不返回空列表，而是给出提示，避免用户以为「搜不到」。
+        /// </summary>
+        private static bool _acceptsFolderParam(FolderParamKind kind, SearchFolderMode mode)
+        {
+            return mode switch
             {
-                new()
-                {
-                    Title = _context.API.GetTranslation("snippets_plugin_snippets_empty"),
-                    SubTitle = _context.API.GetTranslation("snippets_plugin_snippets_empty_add"),
-                    IcoPath = IconPath,
-                    AutoCompleteText = $"{query.ActionKeyword} "
-                }
+                SearchFolderMode.FolderInFirst => kind is FolderParamKind.None or FolderParamKind.First,
+                SearchFolderMode.FolderInLast => kind is FolderParamKind.None or FolderParamKind.Last,
+                SearchFolderMode.AutoFolder =>
+                    kind is FolderParamKind.None or FolderParamKind.First or FolderParamKind.Last,
+                _ => kind == FolderParamKind.None,
             };
         }
 
-
         /// <summary>
-        /// 1.x.x version snippets merge to 2.x.x version
+        /// 追加候选文件夹。选中后会把 Folder 名按当前 <c>:f</c> 位置补进查询。
         /// </summary>
-        [Obsolete]
-        private void _mergeOldSnippet()
+        private void _appendFolderResults(Query query, List<Result> results, FolderQuery folderQuery)
         {
-            // old version snippets in Settings.json
-            var snippets = _settings.Snippets;
-            if (snippets == null || !snippets.Any()) return;
-
-            foreach (var snippet in snippets)
+            var folders = _snippetManage.ListFolders(folderQuery.HasFolderKey ? folderQuery.FolderKey : null);
+            foreach (var folderModel in folders)
             {
-                _snippetManage.Add(new SnippetModel
+                var name = folderModel.Name;
+                var completeText = $"{query.ActionKeyword} {folderQuery.RenderWithFolder(name)}";
+
+                results.Add(new Result
                 {
-                    Key = snippet.Key,
-                    Value = snippet.Value
+                    Title = name,
+                    AutoCompleteText = completeText,
+                    IcoPath = FolderIconPath,
+                    Action = _ =>
+                    {
+                        _context.API.ChangeQuery(completeText, true);
+                        return false;
+                    }
                 });
             }
+        }
 
-            // clear old snippets after merge
-            _settings.Snippets = null;
-            _context.API.SavePluginSettings();
+        /// <summary>
+        /// 用户写的 <c>:f</c> 位置和当前模式不匹配时的提示项。
+        /// </summary>
+        private Result _buildFolderParamMismatchResult(FolderParamKind kind, SearchFolderMode mode)
+        {
+            var current = _context.API.GetTranslation($"snippets_plugin_search_folder_mode_{(int)mode}");
+            var expected = _context.API.GetTranslation(kind == FolderParamKind.First
+                ? "snippets_plugin_folder_param_form_last"
+                : "snippets_plugin_folder_param_form_first");
+
+            return new Result
+            {
+                Title = _context.API.GetTranslation("snippets_plugin_folder_param_mismatch"),
+                SubTitle = string.Format(
+                    _context.API.GetTranslation("snippets_plugin_folder_param_mismatch_info"), current, expected),
+                IcoPath = FolderIconPath,
+                Action = _ => false,
+            };
         }
     }
 }

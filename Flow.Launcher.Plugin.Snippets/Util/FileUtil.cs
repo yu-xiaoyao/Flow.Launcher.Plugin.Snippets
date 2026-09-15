@@ -8,7 +8,11 @@ public class FileUtil
 {
     public static void WriteSnippets(string file, List<SnippetModel> sms)
     {
-        var json = JsonSerializer.Serialize(sms);
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true
+        };
+        var json = JsonSerializer.Serialize(sms, options);
         File.WriteAllText(file, json);
     }
 

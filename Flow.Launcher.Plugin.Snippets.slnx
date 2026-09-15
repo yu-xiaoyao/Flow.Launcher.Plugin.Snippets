@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Flow.Launcher.Plugin.Snippets/Flow.Launcher.Plugin.Snippets.csproj" />
+  <Project Path="TestCodeProject/TestCodeProject.csproj" />
+</Solution>

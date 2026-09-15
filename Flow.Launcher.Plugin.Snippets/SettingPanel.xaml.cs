@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Flow.Launcher.Plugin.Snippets.Sqlite;
 using Flow.Launcher.Plugin.Snippets.Util;
 using Microsoft.Win32;
 
@@ -12,24 +13,52 @@ namespace Flow.Launcher.Plugin.Snippets;
 
 public partial class SettingPanel : UserControl
 {
-    private IPublicAPI _publicApi;
+    private PluginInitContext _context;
     private Settings _settings;
     private SnippetManage _snippetManage;
 
-    public SettingPanel(IPublicAPI contextApi, Settings settings, SnippetManage snippetManage)
+    public SettingPanel(PluginInitContext context, Settings settings, SnippetManage snippetManage)
     {
-        _publicApi = contextApi;
+        _context = context;
         _settings = settings;
         _snippetManage = snippetManage;
         InitializeComponent();
 
-        ComboBoxStorageMode.SelectedIndex = _settings.StorageType == StorageType.Sqlite ? 1 : 0;
+        // ComboBoxStorageMode.SelectedIndex = _settings.StorageType == StorageType.Sqlite ? 1 : 0;
         CheckBoxAutoPaste.IsChecked = _settings.AutoPasteEnabled;
         CheckBoxDynamicVariables.IsChecked = _settings.DynamicVariables;
 
-        _initCopyView();
 
-        // CbAutoPasteMethod.Items
+        CbKeywordMatchMode.Items.Add(_context.API.GetTranslation("snippets_plugin_keyword_like"));
+        CbKeywordMatchMode.Items.Add(_context.API.GetTranslation("snippets_plugin_keyword_fuzzy"));
+        CbKeywordMatchMode.SelectedIndex = (int)_settings.KeywordMatchMode;
+
+        var searchFolderModes = (SearchFolderMode[])Enum.GetValues(typeof(SearchFolderMode));
+        if ((int)_settings.SearchFolderMode >= searchFolderModes.Length)
+        {
+            _settings.SearchFolderMode = 0;
+            _context.API.SavePluginSettings();
+        }
+
+        for (var i = 0; i < searchFolderModes.Length; i++)
+            CbSearchFolderMode.Items.Add(_context.API.GetTranslation($"snippets_plugin_search_folder_mode_{i}"));
+        CbSearchFolderMode.SelectedIndex = (int)_settings.SearchFolderMode;
+
+        CbDisplayFolder.IsChecked = _settings.DisplayFolder;
+        if (_settings.DisplayFolder)
+        {
+            CbDisplayFolderIcon.IsChecked = _settings.DisplayFolderIcon;
+            CbDisplayFolderIcon.IsEnabled = true;
+        }
+        else
+        {
+            // 显示文件夹 未勾选时, 显示文件夹图标 强制取消并禁用
+            CbDisplayFolderIcon.IsChecked = false;
+            CbDisplayFolderIcon.IsEnabled = false;
+            _settings.DisplayFolderIcon = false;
+        }
+
+        _initCopyView();
     }
 
     private void _initCopyView()
@@ -54,7 +83,7 @@ public partial class SettingPanel : UserControl
         {
             // reset to default
             _settings.AutoPasteMethod = 0;
-            _publicApi.SavePluginSettings();
+            _context.API.SavePluginSettings();
         }
 
         CbAutoPasteMethod.SelectedIndex = _settings.AutoPasteMethod;
@@ -65,7 +94,7 @@ public partial class SettingPanel : UserControl
         if (_settings.SendCtrlVMethod >= 2)
         {
             _settings.SendCtrlVMethod = 0;
-            _publicApi.SavePluginSettings();
+            _context.API.SavePluginSettings();
         }
 
         CbSendVMethod.SelectedIndex = _settings.SendCtrlVMethod;
@@ -73,7 +102,9 @@ public partial class SettingPanel : UserControl
 
     private void ButtonOpenManage_OnClick(object sender, RoutedEventArgs e)
     {
-        FormWindows.ShowWindows(_publicApi, _snippetManage);
+        // FormWindows.ShowWindows(_publicApi, _snippetManage);
+        SettingWindow.Show(_context, _snippetManage);
+
         /*var fw = new FormWindows(_publicApi, _snippetManage)
         {
             // Title = _publicApi.GetTranslation("snippets_plugin_manage_snippets"),
@@ -86,14 +117,21 @@ public partial class SettingPanel : UserControl
         fw.ShowDialog();*/
     }
 
-    private void ButtonResetScore_OnClick(object sender, RoutedEventArgs e)
+    private void ButtonResetSort_OnClick(object sender, RoutedEventArgs e)
     {
         _snippetManage.ResetAllScore();
     }
 
     private void ButtonClear_OnClick(object sender, RoutedEventArgs e)
     {
-        _snippetManage.Clear();
+        var result = _context.API.ShowMsgBox(_context.API.GetTranslation("snippets_plugin_clear_confirm"),
+            button: MessageBoxButton.YesNo, icon: MessageBoxImage.Question, defaultResult: MessageBoxResult.No);
+
+        if (result == MessageBoxResult.Yes)
+        {
+            _snippetManage.Clear();
+            _snippetManage.CleanFolders();
+        }
     }
 
     private void ButtonImport_OnClick(object sender, RoutedEventArgs e)
@@ -102,7 +140,7 @@ public partial class SettingPanel : UserControl
         var dialog = new OpenFileDialog
         {
             Filter = "Json file (*.json)|*.json",
-            Title = _publicApi.GetTranslation("snippets_plugin_select_json_file"),
+            Title = _context.API.GetTranslation("snippets_plugin_select_json_file"),
             Multiselect = false
         };
 
@@ -112,8 +150,8 @@ public partial class SettingPanel : UserControl
 
         if (!File.Exists(file))
         {
-            _publicApi.ShowMsgError(_publicApi.GetTranslation("snippets_plugin_error"),
-                _publicApi.GetTranslation("snippets_plugin_file_not_found"));
+            _context.API.ShowMsgError(_context.API.GetTranslation("snippets_plugin_error"),
+                _context.API.GetTranslation("snippets_plugin_file_not_found"));
             return;
         }
 
@@ -122,7 +160,7 @@ public partial class SettingPanel : UserControl
             var sms = FileUtil.ReadSnippets(file);
             foreach (var sm in sms)
             {
-                _snippetManage.Add(sm);
+                _snippetManage.Add(sm.Name, sm.Value, folderId: sm.FolderId);
             }
         });
     }
@@ -132,7 +170,7 @@ public partial class SettingPanel : UserControl
         var dialog = new SaveFileDialog
         {
             Filter = "Json file (*.json)|*.json",
-            Title = _publicApi.GetTranslation("snippets_plugin_save_json_file"),
+            Title = _context.API.GetTranslation("snippets_plugin_save_json_file"),
             FileName = "snippets.json"
         };
         if (dialog.ShowDialog() != true) return;
@@ -141,45 +179,92 @@ public partial class SettingPanel : UserControl
         Task.Run(() => FileUtil.WriteSnippets(file, list));
     }
 
-    private void ButtonChangeAndRestart_OnClick(object sender, RoutedEventArgs e)
+    private void CbKeywordMatchMode_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        var mode = ComboBoxStorageMode.SelectedIndex;
-        var storageType = mode == 0 ? StorageType.JsonSetting : StorageType.Sqlite;
-
-        if (storageType != _settings.StorageType)
+        var index = CbKeywordMatchMode.SelectedIndex;
+        if (Enum.IsDefined(typeof(KeywordMatchMode), index))
         {
-            _settings.StorageType = storageType;
-            _publicApi.SavePluginSettings();
-            _publicApi.RestartApp();
+            var keywordMatchMode = ((KeywordMatchMode[])Enum.GetValues(typeof(KeywordMatchMode)))[index];
+            _settings.KeywordMatchMode = keywordMatchMode;
+            _snippetManage.SetKeywordMatchMode(keywordMatchMode);
+            _context.API.SavePluginSettings();
         }
     }
 
+    private void CbSearchFolderMode_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var index = CbSearchFolderMode.SelectedIndex;
+        if (Enum.IsDefined(typeof(SearchFolderMode), index))
+        {
+            _settings.SearchFolderMode = ((SearchFolderMode[])Enum.GetValues(typeof(SearchFolderMode)))[index];
+            _context.API.SavePluginSettings();
+        }
+    }
+
+
+    private void DisplayFolder_Checked(object sender, RoutedEventArgs e)
+    {
+        _settings.DisplayFolder = true;
+        CbDisplayFolderIcon.IsEnabled = true;
+        _context.API.SavePluginSettings();
+    }
+
+    private void DisplayFolder_Unchecked(object sender, RoutedEventArgs e)
+    {
+        _settings.DisplayFolder = false;
+        // 显示文件夹取消勾选时, 显示文件夹图标一并取消且不可勾选
+        CbDisplayFolderIcon.IsChecked = false;
+        CbDisplayFolderIcon.IsEnabled = false;
+        _context.API.SavePluginSettings();
+    }
+
+
+    private void DisplayFolderIcon_Checked(object sender, RoutedEventArgs e)
+    {
+        _settings.DisplayFolderIcon = true;
+        _context.API.SavePluginSettings();
+    }
+
+    private void DisplayFolderIcon_Unchecked(object sender, RoutedEventArgs e)
+    {
+        _settings.DisplayFolderIcon = false;
+        _context.API.SavePluginSettings();
+    }
+
+
     private void CheckBoxAutoPaste_Checked(object sender, RoutedEventArgs e)
     {
-        _settings.AutoPasteEnabled = true;
+        AutoPasteDelayPanel.IsEnabled = true;
         AutoPasteConfigPanel.IsEnabled = true;
-        _publicApi.SavePluginSettings();
+        
+        _settings.AutoPasteEnabled = true;
+        _context.API.SavePluginSettings();
+        
+        
     }
 
     private void CheckBoxAutoPaste_Unchecked(object sender, RoutedEventArgs e)
     {
-        _settings.AutoPasteEnabled = false;
+        AutoPasteDelayPanel.IsEnabled = false;
         AutoPasteConfigPanel.IsEnabled = false;
-        _publicApi.SavePluginSettings();
+        
+        _settings.AutoPasteEnabled = false;
+        _context.API.SavePluginSettings();
     }
 
 
     private void CheckBoxDynamicVariables_Checked(object sender, RoutedEventArgs e)
     {
         _settings.DynamicVariables = true;
-        _publicApi.SavePluginSettings();
+        _context.API.SavePluginSettings();
     }
 
     private void CheckBoxDynamicVariables_Unchecked(object sender, RoutedEventArgs e)
     {
         _settings.DynamicVariables = false;
-        _publicApi.SavePluginSettings();
+        _context.API.SavePluginSettings();
     }
+
 
     private void ButtonSaveSettings_OnClick(object sender, RoutedEventArgs e)
     {
@@ -187,7 +272,7 @@ public partial class SettingPanel : UserControl
         if (int.TryParse(delayMs, out var result))
         {
             _settings.PasteDelayMs = result;
-            _publicApi.SavePluginSettings();
+            _context.API.SavePluginSettings();
         }
     }
 
@@ -212,7 +297,7 @@ public partial class SettingPanel : UserControl
         if (Enum.IsDefined(typeof(ClipboardUtils.CopyMethod), index))
         {
             _settings.CopyMethod = index;
-            _publicApi.SavePluginSettings();
+            _context.API.SavePluginSettings();
         }
     }
 
@@ -222,7 +307,7 @@ public partial class SettingPanel : UserControl
         var idx = CbAutoPasteMethod.SelectedIndex;
         if (idx >= methods.Length) return;
         _settings.AutoPasteMethod = idx;
-        _publicApi.SavePluginSettings();
+        _context.API.SavePluginSettings();
     }
 
     private void CbSendVMethod_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -230,7 +315,7 @@ public partial class SettingPanel : UserControl
         var idx = CbSendVMethod.SelectedIndex;
         if (idx >= 2) return;
         _settings.SendCtrlVMethod = idx;
-        _publicApi.SavePluginSettings();
+        _context.API.SavePluginSettings();
     }
 
     [GeneratedRegex("[^0-9]+")]

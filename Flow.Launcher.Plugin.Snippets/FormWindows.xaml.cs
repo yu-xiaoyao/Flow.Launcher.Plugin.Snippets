@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -73,7 +74,7 @@ public partial class FormWindows : Window
     private void _reload()
     {
         _loadData();
-        var findIdx = _findBySelectData(_selectSm?.Key);
+        var findIdx = _findBySelectData(_selectSm?.Name);
         if (findIdx != -1)
             DataGrid.SelectedIndex = findIdx;
     }
@@ -85,7 +86,7 @@ public partial class FormWindows : Window
         var findIdx = -1;
         for (var i = 0; i < _snippetsSource.Count; i++)
         {
-            if (!string.Equals(findKey, _snippetsSource[i].Key)) continue;
+            if (!string.Equals(findKey, _snippetsSource[i].Name)) continue;
             findIdx = i;
             break;
         }
@@ -112,7 +113,7 @@ public partial class FormWindows : Window
             }
             else
             {
-                snippets = _snippetManage.List(key: filter);
+                snippets = _snippetManage.List(name: filter);
             }
         }
 
@@ -134,7 +135,7 @@ public partial class FormWindows : Window
             if (selectedIndex == -1 || selectedIndex >= _snippetsSource.Count) return;
             var sm = _snippetsSource[selectedIndex];
             _snippetsSource.RemoveAt(selectedIndex);
-            _snippetManage.RemoveByKey(sm.Key);
+            _snippetManage.RemoveSnippetById(sm.Id);
             _selectSm = null;
             _renderSelect();
         };
@@ -239,9 +240,9 @@ public partial class FormWindows : Window
             BtnSwitch.Content = _publicAPI.GetTranslation("snippets_plugin_edit_item_key");
 
             TbKey.IsEnabled = false;
-            TbKey.Text = _selectSm.Key;
+            TbKey.Text = _selectSm.Name;
             TbValue.Text = _selectSm.Value;
-            TbScore.Text = $"{_selectSm.Score}";
+            TbScore.Text = $"{_selectSm.OrderNum}";
         }
         else
         {
@@ -290,12 +291,7 @@ public partial class FormWindows : Window
                 return;
             }
 
-            _snippetManage.Add(new SnippetModel
-            {
-                Key = key,
-                Value = value,
-                Score = score
-            });
+            _snippetManage.Add(key, value);
 
             TbKey.Text = "";
             TbValue.Text = "";
@@ -307,14 +303,14 @@ public partial class FormWindows : Window
             // update
             var sm = new SnippetModel
             {
-                Key = _selectSm.Key,
+                Name = _selectSm.Name,
                 Value = value,
-                Score = score
+                OrderNum = score
             };
-            _snippetManage.UpdateByKey(sm);
+            _snippetManage.UpdateSnippetById(_selectSm.Id, value: value);
             _loadData();
 
-            var findIdx = _findBySelectData(_selectSm?.Key);
+            var findIdx = _findBySelectData(_selectSm?.Name);
             if (findIdx != -1)
             {
                 _snippetsSource[findIdx] = sm;

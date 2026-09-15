@@ -12,6 +12,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -37,8 +38,13 @@
   
   <ItemGroup>
     <FrameworkReference Include="Microsoft.WindowsDesktop.App.WindowsForms" />
+    <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
     <PackageReference Include="Flow.Launcher.Plugin" Version="4.5.0" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
+    <!--  传统. SQLite 官方开发团队  -->
+<!--    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />-->
+    <!--  微软 现代、轻量级、原生跨平台  -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.8" />
+    
   </ItemGroup>
 
 </Project>

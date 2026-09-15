@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 
 namespace Flow.Launcher.Plugin.Snippets.Util;
 
@@ -18,10 +17,10 @@ public class InnerLogger
     public static LoggerLevel Level { get; set; } = LoggerLevel.OFF;
     public static ILogger Logger { get; set; } = new NoneLogger();
 
-    public static void SetAsFlowLauncherLogger(IPublicAPI publicApi, LoggerLevel level = LoggerLevel.ERROR)
+    public static void SetAsFlowLauncherLogger(PluginInitContext context, LoggerLevel level = LoggerLevel.ERROR)
     {
         Level = level;
-        Logger = new LoggerImpl(new FlowLauncherLogger(publicApi), Level);
+        Logger = new LoggerImpl(new FlowLauncherLogger(context), Level);
     }
 
     public static void SetAsConsoleLogger(LoggerLevel level = LoggerLevel.ERROR)
@@ -124,36 +123,36 @@ internal class ConsoleLogger : ILogger
 
 internal class FlowLauncherLogger : ILogger
 {
-    private readonly IPublicAPI _publicApi;
+    private readonly PluginInitContext _context;
 
-    public FlowLauncherLogger(IPublicAPI publicApi)
+    public FlowLauncherLogger(PluginInitContext context)
     {
-        _publicApi = publicApi;
+        _context = context;
     }
 
     public void Trace(string message)
     {
-        _publicApi.LogDebug("Snippets", "Trace - " + message);
+        _context.API.LogDebug(_context.CurrentPluginMetadata.Name, "Trace - " + message);
     }
 
     public void Debug(string message)
     {
-        _publicApi.LogDebug("Snippets", message);
+        _context.API.LogDebug(_context.CurrentPluginMetadata.Name, message);
     }
 
     public void Info(string message)
     {
-        _publicApi.LogInfo("Snippets", message);
+        _context.API.LogInfo(_context.CurrentPluginMetadata.Name, message);
     }
 
     public void Warn(string message)
     {
-        _publicApi.LogWarn("Snippets", message);
+        _context.API.LogWarn(_context.CurrentPluginMetadata.Name, message);
     }
 
     public void Error(string message, Exception ex = null)
     {
-        _publicApi.LogException("Snippets", message, ex);
+        _context.API.LogException(_context.CurrentPluginMetadata.Name, message, ex);
     }
 }
 
