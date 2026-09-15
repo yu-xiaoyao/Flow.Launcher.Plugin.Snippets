@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using Flow.Launcher.Plugin.Snippets.Model;
 using Flow.Launcher.Plugin.Snippets.Util;
+using JetBrains.Annotations;
 using Microsoft.Data.Sqlite;
 
 namespace Flow.Launcher.Plugin.Snippets.Sqlite;
 
 public class MsSqliteSnippetManage : SnippetManage
 {
-    public const string DbFileName = "snippets3.db";
+    public const string DbFileName = "snippets.db";
 
     /**
     * version match plugin version
@@ -204,7 +205,7 @@ public class MsSqliteSnippetManage : SnippetManage
 
         var transaction = connection.BeginTransaction();
         foreach (var sm in list)
-            _addSnippet(connection, sm);
+            _addSnippet(connection, sm, transaction);
         transaction.Commit();
     }
 
@@ -454,12 +455,16 @@ public class MsSqliteSnippetManage : SnippetManage
         return _addSnippet(connection, sm) > 0;
     }
 
-    private int _addSnippet(SqliteConnection connection, SnippetModel sm)
+    private int _addSnippet(SqliteConnection connection, SnippetModel sm,
+        [CanBeNull] SqliteTransaction transaction = null)
     {
         const string sql =
             $"insert into {TABLE_NAME} (id, name, value, order_num, create_time, update_time, favorites, syntax, folder_id) values (@id, @name, @value, @order_num, @create_time, @update_time, @favorites, @syntax, @folder_id)";
 
         using var command = new SqliteCommand(sql, connection);
+        if (transaction != null)
+            command.Transaction = transaction;
+        
         command.Parameters.AddWithValue("@id", sm.Id);
         command.Parameters.AddWithValue("@name", sm.Name);
         command.Parameters.AddWithValue("@value", sm.Value);
