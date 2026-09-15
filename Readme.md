@@ -22,16 +22,27 @@ A snippets plugin for the [Flow launcher](https://github.com/Flow-Launcher/Flow.
 - [v2.3.x branch]([https://github.com/yu-xiaoyao/Flow.Launcher.Plugin.Snippets/releases/tag/v2.0.4](https://github.com/yu-xiaoyao/Flow.Launcher.Plugin.Snippets/tree/v2.3.x))
 
 
-### Storage Type
-- Sqlite
+### ⚠️ Upgrade to v3.x.x
+#### 1. Upgrade to `3.x.x` Features. sqlite new table name: `snippet_3`.
+> only support SQLite storage. Remove JSON Storage
+#### 3. ⚠️ Incompatible for version: `v1.x.x`
+⚠️⚠️upgrade version: `v1.x.x -> 3.x.x`:
 
-> Note: If you want to use Sqlite, you need to change the storage type in the settings. PS: `original data will not be migrated`
+1. `️Simple Storage Version` data can not upgrade to 3.x.x version
+   and
+2. data will loss.
 
-#### Change Storage Type Migration
+#### Compatibility for version. `2.x.x`
+##### 1. v2.x.x Storage type: JSON
+1. JSON Storge Snippet auto save to Sqlite table: `snippet_3`.
+2. Setting: Storage type auto set to Sqlite
+3. JSON storage file name rename to `JsonSetting.json.v2` , Old File Path: `%APPDATA%\FlowLauncher\Settings\Plugins\Flow.Launcher.Plugin.Snippets\JsonSetting.json.v2`
 
-1. export original data
-2. change storage type
-3. import original data
+##### 2. v2.x.x Storage type: Sqlite
+1. Sqlite data auto move to new table name: `snippet_3`
+1. Sqlite db file: `%APPDATA%\FlowLauncher\Settings\Plugins\Flow.Launcher.Plugin.Snippets\snippets.db`
+2. old data table name: `snippet`, new data table name: `snippet_3`
+
 
 ## Recommended Settings
 ![](Resources/v3_recommended_settings.png)
