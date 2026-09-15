@@ -1,7 +1,7 @@
 Flow.Launcher.Plugin.Snippets
 ==================
 
-A plugin for the [Flow launcher](https://github.com/Flow-Launcher/Flow.Launcher).
+A snippets plugin for the [Flow launcher](https://github.com/Flow-Launcher/Flow.Launcher).
 
 ## Usage
 
@@ -17,22 +17,12 @@ A plugin for the [Flow launcher](https://github.com/Flow-Launcher/Flow.Launcher)
 - **Dynamic variables** for date and time (e.g., `{{date}}`, `{{time}}`, `{{timestamp}}`)
 
 ### Compatibility
+> Auto Upgrade and move data. 2.3.x -> 3.0.0
 
-> for old flow launcher 1.9.x version, download this release
+- [v2.3.x branch]([https://github.com/yu-xiaoyao/Flow.Launcher.Plugin.Snippets/releases/tag/v2.0.4](https://github.com/yu-xiaoyao/Flow.Launcher.Plugin.Snippets/tree/v2.3.x))
 
-- [Release v2.0.4](https://github.com/yu-xiaoyao/Flow.Launcher.Plugin.Snippets/releases/tag/v2.0.4)
-- [flow.launcher-1.9.x](https://github.com/yu-xiaoyao/Flow.Launcher.Plugin.Snippets/tree/flow.launcher-1.9.x)
-
-### Simple Storage Version
-
-> only support simple json storage snippets.
-
-- [1.x](https://github.com/yu-xiaoyao/Flow.Launcher.Plugin.Snippets/tree/1.x)
 
 ### Storage Type
-
-- Flow Launcher Json Setting
-  - Default
 - Sqlite
 
 > Note: If you want to use Sqlite, you need to change the storage type in the settings. PS: `original data will not be migrated`
@@ -42,6 +32,9 @@ A plugin for the [Flow launcher](https://github.com/Flow-Launcher/Flow.Launcher)
 1. export original data
 2. change storage type
 3. import original data
+
+## Recommended Settings
+![](Resources/v3_recommended_settings.png)
 
 ## Settings Explain
 

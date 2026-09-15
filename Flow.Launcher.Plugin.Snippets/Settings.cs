@@ -17,11 +17,6 @@ public class Settings : BaseModel
     public KeywordMatchMode KeywordMatchMode { get; set; } = KeywordMatchMode.Sql_Like;
 
     /// <summary>
-    /// Enable Folder Mode
-    /// </summary>
-    public bool EnableFolder { get; set; } = false;
-
-    /// <summary>
     /// copy method
     /// </summary>
     public int CopyMethod { get; set; }
