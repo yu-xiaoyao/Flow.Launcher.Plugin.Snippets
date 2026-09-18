@@ -32,6 +32,7 @@ namespace TestCodeProject
 
         // ---- 期望值简写 ----
         private const string Mismatch = "snippets_plugin_folder_param_mismatch";
+        private const string Add = "snippets_plugin_add";
         private const string DevJava = "dev-pass | Java";
         private const string DevPython = "dev-pass | Python";
         private const string DevMyFolder = "dev-pass | My Folder";
@@ -136,9 +137,12 @@ namespace TestCodeProject
             // 0. Disable —— 完全不认识 :f，就是普通的名字搜索
             // ============================================================
             Spec(SearchFolderMode.Disable, "sp dev-pass", AllDevPass);
-            Spec(SearchFolderMode.Disable, "sp :f Java", Array.Empty<string>(),
-                ":f 不生效，被当成普通关键字 ':f Java'");
-            Spec(SearchFolderMode.Disable, "sp dev-pass :f Java", Array.Empty<string>());
+            // :f 在 Disable 下不生效，被当成普通关键字。:f 本身是合法的 Snippet 名，
+            // 所以搜不到时会给「新建」候选（v3.0.1 的兜底），不再是空列表。
+            Spec(SearchFolderMode.Disable, "sp :f Java", new[] { Add },
+                ":f 不生效，整串 ':f Java' 搜不到 -> 给出新建候选 name=\":f\" / value=\"Java\"");
+            Spec(SearchFolderMode.Disable, "sp dev-pass :f Java", new[] { Add, Add },
+                "同上，3 个 token -> 2 个候选");
 
             // ============================================================
             // 1. AutoFolder

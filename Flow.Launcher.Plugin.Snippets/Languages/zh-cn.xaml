@@ -32,7 +32,7 @@
     <system:String x:Key="snippets_plugin_confirm_delete">确认删除?</system:String>
     <system:String x:Key="snippets_plugin_delete_folder">确认删除目录: {0}</system:String>
 
-    <system:String x:Key="snippets_plugin_add_info">添加 Snippet. {0} = {1}</system:String>
+    <system:String x:Key="snippets_plugin_add_info">添加 Snippet. 名称: [{0}]. 内容: [{1}]</system:String>
     <system:String x:Key="snippets_plugin_add_failed">添加 {0} 失败</system:String>
     <system:String x:Key="snippets_plugin_edit_failed">编辑 {0} 失败</system:String>
     <system:String x:Key="snippets_plugin_name_already_exists">名称已存在: {0}</system:String>

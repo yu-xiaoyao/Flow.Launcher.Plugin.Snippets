@@ -11,6 +11,7 @@ namespace TestCodeProject
             var ok = FolderQueryParserTests.Run();
             ok &= FolderSearchModeTests.Run();
             ok &= FolderParamPositionTests.Run();
+            ok &= AddSnippetSuggestionTests.Run();
             ok &= FuzzTests.Run();
             ok &= SqliteLikeTests.Run();
             ok &= RealDbIntegrationTests.Run();

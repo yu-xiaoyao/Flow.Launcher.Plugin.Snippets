@@ -22,11 +22,16 @@ namespace TestCodeProject
         /// <summary>每次 List() 调用的实参记录</summary>
         public readonly List<(string name, string folderName, long? folderId)> ListCalls = new();
 
+        /// <summary>每次 Add(name, value) 的记录 —— 用来断言「点了新建候选之后到底建了什么」</summary>
+        public readonly List<(string name, string value)> AddCalls = new();
+
         /// <summary>最后一次 List() 调用</summary>
         public (string name, string folderName, long? folderId)? LastListCall =>
             ListCalls.Count == 0 ? null : ListCalls[^1];
 
         public void ClearCallLog() => ListCalls.Clear();
+
+        public void ClearAddLog() => AddCalls.Clear();
 
         #region data setup
 
@@ -125,7 +130,10 @@ namespace TestCodeProject
         public FolderModel GetFolder(string name) => Folders.FirstOrDefault(f => f.Name == name);
 
         public bool Add(string name, string value, string syntax = null, bool? favorites = null, long? folderId = null)
-            => throw new NotSupportedException();
+        {
+            AddCalls.Add((name, value));
+            return true;
+        }
 
         public bool Add(SnippetModel sm) => throw new NotSupportedException();
 

@@ -17,6 +17,11 @@ namespace TestCodeProject
             if (targetMethod.Name == nameof(IPublicAPI.GetTranslation) && args is { Length: 1 })
                 return args[0];
 
+            // void（ChangeQuery / LogInfo ...）直接返回 null。
+            // 否则会走到 Activator.CreateInstance(typeof(void)) 抛异常。
+            if (targetMethod.ReturnType == typeof(void))
+                return null;
+
             return targetMethod.ReturnType.IsValueType
                 ? Activator.CreateInstance(targetMethod.ReturnType)
                 : null;

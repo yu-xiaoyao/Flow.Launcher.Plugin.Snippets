@@ -34,7 +34,11 @@ namespace Flow.Launcher.Plugin.Snippets
             // add VisibilityChanged Event
             _context.API.VisibilityChanged += VisibilityChangedEventHandler;
 
+#if DEBUG
             InnerLogger.SetAsFlowLauncherLogger(_context, LoggerLevel.DEBUG);
+#else
+            InnerLogger.SetAsFlowLauncherLogger(_context, LoggerLevel.INFO);
+#endif
 
             var needUpdateDb = _settings.StorageType == StorageType.Sqlite;
 
@@ -59,19 +63,23 @@ namespace Flow.Launcher.Plugin.Snippets
 
         public List<Result> Query(Query query)
         {
-            // all data
             if (string.IsNullOrEmpty(query.Search))
             {
+                // search text is empty, ListRecent 
+
                 // return _snippetManage.List().Select(sm => _modelToResult(query, sm)).ToList();
                 var allSnips = _snippetManage.ListRecent();
                 if (allSnips.Count == 0)
                 {
+                    // show open setting and add dialog
                     return new List<Result>
                     {
-                        _buildManageResult(query)
+                        _buildManageResult(query),
+                        _buildAddDialogResult(query),
                     };
                 }
 
+                // has data
                 return allSnips.Select(sm => _modelToResult(query, sm)).ToList();
             }
 
@@ -80,9 +88,10 @@ namespace Flow.Launcher.Plugin.Snippets
             // 禁用文件夹过滤时 :f 不生效，整串当作 Snippet 名字搜索
             if (mode == SearchFolderMode.Disable)
             {
-                return _snippetManage.List(name: query.Search)
+                var rs = _snippetManage.List(name: query.Search)
                     .Select(sm => _modelToResult(query, sm))
                     .ToList();
+                return _wrapperResultList(query, rs);
             }
 
             var results = new List<Result>();
@@ -105,7 +114,7 @@ namespace Flow.Launcher.Plugin.Snippets
             if (!_acceptsFolderParam(folderQuery.Kind, mode))
             {
                 results.Add(_buildFolderParamMismatchResult(folderQuery.Kind, mode));
-                return results;
+                return _wrapperResultList(query, results);
             }
 
             // 只给了 Folder 没给 Snippet 关键字时，顺便列出候选文件夹（Tab 可补全）
@@ -116,6 +125,19 @@ namespace Flow.Launcher.Plugin.Snippets
 
             results.AddRange(_snippetManage.List(name: folderQuery.SnippetKey, folderName: folderQuery.FolderKey)
                 .Select(sm => _modelToResult(query, sm, folderQuery)));
+
+            return folderQuery.Kind == FolderParamKind.None ? _wrapperResultList(query, results) : results;
+        }
+
+
+        private List<Result> _wrapperResultList(Query query, List<Result> results)
+        {
+            // InnerLogger.Logger.Debug($"Query: {query.Search}. results.count = {results.Count}");
+            if (!results.Any() && query.SearchTerms.Length >= 2)
+            {
+                // search result is empty 
+                _appendSnippets(query, results);
+            }
 
             return results;
         }
@@ -248,6 +270,25 @@ namespace Flow.Launcher.Plugin.Snippets
             };
         }
 
+        private Result _buildAddDialogResult([CanBeNull] Query query = null)
+        {
+            return new Result
+            {
+                Title = _context.API.GetTranslation("snippets_plugin_add"),
+                IcoPath = IconPath,
+                AutoCompleteText = query == null ? "" : $"{query.ActionKeyword} {query.Search}",
+                Action = _ =>
+                {
+                    var w = new SnippetEditWindows(_context, _snippetManage)
+                    {
+                        WindowStartupLocation = WindowStartupLocation.CenterScreen
+                    };
+                    w.ShowDialog();
+                    return true;
+                },
+            };
+        }
+
 
         private void _add(string name, string value)
         {
@@ -292,22 +333,8 @@ namespace Flow.Launcher.Plugin.Snippets
 
                 // open manage panel
                 menus.Add(_buildManageResult());
-
                 // open Add Snippet Dialog
-                menus.Add(new Result
-                {
-                    Title = _context.API.GetTranslation("snippets_plugin_add"),
-                    IcoPath = IconPath,
-                    Action = _ =>
-                    {
-                        var w = new SnippetEditWindows(_context, _snippetManage)
-                        {
-                            WindowStartupLocation = WindowStartupLocation.CenterScreen
-                        };
-                        w.ShowDialog();
-                        return true;
-                    },
-                });
+                menus.Add(_buildAddDialogResult());
             }
 
             return menus;
